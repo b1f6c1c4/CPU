@@ -24,46 +24,47 @@ namespace Assembler
 
         public sealed partial class ObjContext
         {
-            public int Serialize(IDictionary<string, int> symbols)
+            public int Serialize(IInstruction inst, Func<IInstruction, string, int> symbols)
             {
                 if (number() != null)
                     return number();
                 if (Name() != null)
-                    return symbols[Name().Symbol.Text];
+                    return symbols(inst, Name().Symbol.Text);
                 throw new InvalidOperationException();
             }
         }
 
         public sealed partial class InstructionContext : IInstruction
         {
-            public int Length => 2;
+            public int Length => GetInst().Length;
 
-            public List<byte> Serialize(IDictionary<string, int> symbols)
+            public List<int> Serialize(Func<IInstruction, string, int> symbols) => GetInst().Serialize(symbols);
+
+            private IInstruction GetInst()
             {
                 if (typeI() != null)
-                    return typeI().Serialize(symbols);
+                    return typeI();
                 if (typeR() != null)
-                    return typeR().Serialize(symbols);
+                    return typeR();
                 if (typeJ() != null)
-                    return typeJ().Serialize(symbols);
+                    return typeJ();
                 throw new InvalidOperationException();
             }
         }
 
         public sealed partial class TypeRContext : IInstruction
         {
-            public int Length => 2;
+            public int Length => 1;
 
-            public List<byte> Serialize(IDictionary<string, int> symbols)
+            public List<int> Serialize(Func<IInstruction, string, int> symbols)
             {
                 var op = GetOpcode(TypeR().Symbol.Text);
                 var rd = RegisterNumber(Rd);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
-                return new List<byte>
+                return new List<int>
                            {
-                               (byte)((op << 4) | (rs << 2) | rt),
-                               (byte)(rd << 6)
+                               (op << 12) | (rs << 10) | (rt << 8) | (rd << 6)
                            };
             }
 
@@ -93,9 +94,9 @@ namespace Assembler
 
         public sealed partial class TypeIContext : IInstruction
         {
-            public int Length => 2;
+            public int Length => 1;
 
-            public List<byte> Serialize(IDictionary<string, int> symbols)
+            public List<int> Serialize(Func<IInstruction, string, int> symbols)
             {
                 var op = GetOpcode((TypeI() ?? TypeIJ()).Symbol.Text);
                 var rs = RegisterNumber(Rs);
@@ -104,13 +105,12 @@ namespace Assembler
                 if (TypeI() != null)
                     imm = number();
                 else if (TypeIJ() != null)
-                    imm = obj().Serialize(symbols);
+                    imm = obj().Serialize(this, symbols);
                 else
                     throw new InvalidOperationException();
-                return new List<byte>
+                return new List<int>
                            {
-                               (byte)((op << 4) | (rs << 2) | rt),
-                               (byte)(imm)
+                               (op << 12) | (rs << 10) | (rt << 8) | imm
                            };
             }
 
@@ -140,16 +140,15 @@ namespace Assembler
 
         public sealed partial class TypeJContext : IInstruction
         {
-            public int Length => 2;
+            public int Length => 1;
 
-            public List<byte> Serialize(IDictionary<string, int> symbols)
+            public List<int> Serialize(Func<IInstruction, string, int> symbols)
             {
                 var op = GetOpcode(TypeJ().Symbol.Text);
-                var imm = obj().Serialize(symbols);
-                return new List<byte>
+                var imm = obj().Serialize(this, symbols);
+                return new List<int>
                            {
-                               (byte)(op << 4),
-                               (byte)(imm)
+                               (op << 12) | imm
                            };
             }
 
@@ -157,20 +156,8 @@ namespace Assembler
             {
                 switch (text)
                 {
-                    case "AND":
-                        return 0x0;
-                    case "OR":
-                        return 0x1;
-                    case "ADD":
-                        return 0x2;
-                    case "SUB":
-                        return 0x3;
-                    case "ADDC":
-                        return 0x6;
-                    case "SUBC":
-                        return 0x5;
-                    case "SLT":
-                        return 0x4;
+                    case "JMP":
+                        return 0x7;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(text));
                 }

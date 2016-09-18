@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Assembler
 {
-    internal interface IInstruction
+    public interface IInstruction
     {
         int Length { get; }
 
-        List<byte> Serialize(IDictionary<string, int> symbols);
+        List<int> Serialize(Func<IInstruction, string, int> symbols);
     }
 }

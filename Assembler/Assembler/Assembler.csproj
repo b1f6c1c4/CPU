@@ -51,9 +51,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsmParser.cs" />
+    <Compile Include="AsmSerializer.cs" />
     <Compile Include="IInstruction.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextAssembler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
