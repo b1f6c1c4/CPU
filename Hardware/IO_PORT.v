@@ -4,7 +4,7 @@ module IO_PORT(
    input RE,
    input WE,
    input [7:0] Din,
-   output [7:0] Dout,
+   output reg [7:0] Dout,
    output io_read,
    output io_write,
    inout [7:0] IO0,
@@ -16,5 +16,35 @@ module IO_PORT(
    inout [7:0] IO6,
    inout [7:0] IO7
 );
+
+   assign io_read = (addr <= 8'h7) && RE;
+   assign io_write = (addr <= 8'h7) && WE;
+
+   wire [7:0] write_ena;
+
+   always @(*)
+      if (RE)
+         case (addr)
+            8'h0: Dout <= IO0;
+            8'h1: Dout <= IO1;
+            8'h2: Dout <= IO2;
+            8'h3: Dout <= IO3;
+            8'h4: Dout <= IO4;
+            8'h5: Dout <= IO5;
+            8'h6: Dout <= IO6;
+            8'h7: Dout <= IO7;
+            default: Dout <= 8'bx;
+         endcase
+      else
+         Dout <= 8'bx;
+
+   assign IO0 = (addr == 8'h0) && WE ? Din : 8'bz;
+   assign IO1 = (addr == 8'h1) && WE ? Din : 8'bz;
+   assign IO2 = (addr == 8'h2) && WE ? Din : 8'bz;
+   assign IO3 = (addr == 8'h3) && WE ? Din : 8'bz;
+   assign IO4 = (addr == 8'h4) && WE ? Din : 8'bz;
+   assign IO5 = (addr == 8'h5) && WE ? Din : 8'bz;
+   assign IO6 = (addr == 8'h6) && WE ? Din : 8'bz;
+   assign IO7 = (addr == 8'h7) && WE ? Din : 8'bz;
 
 endmodule
