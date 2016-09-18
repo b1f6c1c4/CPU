@@ -6,13 +6,29 @@ namespace Assembler
     {
         private static void Main(string[] args)
         {
-            TextAssembler asm;
-            if (args.Length >= 1 &&
-                args[0] == "-h")
-                asm = new HexAssembler(Console.Out);
-            else
-                asm = new BinAssembler(Console.Out);
-            asm.Feed(Console.In);
+            try
+            {
+                TextAssembler asm;
+                if (args.Length < 1)
+                    asm = new HexAssembler(Console.Out);
+                else
+                    switch (args[0])
+                    {
+                        case "-b":
+                            asm = new BinAssembler(Console.Out);
+                            break;
+                        case "-l":
+                            asm = new BinAssembler(Console.Out, d: "");
+                            break;
+                        default:
+                            throw new ArgumentException();
+                    }
+                asm.Feed(Console.In);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+            }
         }
     }
 }
