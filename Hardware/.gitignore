@@ -1,0 +1,7 @@
+*
+
+!.gitignore
+!*.qpf
+!*.qsf
+!*.v
+!*.md
