@@ -23,20 +23,17 @@ module IO_PORT(
    wire [7:0] write_ena;
 
    always @(*)
-      if (RE)
-         case (addr)
-            8'h0: Dout <= IO0;
-            8'h1: Dout <= IO1;
-            8'h2: Dout <= IO2;
-            8'h3: Dout <= IO3;
-            8'h4: Dout <= IO4;
-            8'h5: Dout <= IO5;
-            8'h6: Dout <= IO6;
-            8'h7: Dout <= IO7;
-            default: Dout <= 8'bx;
-         endcase
-      else
-         Dout <= 8'bx;
+      case (addr)
+         8'h0: Dout <= IO0;
+         8'h1: Dout <= IO1;
+         8'h2: Dout <= IO2;
+         8'h3: Dout <= IO3;
+         8'h4: Dout <= IO4;
+         8'h5: Dout <= IO5;
+         8'h6: Dout <= IO6;
+         8'h7: Dout <= IO7;
+         default: Dout <= 8'bx;
+      endcase
 
    assign IO0 = (addr == 8'h0) && WE ? Din : 8'bz;
    assign IO1 = (addr == 8'h1) && WE ? Din : 8'bz;
