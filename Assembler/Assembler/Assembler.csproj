@@ -52,6 +52,8 @@
   <ItemGroup>
     <Compile Include="AsmParser.cs" />
     <Compile Include="AsmSerializer.cs" />
+    <Compile Include="BinAssembler.cs" />
+    <Compile Include="HexAssembler.cs" />
     <Compile Include="IInstruction.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,7 +6,12 @@ namespace Assembler
     {
         private static void Main(string[] args)
         {
-            var asm = new TextAssembler(Console.Out);
+            TextAssembler asm;
+            if (args.Length >= 1 &&
+                args[0] == "-h")
+                asm = new HexAssembler(Console.Out);
+            else
+                asm = new BinAssembler(Console.Out);
             asm.Feed(Console.In);
         }
     }

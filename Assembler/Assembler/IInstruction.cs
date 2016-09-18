@@ -7,6 +7,6 @@ namespace Assembler
     {
         int Length { get; }
 
-        List<int> Serialize(Func<IInstruction, string, int> symbols);
+        List<int> Serialize(Func<IInstruction, string, bool, int> symbols);
     }
 }

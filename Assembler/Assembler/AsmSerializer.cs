@@ -11,9 +11,9 @@ namespace Assembler
 
         private readonly Dictionary<string, int> m_Symbols;
 
-        protected AsmSerializer()
+        protected AsmSerializer(int initial = 0)
         {
-            m_Position = 0;
+            m_Position = initial;
             m_Symbols = new Dictionary<string, int>();
         }
 
@@ -23,8 +23,15 @@ namespace Assembler
             var parser = new AsmParser(new CommonTokenStream(lexer));
             var prog = parser.prog();
 
+            var ini = m_Position;
+
             foreach (var context in prog.line())
                 Parse(context);
+
+            m_Position = ini;
+
+            foreach (var context in prog.line())
+                Serialize(context);
         }
 
         private void Parse(AsmParser.LineContext context)
@@ -38,6 +45,12 @@ namespace Assembler
             }
 
             if (context.instruction() != null)
+                m_Position += context.instruction().Length;
+        }
+
+        private void Serialize(AsmParser.LineContext context)
+        {
+            if (context.instruction() != null)
             {
                 var res = context.instruction().Serialize(GetSymbol);
                 Put(res);
@@ -47,12 +60,14 @@ namespace Assembler
 
         protected abstract void Put(List<int> res);
 
-        private int GetSymbol(IInstruction inst, string symbol)
+        private int GetSymbol(IInstruction inst, string symbol, bool absolute)
         {
             int pos;
             if (!m_Symbols.TryGetValue(symbol, out pos))
                 throw new KeyNotFoundException($"Symbol {symbol} not found.");
 
+            if (absolute)
+                return pos;
             return pos - (m_Position + inst.Length);
         }
     }

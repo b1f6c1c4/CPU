@@ -3,22 +3,23 @@ using System.IO;
 
 namespace Assembler
 {
-    public class TextAssembler : AsmSerializer
+    public abstract class TextAssembler : AsmSerializer
     {
-        private readonly TextWriter m_Writer;
-        private readonly int m_Width;
+        protected readonly TextWriter Writer;
+        protected readonly int Width;
 
-        public TextAssembler(TextWriter writer, int width = 16)
+        protected TextAssembler(TextWriter writer, int width = 16)
         {
-            m_Writer = writer;
-            m_Width = width;
+            Writer = writer;
+            Width = width;
         }
 
         protected override void Put(List<int> res)
         {
-            var fmt = "{0:X" + (m_Width / 4) + "}";
             foreach (var v in res)
-                m_Writer.WriteLine(fmt, v);
+                PutValue(v & ((1 << Width) - 1));
         }
+
+        protected abstract void PutValue(int v);
     }
 }

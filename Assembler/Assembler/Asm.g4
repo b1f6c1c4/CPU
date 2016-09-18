@@ -30,7 +30,7 @@ typeR
 
 typeI
     : TypeI Rt=Register ',' Rs=Register ',' number
-    | TypeIJ Rt=Register ',' Rs=Register ',' obj
+    | TypeIJ Rs=Register ',' Rt=Register ',' obj
     ;
 
 typeJ
@@ -87,7 +87,7 @@ Register
     ;
 
 Name
-    : [a-zA-Z] [a-zA-Z0-9."]*
+    : [a-zA-Z] [a-zA-Z0-9\-_]*
     ;
 
 Comment
