@@ -1,0 +1,17 @@
+init:
+    ANDI R0, R0, 0
+    ADDI R0, R0, 0x0b
+    ANDI R3, R3, 0
+    LW R2, R3, 6
+    BEQ R2, R0, is_minus
+    JMP init
+is_minus:
+    ANDI R3, R3, 0
+    LW R0, R3, 2
+    LW R1, R3, 4
+    SUB R2, R0, R1
+    ANDI R3, R3, 0
+    SW R2, R3, 0
+    ANDI R3, R3, 0
+    SW R2, R3, 1
+    JMP init
