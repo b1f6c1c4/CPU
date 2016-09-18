@@ -16,7 +16,9 @@ module alu(
    always @(*)
       case (CS)
          AC_AD: {carry_out,S} <= data_a + data_b + carry_in;
-         AC_SB: {carry_out,S} <= data_a - data_b - carry_in;
+         AC_SB: {carry_out,S} <= data_a - data_b - ~carry_in;
+         AC_ADX: {carry_out,S} <= data_a + data_b;
+         AC_SBX: {carry_out,S} <= data_a - data_b;
          AC_AN: begin S <= data_a & data_b; carry_out <= 1'b0; end
          AC_OR: begin S <= data_a | data_b; carry_out <= 1'b0; end
          AC_LS: begin S <= data_a < data_b; carry_out <= 1'b0; end
