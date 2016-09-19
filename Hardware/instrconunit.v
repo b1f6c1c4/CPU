@@ -4,9 +4,10 @@ module instrconunit(
    input Reset,
    input BRANCH,
    input JUMP,
-   input [7:0] imm,
-   output reg [7:0] PC
+   input [PC_N-1:0] imm,
+   output reg [PC_N-1:0] PC
 );
+`include "CPU_INTERNAL.v"
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
@@ -14,8 +15,8 @@ module instrconunit(
       else if (JUMP)
          PC <= imm;
       else if (BRANCH)
-         PC <= PC + imm + 8'b1;
+         PC <= PC + imm + 1'b1;
       else
-         PC <= PC + 8'b1;
+         PC <= PC + 1'b1;
 
 endmodule

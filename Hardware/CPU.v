@@ -5,6 +5,8 @@ module CPU(
    inout [7:0] io_0, io_1, io_2, io_3,
    inout [7:0] io_4, io_5, io_6, io_7
    );
+`include "CPU_INTERNAL.v"
+
    // links
    wire re_WE;
    wire [1:0] re_N1, re_N2, re_ND;
@@ -16,7 +18,7 @@ module CPU(
    wire ra_WR;
    wire [7:0] ra_addr, ra_data, ra_q;
 
-   wire [7:0] ro_addr;
+   wire [PC_N-1:0] ro_addr;
    wire [15:0] ro_q;
 
    wire cu_jump, cu_branch, cu_alusrcb, cu_writemem;
@@ -24,7 +26,8 @@ module CPU(
    wire [2:0] cu_aluc;
    wire [3:0] cu_op;
 
-   wire [7:0] pc_imm, pc_pc;
+   reg signed [PC_N-1:0] pc_imm;
+   wire [PC_N-1:0] pc_pc;
 
    wire al_zero, al_Cin, al_Cout;
    wire [7:0] al_A, al_B, al_S;
@@ -33,6 +36,7 @@ module CPU(
 
    // data path
    wire [7:0] virtual_mem_q = io_read ? io_Dout : ra_q;
+   wire signed [7:0] short_imm = ro_q[7:0];
 
    assign cu_op = ro_q[15:12]; // Op
 
@@ -53,7 +57,11 @@ module CPU(
 
    assign ro_addr = pc_pc;
 
-   assign pc_imm = ro_q[7:0]; // Imm
+   always @(*)
+      if (cu_jump) // JMP is long jump
+         pc_imm <= ro_q[PC_N-1:0]; // long Imm
+      else
+         pc_imm <= short_imm; // signed extension of short Imm
 
    assign al_A = re_Q1;
    assign al_B = cu_alusrcb ? ro_q[7:0] : re_Q2;
@@ -89,7 +97,8 @@ module CPU(
       .JUMP(cu_jump), .BRANCH(cu_branch),
       .ALUC(cu_aluc), .WRITEMEM(cu_writemem),
       .WRITEREG(cu_writereg), .MEMTOREG(cu_memtoreg),
-      .REGDES(cu_regdes), .WRFLAG(cu_wrflag));
+      .REGDES(cu_regdes), .WRFLAG(cu_wrflag),
+      .ALUSRCB(cu_alusrcb));
 
    instrconunit pc(
       .Clock(Clock), .Reset(Reset),

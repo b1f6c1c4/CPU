@@ -97,6 +97,9 @@ namespace Assembler
                     imm = obj().Serialize(this, symbols, false);
                 else
                     throw new InvalidOperationException();
+                if (imm > 0x7f ||
+                    imm < -0x80)
+                    throw new ApplicationException("BEQ/BNE jump too long; use JMP");
                 return new List<int>
                            {
                                (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff)
@@ -137,7 +140,7 @@ namespace Assembler
                 var imm = obj().Serialize(this, symbols, true);
                 return new List<int>
                            {
-                               (op << 12) | (imm & 0xff)
+                               (op << 12) | (imm & 0xfff)
                            };
             }
 

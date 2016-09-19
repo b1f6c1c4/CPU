@@ -1,3 +1,5 @@
+localparam PC_N    = 12;
+
 localparam OP_AND  = 4'h0;
 localparam OP_OR   = 4'h1;
 localparam OP_ADD  = 4'h2;
