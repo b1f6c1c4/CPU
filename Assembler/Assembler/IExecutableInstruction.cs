@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Assembler
+﻿namespace Assembler
 {
     public class Context
     {

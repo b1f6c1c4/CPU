@@ -7,22 +7,22 @@ namespace Assembler
 {
     public class AsmExecuter
     {
-        private List<IExecutableInstruction> m_Instructions;
+        private readonly List<IExecutableInstruction> m_Instructions;
 
         private readonly Dictionary<string, int> m_Symbols;
 
-        private Context CPU { get; set; }
+        public Context CPU { get; set; }
 
-        protected AsmExecuter()
+        public AsmExecuter()
         {
             m_Instructions = new List<IExecutableInstruction>();
             m_Symbols = new Dictionary<string, int>();
 
             CPU = new Context
-                        {
-                            Registers = new byte[4],
-                            Ram = new byte[256]
-                        };
+                      {
+                          Registers = new byte[4],
+                          Ram = new byte[256]
+                      };
         }
 
         public void Feed(TextReader reader)

@@ -28,49 +28,45 @@ namespace Assembler
                 {
                     case "AND":
                         context.Registers[RegisterNumber(Rd)] =
-                            (byte)(context.Registers[RegisterNumber(Rt)] &
-                                   context.Registers[RegisterNumber(Rs)]);
+                            (byte)(context.Registers[RegisterNumber(Rs)] &
+                                   context.Registers[RegisterNumber(Rt)]);
                         return null;
                     case "OR":
                         context.Registers[RegisterNumber(Rd)] =
-                            (byte)(context.Registers[RegisterNumber(Rt)] |
-                                   context.Registers[RegisterNumber(Rs)]);
+                            (byte)(context.Registers[RegisterNumber(Rs)] |
+                                   context.Registers[RegisterNumber(Rt)]);
                         return null;
                     case "ADD":
                         {
-                            var s = context.Registers[RegisterNumber(Rt)] +
-                                    context.Registers[RegisterNumber(Rs)];
-                            if ((s & ~0xff) != 0)
-                                context.CFlag = true;
+                            var s = context.Registers[RegisterNumber(Rs)] +
+                                    context.Registers[RegisterNumber(Rt)];
+                            context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
                             return null;
                         }
                     case "SUB":
                         {
-                            var s = context.Registers[RegisterNumber(Rt)] -
-                                    context.Registers[RegisterNumber(Rs)];
-                            if ((s & ~0xff) != 0)
-                                context.CFlag = true;
+                            var s = context.Registers[RegisterNumber(Rs)] -
+                                    context.Registers[RegisterNumber(Rt)];
+                            context.CFlag = (s & ~0xff) == 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
                             return null;
                         }
                     case "ADDC":
                         {
-                            var s = context.Registers[RegisterNumber(Rt)] +
-                                    context.Registers[RegisterNumber(Rs)] +
+                            var s = context.Registers[RegisterNumber(Rs)] +
+                                    context.Registers[RegisterNumber(Rt)] +
                                     (context.CFlag ? 1 : 0);
-                            if ((s & ~0xff) != 0)
-                                context.CFlag = true;
+                            context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
                             return null;
                         }
                     case "SUBC":
                         {
-                            var s = context.Registers[RegisterNumber(Rt)] -
-                                    context.Registers[RegisterNumber(Rs)] -
-                                    (context.CFlag ? 1 : 0);
-                            if ((s & ~0xff) != 0)
-                                context.CFlag = true;
+                            var s = context.Registers[RegisterNumber(Rs)] -
+                                    context.Registers[RegisterNumber(Rt)] -
+                                    (context.CFlag ? 0 : 1);
+                            context.CFlag = (s & ~0xff) == 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
                             return null;
                         }
@@ -105,10 +101,9 @@ namespace Assembler
                         return null;
                     case "ADDI":
                         {
-                            var s = context.Registers[RegisterNumber(Rt)] +
+                            var s = context.Registers[RegisterNumber(Rs)] +
                                     number();
-                            if ((s & ~0xff) != 0)
-                                context.CFlag = true;
+                            context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rt)] = (byte)s;
                             return null;
                         }
@@ -121,7 +116,7 @@ namespace Assembler
                     case "SW":
                         {
                             var addr = (context.Registers[RegisterNumber(Rs)] + number()) & 0xff;
-                            context.Registers[RegisterNumber(Rt)] = context.Ram[addr];
+                            context.Ram[addr] = context.Registers[RegisterNumber(Rt)];
                             return null;
                         }
                     case "BEQ":

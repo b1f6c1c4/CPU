@@ -26,10 +26,10 @@ and:
     SW   R3, R2, 0x25   ; MEM[0x25] = R3
 or:
     ANDI R2, R2, 0x00   ;
-    ORI R3, R0, 0xC3    ; R3 = R0 | 0xC2
-    SW   R3, R2, 0x24   ; MEM[0x24] = R3
+    ORI R3, R0, 0xC2    ; R3 = R0 | 0xC2
+    SW   R3, R2, 0x26   ; MEM[0x26] = R3
     ORI R3, R1, 0x00    ; R3 = R1 | 0x00
-    SW   R3, R2, 0x25   ; MEM[0x25] = R3
+    SW   R3, R2, 0x27   ; MEM[0x27] = R3
 lt:
     ANDI R2, R2, 0x00   ;
     ANDI R3, R3, 0x00   ;
@@ -43,12 +43,12 @@ lt:
     SLT  R3, R3, R0     ; R3 = (0xC2 < R0)
     BEQ  R3, R2, lt_ge  ; if (!(R3)) goto lt_ge
 lt_lt:
-    SW   R2, R2, 0x27   ; MEM[0x27] = 0
+    SW   R2, R2, 0x29   ; MEM[0x29] = 0
     ADDI R3, R2, 0x01   ;
-    SW   R3, R2, 0x26   ; MEM[0x26] = 1
+    SW   R3, R2, 0x28   ; MEM[0x28] = 1
     JMP  done           ; goto done
 lt_ge:
-    SW   R2, R2, 0x27   ; MEM[0x27] = 0
-    SW   R2, R2, 0x26   ; MEM[0x26] = 0
+    SW   R2, R2, 0x29   ; MEM[0x29] = 0
+    SW   R2, R2, 0x28   ; MEM[0x28] = 0
 done:
     ANDI R2, R2, 0x00   ; NOP
