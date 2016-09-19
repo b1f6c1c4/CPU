@@ -1,0 +1,91 @@
+    ANDI R0, R0, 0x00   ;
+    ADDI R0, R0, 0x58   ; R0 = 0x58
+    ANDI R1, R1, 0x00   ;
+    ADDI R1, R1, 0x01   ; R1 = 0x01
+add:
+    ANDI R3, R3, 0x00   ;
+    ADDI R2, R0, 0xC2   ; R2 + c = R0 + 0xC2
+    SW   R2, R3, 0x20   ; MEM[0x20] = R2
+    ANDI R2, R2, 0x00   ;
+    ADDC R3, R1, R3     ; R3 = R1 + c
+    SW   R3, R2, 0x21   ; MEM[0x21] = R3
+minus:
+    ANDI R2, R2, 0x00   ;
+    ADDI R2, R2, 0xC2   ; R2 = 0xC2
+    ANDI R3, R3, 0x00   ;
+    SUB  R2, R2, R0     ; R2 + c -= R0
+    SW   R2, R3, 0x22   ; MEM[0x22] = R2
+    ANDI R2, R2, 0x00   ;
+    SUBC R3, R3, R1     ; R3 -= R1 + c
+    SW   R3, R2, 0x23   ; MEM[0x23] = R3
+prepare:
+    ANDI R1, R1, 0x00   ;
+disp_add:
+    ; IO0[datainL] = MEM[0x20]
+    LW   R0, R1, 0x20   ;
+    SW   R0, R1, 0x00   ;
+    ; IO1[datainH] = MEM[0x21]
+    LW   R0, R1, 0x21   ;
+    SW   R0, R1, 0x01   ;
+    ADDI R2, R1, 0x00   ; R2 = 0
+    JMP  delay          ; call delay
+disp_add_ret:
+    JMP  disp_minus     ;
+disp_minus:
+    ; IO0[datainL] = MEM[0x22]
+    LW   R0, R1, 0x22   ;
+    SW   R0, R1, 0x00   ;
+    ; IO1[datainH] = MEM[0x23]
+    LW   R0, R1, 0x23   ;
+    SW   R0, R1, 0x01   ;
+    ADDI R2, R1, 0x01   ; R2 = 1
+    JMP  delay          ; call delay
+disp_minus_ret:
+    JMP  disp_add       ;
+delay:                  ; R2 is preserved
+    ; loop 694444 times to get 0.5s delay
+    ANDI R1, R1, 0x00   ;
+    ADDI R3, R1, 0xac   ;
+    SW   R3, R1, 0xa0   ;
+    ADDI R3, R1, 0x98   ;
+    SW   R3, R1, 0xa1   ;
+    ADDI R3, R1, 0x0a   ;
+    SW   R3, R1, 0xa2   ;
+    SW   R1, R1, 0xa3   ;
+    ; SOFT DELAY
+    ; Delays are in MEM[0xa3] .. MEM[0xa0] = n
+    ; Use MEM[0xa7] .. MEM[0xa4] as the loop variable i
+    ANDI R1, R1, 0x00   ;
+    ; i = n
+    LW   R0, R1, 0xa0   ;
+    SW   R0, R1, 0xa4   ;
+    LW   R0, R1, 0xa1   ;
+    SW   R0, R1, 0xa5   ;
+    LW   R0, R1, 0xa2   ;
+    SW   R0, R1, 0xa6   ;
+    LW   R0, R1, 0xa3   ;
+    SW   R0, R1, 0xa7   ;
+loop:                   ; 18 insts per loop
+    ; R3 = |(--i)
+    ANDI R3, R3, 0x00   ; R3 = 0
+    LW   R0, R1, 0xa4   ;
+    ADDI R0, R0, 0xff   ; R0--
+    OR   R3, R3, R0     ; R3 |= R0
+    SW   R0, R1, 0xa4   ;
+    LW   R0, R1, 0xa5   ;
+    SUBC R0, R0, R1     ; R0 -= c
+    OR   R3, R3, R0     ; R3 |= R0
+    SW   R0, R1, 0xa5   ;
+    LW   R0, R1, 0xa6   ;
+    SUBC R0, R0, R1     ; R0 -= c
+    OR   R3, R3, R0     ; R3 |= R0
+    SW   R0, R1, 0xa6   ;
+    LW   R0, R1, 0xa7   ;
+    SUBC R0, R0, R1     ; R0 -= c
+    OR   R3, R3, R0     ; R3 |= R0
+    SW   R0, R1, 0xa7   ;
+    ; if (R3) goto loop
+    BNE  R3, R1, loop   ;
+ret:
+    BEQ  R2, R1, disp_add_ret ;
+    JMP  disp_minus_ret ;
