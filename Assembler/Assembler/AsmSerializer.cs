@@ -32,6 +32,8 @@ namespace Assembler
 
             foreach (var context in prog.line())
                 Serialize(context);
+
+            PutFinal();
         }
 
         private void Parse(AsmParser.LineContext context)
@@ -59,6 +61,8 @@ namespace Assembler
         }
 
         protected abstract void Put(List<int> res);
+
+        protected virtual void PutFinal() { }
 
         private int GetSymbol(IInstruction inst, string symbol, bool absolute)
         {

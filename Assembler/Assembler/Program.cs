@@ -124,7 +124,7 @@ namespace Assembler
             else if (isConsole)
                 asm = new BinAssembler(sout);
             else
-                asm = new BinAssembler(sout, d: "");
+                asm = new IntelAssembler(sout);
             asm.Feed(sin);
         }
     }

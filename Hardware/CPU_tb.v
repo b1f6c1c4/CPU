@@ -12,9 +12,9 @@ module CPU_tb;
    wire [7:0] R1;
    wire [7:0] R2;
    wire [7:0] R3;
-   wire [2:0] cu_aluop;
+   wire [2:0] cu_aluc;
 
-   CPU mdl(Clock, Reset, io_0, io_1, io_2, io_3, io_4, io_5, io_6, io_7, pc_pc, fl_out, R0, R1, R2, R3, cu_aluop);
+   CPU mdl(.Clock(Clock), .Reset(Reset), .io_0(io_0), .io_1(io_1), .io_2(io_2), .io_3(io_3), .io_4(io_4), .io_5(io_5), .io_6(io_6), .io_7(io_7), .pc_pc(pc_pc), .fl_out(fl_out), .R0(R0), .R1(R1), .R2(R2), .R3(R3), .cu_aluc(cu_aluc));
 
    initial
       begin
