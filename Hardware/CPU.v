@@ -106,12 +106,12 @@ module CPU(
       .IO4(io_4), .IO5(io_5), .IO6(io_6), .IO7(io_7));
 
    lpm_ram_256_8 ra(
-      .Clock(Clock),
+      .clock(Clock),
       .address(ra_addr), .data(ra_data),
       .wren(ra_WR), .q(ra_q));
 
    lpm_rom_256_16 ro(
-      .Clock(Clock),
+      .clock(Clock),
       .address(ro_addr), .q(ro_q));
 
    ctrlunit cu(
