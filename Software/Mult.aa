@@ -1,0 +1,43 @@
+mult:
+    ; put numbers in R0, R1
+    ; results are {R0,R1}
+    ;
+    ; MEM[0x84] is mr
+    ; R2 is bit mask
+    ; {MEM[0x81],MEM[0x80]} is mp
+    ; {MEM[0x83],MEM[0x82]} is sum
+    ANDI R2, R2, 0x00   ;
+    SW   R0, R2, 0x84   ; mr = R0
+    SW   R2, R2, 0x81   ;
+    SW   R1, R2, 0x80   ; mp = R1
+    ADDI R2, R2, 0x01   ; R2 = 0x01
+    ANDI R1, R1, 0x00   ;
+loop:
+    LW   R0, R2, 0x84   ;
+    AND  R3, R2, R0     ;
+    BNE  R1, R3, added  ; if (!(R2 & mr)) goto added
+    ; sum += mp
+    LW   R0, R1, 0x80   ; R0 = mp_L
+    LW   R3, R1, 0x82   ; R3 = sum_L
+    ADD  R3, R3, R0     ; R3 + c += R0
+    SW   R3, R1, 0x82   ; sum_L = R3
+    LW   R0, R1, 0x81   ; R0 = mp_H
+    LW   R3, R1, 0x83   ; R3 = sum_H
+    ADDC R3, R3, R0     ; R3 += R0 + c
+    SW   R3, R1, 0x83   ; sum_H = R3
+added:
+    ADD  R2, R2, R2     ; R2 <<= 1
+    BEQ  R2, R1, done   ; if (!(R2)) goto done
+    ; mp <<= 1
+    LW   R0, R1, 0x80   ; R0 = mp_L
+    ADD  R0, R0, R0     ; R0 + c <<= 1
+    ADDC R3, R1, R1     ; R3 = c
+    SW   R0, R1, 0x80   ; mp_L = R0
+    LW   R0, R1, 0x81   ; R0 = mp_H
+    ADD  R0, R0, R0     ; R0 <<= 1
+    ADD  R0, R0, R3     ; R0 += R3
+    SW   R0, R1, 0x81   ; mp_H = R0
+    JMP  loop           ; goto loop
+done:
+    SW   R0, R1, 0x82   ; R0 = sum_L
+    SW   R1, R1, 0x82   ; R1 = sum_H
