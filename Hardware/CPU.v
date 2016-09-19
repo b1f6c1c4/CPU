@@ -1,21 +1,10 @@
 `default_nettype none
 module CPU(
-   input CLK,
-   input RST,
-   input [3:0] H,
-   output [3:0] V,
-   output [3:0] SD,
-   output [7:0] SEG,
-   output [7:0] LD,
-   input [7:0] SB,
-   output Buzz
+   input Clock,
+   input Reset,
+   inout [7:0] io_0, io_1, io_2, io_3,
+   inout [7:0] io_4, io_5, io_6, io_7
    );
-
-   // fundamental modules
-   wire Clock, Reset;
-   assign Clock = CLK;
-   rst_recover rst(Clock, RST, Reset);
-
    // links
    wire re_WE;
    wire [1:0] re_N1, re_N2, re_ND;
@@ -23,8 +12,6 @@ module CPU(
 
    wire io_RE, io_WE, io_read, io_write;
    wire [7:0] io_addr, io_Din, io_Dout;
-   wire [7:0] io_0, io_1, io_2, io_3;
-   wire [7:0] io_4, io_5, io_6, io_7;
 
    wire ra_WR;
    wire [7:0] ra_addr, ra_data, ra_q;
@@ -44,11 +31,6 @@ module CPU(
 
    wire [7:0] fl_in, fl_out;
 
-   wire in_finish;
-   wire [2:0] in_op;
-   wire [7:0] in_SRCH, in_SRCL, in_DSTH, in_DSTL;
-   wire [7:0] ou_H, ou_L;
-
    // data path
    wire [7:0] virtual_mem_q = io_read ? io_Dout : ra_q;
 
@@ -58,13 +40,6 @@ module CPU(
    assign io_WE = cu_writemem;
    assign io_addr = ra_addr;
    assign io_Din = re_Q2;
-   assign io_0 = ou_H;
-   assign io_1 = ou_L;
-   assign io_2 = in_SRCH;
-   assign io_3 = in_SRCL;
-   assign io_4 = in_DSTH;
-   assign io_5 = in_DSTL;
-   assign io_6 = in_op;
 
    assign re_N1 = ro_q[11:10]; // Rs
    assign re_N2 = ro_q[9:8]; // Rt
@@ -128,17 +103,5 @@ module CPU(
    Flag fl(
       .Clock(Clock), .Reset(Reset),
       .Flagin(fl_in), .Flagout(fl_out));
-
-   key_scan in(
-      .CLK(Clock), .RESET(Reset),
-      .V1(H[3]), .V2(H[2]), .V3(H[1]), .V4(H[0]),
-      .H1(V[3]), .H2(V[2]), .H3(V[1]), .H4(V[0]),
-      .SRCH(in_SRCH), .SRCL(in_SRCL), .DSTH(in_DSTH), .DSTL(in_DSTL),
-      .ALU_OP(in_op), .finish(in_finish));
-
-   seg out(
-      .CLK_seg(Clock),
-      .data_inH(ou_H), .data_inL(ou_L),
-      .seg_sel(SD), .data_out(SEG));
 
 endmodule
