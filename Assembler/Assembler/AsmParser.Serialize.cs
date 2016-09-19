@@ -39,17 +39,6 @@ namespace Assembler
             public int Length => GetInst().Length;
 
             public List<int> Serialize(Func<IInstruction, string, bool, int> symbols) => GetInst().Serialize(symbols);
-
-            private IInstruction GetInst()
-            {
-                if (typeI() != null)
-                    return typeI();
-                if (typeR() != null)
-                    return typeR();
-                if (typeJ() != null)
-                    return typeJ();
-                throw new InvalidOperationException();
-            }
         }
 
         public sealed partial class TypeRContext : IInstruction

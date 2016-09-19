@@ -50,11 +50,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsmParser.cs" />
+    <Compile Include="AsmExecuter.cs" />
+    <Compile Include="AsmParser.Serialize.cs" />
     <Compile Include="AsmSerializer.cs" />
     <Compile Include="BinAssembler.cs" />
     <Compile Include="HexAssembler.cs" />
+    <Compile Include="IExecutableInstruction.cs" />
     <Compile Include="IInstruction.cs" />
+    <Compile Include="AsmParser.Execute.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextAssembler.cs" />
