@@ -35,8 +35,8 @@ module ctrlunit(
          OP_ADD, OP_ADDI: ALUC <= AC_ADX;
          OP_SUB, OP_BNE, OP_BEQ: ALUC <= AC_SBX;
          OP_AND, OP_ANDI: ALUC <= AC_AN;
-         OP_ADDC: ALUC <= AC_SB;
-         OP_SUBC: ALUC <= AC_AD;
+         OP_ADDC: ALUC <= AC_AD;
+         OP_SUBC: ALUC <= AC_SB;
          default: ALUC <= 3'bx;
       endcase
 

@@ -87,7 +87,8 @@ namespace Assembler
 
             public List<int> Serialize(Func<IInstruction, string, bool, int> symbols)
             {
-                var op = GetOpcode((TypeI() ?? TypeIJ()).Symbol.Text);
+                bool br;
+                var op = GetOpcode((TypeI() ?? TypeIJ()).Symbol.Text, out br);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
                 int imm;
@@ -97,17 +98,17 @@ namespace Assembler
                     imm = obj().Serialize(this, symbols, false);
                 else
                     throw new InvalidOperationException();
-                if (imm > 0x7f ||
-                    imm < -0x80)
-                    throw new ApplicationException("BEQ/BNE jump too long; use JMP");
+                if (br && (imm > 0x7f || imm < -0x80))
+                    throw new ApplicationException($"BEQ/BNE at line {TypeI().Symbol.Line} jump too long; use JMP");
                 return new List<int>
                            {
                                (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff)
                            };
             }
 
-            private static int GetOpcode(string text)
+            private static int GetOpcode(string text, out bool br)
             {
+                br = false;
                 switch (text)
                 {
                     case "ANDI":
@@ -121,8 +122,10 @@ namespace Assembler
                     case "SW":
                         return 0xc;
                     case "BEQ":
+                        br = true;
                         return 0xd;
                     case "BNE":
+                        br = true;
                         return 0xe;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(text));

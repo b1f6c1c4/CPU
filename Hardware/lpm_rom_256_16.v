@@ -8,7 +8,7 @@ module lpm_rom_256_16(
 
    reg [15:0] rom[0:(2**PC_N-1)];
 
-   always @(posedge Clock)
+   always @(*)
       q <= rom[address];
 
    initial

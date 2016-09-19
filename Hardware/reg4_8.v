@@ -12,9 +12,23 @@ module reg4_8(
    input [1:0] ND, // reg id
    input [7:0] DI, // data
    input REG_WE // enable
+`ifdef SIMULATION
+   ,
+   output [7:0] R0,
+   output [7:0] R1,
+   output [7:0] R2,
+   output [7:0] R3
+`endif
 );
 
    reg [7:0] registers[0:3];
+
+`ifdef SIMULATION
+   assign R0 = registers[0];
+   assign R1 = registers[1];
+   assign R2 = registers[2];
+   assign R3 = registers[3];
+`endif
 
    // read channel 1
    always @(*)

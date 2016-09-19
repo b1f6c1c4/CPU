@@ -2,8 +2,20 @@
 module CPU(
    input Clock,
    input Reset,
-   inout [7:0] io_0, io_1, io_2, io_3,
-   inout [7:0] io_4, io_5, io_6, io_7
+   inout [7:0] io_0, io_1,
+   input [7:0] io_2, io_3,
+   input [7:0] io_4, io_5,
+   inout [7:0] io_6, io_7
+`ifdef SIMULATION
+   ,
+   output [PC_N-1:0] pc_pc,
+   output [7:0] fl_out,
+   output [7:0] R0,
+   output [7:0] R1,
+   output [7:0] R2,
+   output [7:0] R3,
+   output [2:0] cu_aluc
+`endif
    );
 `include "CPU_INTERNAL.v"
 
@@ -23,16 +35,23 @@ module CPU(
 
    wire cu_jump, cu_branch, cu_alusrcb, cu_writemem;
    wire cu_writereg, cu_memtoreg, cu_regdes, cu_wrflag;
+`ifndef SIMULATION
    wire [2:0] cu_aluc;
+`endif
    wire [3:0] cu_op;
 
    reg signed [PC_N-1:0] pc_imm;
+`ifndef SIMULATION
    wire [PC_N-1:0] pc_pc;
+`endif
 
    wire al_zero, al_Cin, al_Cout;
    wire [7:0] al_A, al_B, al_S;
 
-   wire [7:0] fl_in, fl_out;
+   wire [7:0] fl_in;
+`ifndef SIMULATION
+   wire [7:0] fl_out;
+`endif
 
    // data path
    wire [7:0] virtual_mem_q = io_read ? io_Dout : ra_q;
@@ -65,12 +84,15 @@ module CPU(
 
    assign al_A = re_Q1;
    assign al_B = cu_alusrcb ? ro_q[7:0] : re_Q2;
-   assign al_Cin = fl_out[1];
+   assign al_Cin = fl_out[2];
 
    assign fl_in = cu_wrflag ? {5'b0, al_Cout, al_zero, 1'b0} : fl_out;
 
    // main modules
    reg4_8 re(
+`ifdef SIMULATION
+      .R0(R0), .R1(R1), .R2(R2), .R3(R3),
+`endif
       .Clock(Clock), .Reset(Reset),
       .N1(re_N1), .Q1(re_Q1),
       .N2(re_N2), .Q2(re_Q2),

@@ -1,0 +1,5 @@
+    ANDI R2, R2, 0x00
+    ADDI R0, R2, 0x55
+    SW   R0, R2, 0x20
+    LW   R3, R2, 0x20
+    SW   R3, R2, 0x00

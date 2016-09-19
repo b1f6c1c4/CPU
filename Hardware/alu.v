@@ -11,14 +11,36 @@ module alu(
    parameter N = 8;
 `include "ALU_INTERFACE.v"
 
+   reg [N:0] res;
+
    assign zero = ~|S;
 
    always @(*)
       case (CS)
-         AC_AD: {carry_out,S} <= data_a + data_b + carry_in;
-         AC_SB: {carry_out,S} <= data_a - data_b - ~carry_in;
-         AC_ADX: {carry_out,S} <= data_a + data_b;
-         AC_SBX: {carry_out,S} <= data_a - data_b;
+         AC_AD:
+            begin
+               res = data_a + data_b + carry_in;
+               S = res[N-1:0];
+               carry_out = res[N];
+            end
+         AC_SB:
+            begin
+               res = data_a + ~data_b + carry_in;
+               S = res[N-1:0];
+               carry_out = ~res[N];
+            end
+         AC_ADX:
+            begin
+               res = data_a + data_b;
+               S = res[N-1:0];
+               carry_out = res[N];
+            end
+         AC_SBX:
+            begin
+               res = data_a - data_b;
+               S = res[N-1:0];
+               carry_out = res[N];
+            end
          AC_AN: begin S <= data_a & data_b; carry_out <= 1'b0; end
          AC_OR: begin S <= data_a | data_b; carry_out <= 1'b0; end
          AC_LS: begin S <= data_a < data_b; carry_out <= 1'b0; end
