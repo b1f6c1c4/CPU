@@ -1,7 +1,7 @@
 div:
     ; R1 / R0 = R1 rem R0
     ;
-    ; R2 is shifts
+    ; MEM[0x84] is shifts
     ; MEM[0x83] is dq
     ; {MEM[0x81],MEM[0x80]} <<
     ; ---------------------
@@ -11,10 +11,10 @@ div:
     SW   R1, R2, 0x80   ; dp_L = R1
     SW   R2, R2, 0x81   ; dp_H = 0
     SW   R2, R2, 0x83   ; dq = 0
-    ADDI R2, R2, 0x08   ; R2 = 8
     ANDI R1, R1, 0x00   ;
+    ADDI R2, R2, 0x08   ;
+    SW   R2, R1, 0x84   ; sh = 8
 loop:
-    BEQ  R2, R1, done   ; if (!(R2)) goto done
     ; if (dp_H < dr) goto next
     LW   R0, R1, 0x81   ; R0 = dp_H
     LW   R2, R1, 0x82   ; R2 = dr
@@ -28,6 +28,8 @@ loop:
     ORI  R0, R0, 0x01   ; R0 |= 0x01
     SW   R0, R1, 0x83   ; dq = R0
 next:
+    LW   R2, R1, 0x84   ; R2 = sh
+    BEQ  R2, R1, done   ; if (!(R2)) goto done
     ; dp <<= 1
     LW   R0, R1, 0x80   ; R0 = dp_L
     ADD  R0, R0, R0     ; R0 <<= 1
@@ -42,6 +44,8 @@ next:
     ADD  R0, R0, R0     ; R0 <<= 1
     SW   R0, R1, 0x83   ; dq = R0
     ADDI R2, R2, 0xff   ; R2--
+    SW   R2, R1, 0x84   ; sh = R2
+    JMP  loop           ; goto loop
 done:
     LW   R0, R1, 0x81   ; R0 = dp_H
     LW   R1, R1, 0x83   ; R1 = dq

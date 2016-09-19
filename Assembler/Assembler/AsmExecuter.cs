@@ -7,15 +7,22 @@ namespace Assembler
 {
     public class AsmExecuter
     {
+        public delegate void OnBreakPointEventHandler(string line);
+
+        public event OnBreakPointEventHandler OnBreakPoint;
+
         private readonly List<IExecutableInstruction> m_Instructions;
+
+        private readonly Dictionary<int, string> m_Lines;
 
         private readonly Dictionary<string, int> m_Symbols;
 
-        public Context CPU { get; set; }
+        public Context CPU { get; private set; }
 
         public AsmExecuter()
         {
             m_Instructions = new List<IExecutableInstruction>();
+            m_Lines = new Dictionary<int, string>();
             m_Symbols = new Dictionary<string, int>();
 
             CPU = new Context
@@ -37,6 +44,9 @@ namespace Assembler
             var id = 0;
             while (id < m_Instructions.Count)
             {
+                if (m_Symbols.ContainsValue(id))
+                    OnBreakPoint?.Invoke(m_Lines[id]);
+
                 var symbol = m_Instructions[id].Execute(CPU);
                 if (symbol == null)
                 {
@@ -60,7 +70,10 @@ namespace Assembler
             }
 
             if (context.instruction() != null)
+            {
+                m_Lines.Add(m_Instructions.Count, context.GetText());
                 m_Instructions.Add(context.instruction());
+            }
         }
     }
 }
