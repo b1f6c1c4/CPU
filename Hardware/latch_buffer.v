@@ -10,7 +10,7 @@ module latch_buffer(
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
-         out <= 1'bx;
+         out <= 1'b0;
       else if (en)
          out <= in;
 
