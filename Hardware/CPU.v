@@ -132,7 +132,7 @@ module CPU(
       .BRANCH(cu_branch), .JUMP(cu_jump),
       .imm(pc_imm), .PC(pc_pc));
 
-   alu alu(
+   ALU alu(
       .CS(cu_aluc), .data_a(al_A), .data_b(al_B), .carry_in(al_Cin),
       .S(al_S), .zero(al_zero), .carry_out(al_Cout));
 

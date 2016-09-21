@@ -99,7 +99,7 @@ set_global_assignment -name VERILOG_FILE Output_divider.v
 set_global_assignment -name VERILOG_FILE Output_num_decoder.v
 set_global_assignment -name VERILOG_FILE Output_scanner.v
 set_global_assignment -name VERILOG_FILE CPU.v
-set_global_assignment -name VERILOG_FILE alu.v
+set_global_assignment -name VERILOG_FILE ALU.v
 set_global_assignment -name VERILOG_INCLUDE_FILE ALU_INTERFACE.v
 set_global_assignment -name VERILOG_FILE reg4_8.v
 set_global_assignment -name VERILOG_FILE lpm_ram_256_8.v

@@ -1,5 +1,5 @@
 `default_nettype none
-module alu(
+module ALU(
    input [AC_N-1:0] CS,
    input [N-1:0] data_a,
    input [N-1:0] data_b,
