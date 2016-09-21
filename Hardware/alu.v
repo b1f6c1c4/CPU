@@ -41,10 +41,33 @@ module alu(
                S = res[N-1:0];
                carry_out = res[N];
             end
-         AC_AN: begin S <= data_a & data_b; carry_out <= 1'b0; end
-         AC_OR: begin S <= data_a | data_b; carry_out <= 1'b0; end
-         AC_LS: begin S <= data_a < data_b; carry_out <= 1'b0; end
-         default: begin S <= {N{1'bx}}; carry_out <= 1'b0; end
+         AC_AN:
+            begin
+               res <= 1'bx;
+               S <= data_a & data_b;
+               carry_out <= 1'b0;
+            end
+         AC_OR:
+            begin
+               res <= 1'bx;
+               S <= data_a & data_b;
+               S <= data_a | data_b;
+               carry_out <= 1'b0;
+            end
+         AC_LS:
+            begin
+               res <= 1'bx;
+               S <= data_a & data_b;
+               S <= data_a < data_b;
+               carry_out <= 1'b0;
+            end
+         default:
+            begin
+               res <= 1'bx;
+               S <= data_a & data_b;
+               S <= {N{1'bx}};
+               carry_out <= 1'b0;
+            end
       endcase
 
 endmodule

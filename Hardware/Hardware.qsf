@@ -78,9 +78,14 @@ set_location_assignment PIN_185 -to RS
 # UART
 set_location_assignment PIN_44 -to TX
 set_location_assignment PIN_46 -to RX
+set_global_assignment -name QIP_FILE lpm_rom_256_16.qip
+set_global_assignment -name QIP_FILE lpm_ram_256_8.qip
+set_global_assignment -name HEX_FILE ROM.hex
 set_global_assignment -name VERILOG_FILE Hardware.v
 set_global_assignment -name VERILOG_FILE rst_recover.v
 set_global_assignment -name VERILOG_FILE clock_divider.v
+set_global_assignment -name VERILOG_FILE buffer.v
+set_global_assignment -name VERILOG_FILE latch_buffer.v
 set_global_assignment -name VERILOG_INCLUDE_FILE INPUT_INTERNAL.v
 set_global_assignment -name VERILOG_INCLUDE_FILE INPUT_INTERFACE.v
 set_global_assignment -name VERILOG_FILE key_scan.v
@@ -103,6 +108,3 @@ set_global_assignment -name VERILOG_FILE lpm_rom_256_16.v
 set_global_assignment -name VERILOG_FILE Flag.v
 set_global_assignment -name VERILOG_FILE ctrlunit.v
 set_global_assignment -name VERILOG_FILE instrconunit.v
-set_global_assignment -name QIP_FILE lpm_rom_256_16.qip
-set_global_assignment -name QIP_FILE lpm_ram_256_8.qip
-set_global_assignment -name HEX_FILE ROM.hex

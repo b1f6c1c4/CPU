@@ -2,9 +2,10 @@
 module CPU(
    input Clock,
    input Reset,
+   output [7:0] io_ena,
    inout [7:0] io_0, io_1,
-   input [7:0] io_2, io_3,
-   input [7:0] io_4, io_5,
+   inout [7:0] io_2, io_3,
+   inout [7:0] io_4, io_5,
    inout [7:0] io_6, io_7
 `ifdef SIMULATION
    ,
@@ -14,7 +15,8 @@ module CPU(
    output [7:0] R1,
    output [7:0] R2,
    output [7:0] R3,
-   output [2:0] cu_aluc
+   output [2:0] cu_aluc,
+   output [15:0] ro_q
 `endif
    );
 `include "CPU_INTERNAL.v"
@@ -31,7 +33,9 @@ module CPU(
    wire [7:0] ra_addr, ra_data, ra_q;
 
    wire [PC_N-1:0] ro_addr;
+`ifndef SIMULATION
    wire [15:0] ro_q;
+`endif
 
    wire cu_jump, cu_branch, cu_alusrcb, cu_writemem;
    wire cu_writereg, cu_memtoreg, cu_regdes, cu_wrflag;
@@ -103,10 +107,11 @@ module CPU(
       .Din(io_Din), .Dout(io_Dout),
       .io_read(io_read), .io_write(io_write),
       .IO0(io_0), .IO1(io_1), .IO2(io_2), .IO3(io_3),
-      .IO4(io_4), .IO5(io_5), .IO6(io_6), .IO7(io_7));
+      .IO4(io_4), .IO5(io_5), .IO6(io_6), .IO7(io_7),
+      .io_ena(io_ena));
 
    lpm_ram_256_8 ra(
-      .clock(Clock),
+      .clock(~Clock),
       .address(ra_addr), .data(ra_data),
       .wren(ra_WR), .q(ra_q));
 
@@ -123,7 +128,7 @@ module CPU(
       .ALUSRCB(cu_alusrcb));
 
    instrconunit pc(
-      .Clock(Clock), .Reset(Reset),
+      .Clock(~Clock), .Reset(Reset),
       .BRANCH(cu_branch), .JUMP(cu_jump),
       .imm(pc_imm), .PC(pc_pc));
 

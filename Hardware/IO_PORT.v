@@ -14,13 +14,25 @@ module IO_PORT(
    inout [7:0] IO4,
    inout [7:0] IO5,
    inout [7:0] IO6,
-   inout [7:0] IO7
+   inout [7:0] IO7,
+   output reg [7:0] io_ena
 );
 
    assign io_read = (addr <= 8'h7) && RE;
    assign io_write = (addr <= 8'h7) && WE;
 
    wire [7:0] write_ena;
+
+   always @(*)
+      if (~WE)
+         io_ena = 8'b0;
+      else if (addr < 8'h7)
+         begin
+            io_ena = 8'b0;
+            io_ena[addr] = 8'b1;
+         end
+      else
+         io_ena = 8'b0;
 
    always @(*)
       case (addr)
@@ -37,12 +49,11 @@ module IO_PORT(
 
    assign IO0 = (addr == 8'h0) && WE ? Din : 8'bz;
    assign IO1 = (addr == 8'h1) && WE ? Din : 8'bz;
-   // Commented bacuse of Quartus' overly circumspect error reporting strategy
-   // assign IO2 = (addr == 8'h2) && WE ? Din : 8'bz;
-   // assign IO3 = (addr == 8'h3) && WE ? Din : 8'bz;
-   // assign IO4 = (addr == 8'h4) && WE ? Din : 8'bz;
-   // assign IO5 = (addr == 8'h5) && WE ? Din : 8'bz;
-   // assign IO6 = (addr == 8'h6) && WE ? Din : 8'bz;
+   assign IO2 = (addr == 8'h2) && WE ? Din : 8'bz;
+   assign IO3 = (addr == 8'h3) && WE ? Din : 8'bz;
+   assign IO4 = (addr == 8'h4) && WE ? Din : 8'bz;
+   assign IO5 = (addr == 8'h5) && WE ? Din : 8'bz;
+   assign IO6 = (addr == 8'h6) && WE ? Din : 8'bz;
    assign IO7 = (addr == 8'h7) && WE ? Din : 8'bz;
 
 endmodule

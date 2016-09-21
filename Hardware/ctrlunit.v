@@ -32,7 +32,7 @@ module ctrlunit(
       case (OP)
          OP_SLT: ALUC <= AC_LS;
          OP_OR, OP_ORI: ALUC <= AC_OR;
-         OP_ADD, OP_ADDI: ALUC <= AC_ADX;
+         OP_ADD, OP_ADDI, OP_LW, OP_SW: ALUC <= AC_ADX;
          OP_SUB, OP_BNE, OP_BEQ: ALUC <= AC_SBX;
          OP_AND, OP_ANDI: ALUC <= AC_AN;
          OP_ADDC: ALUC <= AC_AD;

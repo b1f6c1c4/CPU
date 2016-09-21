@@ -17,20 +17,38 @@ module Hardware(
    rst_recover rst(Clock, RST, Reset);
 
    // links
+   wire [7:0] io_ena;
    wire in_finish;
    wire [2:0] in_op;
    wire [7:0] in_SRCH, in_SRCL, in_DSTH, in_DSTL;
    wire [7:0] ou_H, ou_L;
+   wire [7:0] io_0, io_1, io_2, io_3;
+   wire [7:0] io_4, io_5, io_6, io_7;
 
    // auxillary
+   latch_buffer lat0(
+      .Clock(Clock), .Reset(Reset),
+      .en(io_ena[0]), .in(io_0), .out(ou_L));
+   latch_buffer lat1(
+      .Clock(Clock), .Reset(Reset),
+      .en(io_ena[1]), .in(io_1), .out(ou_H));
+   buffer buf2(.in(in_SRCL), .out(io_2), .en(~io_ena[2]));
+   buffer buf3(.in(in_SRCH), .out(io_3), .en(~io_ena[3]));
+   buffer buf4(.in(in_DSTL), .out(io_4), .en(~io_ena[4]));
+   buffer buf5(.in(in_DSTH), .out(io_5), .en(~io_ena[5]));
+   buffer buf6(.in({in_op,in_finish}), .out(io_6), .en(~io_ena[6]));
+   latch_buffer lat7(
+      .Clock(Clock), .Reset(Reset),
+      .en(io_ena[7]), .in(io_7), .out({SB[6:0],Buzz}));
 
    // main modules
    CPU u(
       .Clock(Clock), .Reset(Reset),
-      .io_0(ou_H), .io_1(ou_L),
-      .io_2(in_SRCH), .io_3(in_SRCL),
-      .io_4(in_DSTH), .io_5(in_DSTL),
-      .io_6(in_op));
+      .io_ena(io_ena),
+      .io_0(io_0), .io_1(io_1),
+      .io_2(io_2), .io_3(io_3),
+      .io_4(io_4), .io_5(io_5),
+      .io_6(io_6), .io_7(io_7));
 
    key_scan in(
       .CLK(Clock), .RESET(Reset),
