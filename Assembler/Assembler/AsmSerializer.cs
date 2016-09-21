@@ -20,7 +20,7 @@ namespace Assembler
         public void Feed(TextReader reader)
         {
             var lexer = new AsmLexer(new AntlrInputStream(reader));
-            var parser = new AsmParser(new CommonTokenStream(lexer));
+            var parser = new AsmParser(new CommonTokenStream(lexer)) { ErrorHandler = new BailErrorStrategy() };
             var prog = parser.prog();
 
             var ini = m_Position;

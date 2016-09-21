@@ -64,6 +64,8 @@ namespace Assembler
                 Console.Error.Write("Assembler: ");
                 Console.Error.WriteLine(e.Message);
                 Console.Error.WriteLine("Try `Assembler --help' for more information.");
+                Environment.Exit(1);
+                // ReSharper disable once HeuristicUnreachableCode
                 return;
             }
 
@@ -83,6 +85,7 @@ namespace Assembler
             {
                 Console.Error.Write("Assembler: ");
                 Console.Error.WriteLine(e.Message);
+                Environment.Exit(1);
             }
         }
 
