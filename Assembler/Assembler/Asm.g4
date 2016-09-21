@@ -19,9 +19,7 @@ label
     ;
 
 instruction
-    : typeR
-    | typeI
-    | typeJ
+    : Debug = '#'? (typeR | typeI | typeJ)
     ;
 
 typeR

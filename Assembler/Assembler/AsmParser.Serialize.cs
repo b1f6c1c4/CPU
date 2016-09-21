@@ -36,9 +36,10 @@ namespace Assembler
 
         public sealed partial class InstructionContext : IInstruction
         {
-            public int Length => GetInst().Length;
+            public int Length => Debug != null ? 0 : GetInst().Length;
 
-            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols) => GetInst().Serialize(symbols);
+            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols) =>
+                Debug != null ? new List<int>() : GetInst().Serialize(symbols);
         }
 
         public sealed partial class TypeRContext : IInstruction

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using NDesk.Options;
 
 namespace Assembler
@@ -44,10 +45,7 @@ namespace Assembler
                     return;
                 }
 
-                if (extra.Count == 0)
-                    throw new ApplicationException("must specify --input");
-
-                fin = extra[0];
+                fin = extra.Count == 0 ? null : extra[0];
 
                 if (extra.Count > 1)
                     throw new ApplicationException("extra command line argument(s):" + string.Join(" ", extra));
@@ -71,20 +69,32 @@ namespace Assembler
 
             try
             {
-                using (var sin = new StreamReader(fin))
-                    if (run)
-                        DoRun(debug, sin);
-                    else if (!string.IsNullOrEmpty(fout))
-                        using (var sout = new StreamWriter(fout))
-                            DoAssembly(isHex, false, sin, sout);
-                    else
-                        DoAssembly(isHex, true, sin, Console.Out);
+                if (fin != null)
+                    using (var sin = new StreamReader(fin))
+                        Do(run, debug, sin, fout, isHex);
+                else
+                {
+                    if (!ConsoleEx.IsInputRedirected)
+                        Console.WriteLine("Use Ctrl+Z to stop input and execute");
+                    Do(run, debug, Console.In, fout, isHex);
+                }
             }
             catch (Exception e)
             {
                 Console.Error.Write("Assembler: ");
                 Console.Error.WriteLine(e.Message);
             }
+        }
+
+        private static void Do(bool run, bool debug, TextReader sin, string fout, bool isHex)
+        {
+            if (run)
+                DoRun(debug, sin);
+            else if (!string.IsNullOrEmpty(fout))
+                using (var sout = new StreamWriter(fout))
+                    DoAssembly(isHex, false, sin, sout);
+            else
+                DoAssembly(isHex, true, sin, Console.Out);
         }
 
         private static void DoRun(bool debug, TextReader sin)
@@ -127,5 +137,22 @@ namespace Assembler
                 asm = new IntelAssembler(sout);
             asm.Feed(sin);
         }
+    }
+
+    public static class ConsoleEx
+    {
+        public static bool IsOutputRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdout));
+
+        public static bool IsInputRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdin));
+
+        public static bool IsErrorRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stderr));
+
+        // P/Invoke:
+        private enum FileType { Unknown, Disk, Char, Pipe };
+        private enum StdHandle { Stdin = -10, Stdout = -11, Stderr = -12 };
+        [DllImport("kernel32.dll")]
+        private static extern FileType GetFileType(IntPtr hdl);
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetStdHandle(StdHandle std);
     }
 }
