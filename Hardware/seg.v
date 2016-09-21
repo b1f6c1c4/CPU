@@ -15,8 +15,8 @@ module seg(
    wire [15:0] abs_data = data[15] ? ~data + 16'b1 : data;
 
    wire [3:0] bcd0, bcd1, bcd2, bcd3;
-   wire [0:7] oct0t, oct1t, oct2t, oct3t;
-   reg [0:7] oct0, oct1, oct2, oct3;
+   wire [7:0] oct0t, oct1t, oct2t, oct3t;
+   reg [7:0] oct0, oct1, oct2, oct3;
 
    // control
    always @(*)

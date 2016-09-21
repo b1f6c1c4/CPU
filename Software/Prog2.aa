@@ -45,13 +45,15 @@ disp_minus_ret:
 delay:                  ; R2 is preserved
     ; loop 694444 times to get 0.5s delay
     ANDI R1, R1, 0x00   ;
-    ;ADDI R3, R1, 0xac   ;
-    ADDI R3, R1, 0x01   ;
+    ADDI R3, R1, 0xac   ;
+#   ADDI R3, R1, 0x01   ;
     SW   R3, R1, 0xa0   ;
     ADDI R3, R1, 0x98   ;
-    SW   R1, R1, 0xa1   ;
+#   ADDI R3, R1, 0x00   ;
+    SW   R3, R1, 0xa1   ;
     ADDI R3, R1, 0x0a   ;
-    SW   R1, R1, 0xa2   ;
+#   ADDI R3, R1, 0x00   ;
+    SW   R3, R1, 0xa2   ;
     SW   R1, R1, 0xa3   ;
     ; SOFT DELAY
     ; Delays are in MEM[0xa3] .. MEM[0xa0] = n

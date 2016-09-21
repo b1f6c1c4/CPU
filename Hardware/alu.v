@@ -37,9 +37,9 @@ module alu(
             end
          AC_SBX:
             begin
-               res = data_a - data_b;
+               res = data_a + ~data_b + 1'b1;
                S = res[N-1:0];
-               carry_out = res[N];
+               carry_out = ~res[N];
             end
          AC_AN:
             begin

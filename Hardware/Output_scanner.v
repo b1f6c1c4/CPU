@@ -2,12 +2,12 @@
 module Output_scanner(
    input Clock,
    input Reset,
-   input [0:7] oct0,
-   input [0:7] oct1,
-   input [0:7] oct2,
-   input [0:7] oct3,
-   output reg [0:3] SD,
-   output reg [0:7] SEG
+   input [7:0] oct0,
+   input [7:0] oct1,
+   input [7:0] oct2,
+   input [7:0] oct3,
+   output reg [3:0] SD,
+   output reg [7:0] SEG
    );
 `ifdef SIMULATION
    parameter div = 1;
@@ -30,22 +30,22 @@ module Output_scanner(
          case (state)
             2'd0:
                begin
-                  SD <= 4'b1000;
+                  SD <= 4'b0001;
                   SEG <= oct0;
                end
             2'd1:
                begin
-                  SD <= 4'b0100;
+                  SD <= 4'b0010;
                   SEG <= oct1;
                end
             2'd2:
                begin
-                  SD <= 4'b0010;
+                  SD <= 4'b0100;
                   SEG <= oct2;
                end
             2'd3:
                begin
-                  SD <= 4'b0001;
+                  SD <= 4'b1000;
                   SEG <= oct3;
                end
          endcase

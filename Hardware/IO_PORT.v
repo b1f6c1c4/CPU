@@ -26,7 +26,7 @@ module IO_PORT(
    always @(*)
       if (~WE)
          io_ena = 8'b0;
-      else if (addr < 8'h7)
+      else if (addr <= 8'h7)
          begin
             io_ena = 8'b0;
             io_ena[addr] = 8'b1;

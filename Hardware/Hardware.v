@@ -9,6 +9,18 @@ module Hardware(
    output [7:0] LD,
    input [7:0] SB,
    output Buzz
+`ifdef SIMULATION
+   ,
+   output [7:0] io_ena,
+   inout [7:0] io_0,
+   inout [7:0] io_1,
+   inout [7:0] io_2,
+   inout [7:0] io_3,
+   inout [7:0] io_4,
+   inout [7:0] io_5,
+   inout [7:0] io_6,
+   inout [7:0] io_7
+`endif
    );
 
    // fundamental modules
@@ -17,13 +29,16 @@ module Hardware(
    rst_recover rst(Clock, RST, Reset);
 
    // links
-   wire [7:0] io_ena;
    wire in_finish;
    wire [2:0] in_op;
    wire [7:0] in_SRCH, in_SRCL, in_DSTH, in_DSTL;
    wire [7:0] ou_H, ou_L;
+
+`ifndef SIMULATION
+   wire [7:0] io_ena;
    wire [7:0] io_0, io_1, io_2, io_3;
    wire [7:0] io_4, io_5, io_6, io_7;
+`endif
 
    // auxillary
    latch_buffer lat0(
@@ -39,7 +54,9 @@ module Hardware(
    buffer buf6(.in({in_op,in_finish}), .out(io_6), .en(~io_ena[6]));
    latch_buffer lat7(
       .Clock(Clock), .Reset(Reset),
-      .en(io_ena[7]), .in(io_7), .out({SB[6:0],Buzz}));
+      .en(io_ena[7]), .in(io_7), .out(LD));
+
+   assign Buzz = ~LD[0];
 
    // main modules
    CPU u(
