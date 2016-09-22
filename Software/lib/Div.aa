@@ -1,0 +1,71 @@
+    ; Div: Integer Divier
+    ; arg[0]: a -> a / b
+    ; arg[1]: b -> a % b
+Div:
+    PUSH BP
+    ; sh = sp+4
+    ; dq = sp+3
+    ; dr = sp+2
+    ; dp_H = sp+1
+    ; dp_L = sp
+    ; R1 / R0 = R1 rem R0
+    ;
+    ; MEM[0x84] is shifts
+    ; MEM[0x83] is dq
+    ; {MEM[0x81],MEM[0x80]} <<
+    ; ---------------------
+    ; {MEM[0x82],   0x00  }
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 0xfb
+    SW   R3, R1, 0xff   ; sp -= 5
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    SW   R0, R3, 0x02   ; dr = arg[1]
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x00   ; dp_L = arg[0]
+    SW   R1, R3, 0x01   ; dp_H = 0
+    SW   R1, R3, 0x03   ; dq = 0
+    ADDI R0, R1, 0x08
+    SW   R0, R3, 0x04   ; sh = 8
+loop:
+    ; if (dp_H < dr) goto next
+    LW   R0, R3, 0x01
+    LW   R2, R3, 0x02
+    SLT  R0, R0, R2
+    BNE  R0, R1, next
+    ; dp -= dr
+    LW   R0, R3, 0x01
+    SUB  R0, R0, R2
+    SW   R0, R3, 0x01   ; dp_H = R0
+    ; dq |= 0x01
+    LW   R0, R3, 0x03   ; R0 = dq
+    ORI  R0, R0, 0x01   ; R0 |= 0x01
+    SW   R0, R3, 0x03   ; dq = R0
+next:
+    LW   R2, R3, 0x04   ; R2 = sh
+    BEQ  R2, R1, done   ; if (!(R2)) goto done
+    ; dp <<= 1
+    LW   R0, R3, 0x00   ; R0 = dp_L
+    ADD  R0, R0, R0     ; R0 <<= 1
+    ADDC R2, R1, R1     ; R2 = c
+    SW   R0, R3, 0x00   ; dp_L = R0
+    LW   R0, R3, 0x01   ; R0 = dp_H
+    ADD  R0, R0, R0     ; R0 <<= 1
+    ADD  R0, R0, R2     ; R0 += R2
+    SW   R0, R3, 0x01   ; dp_H = R0
+    ; dq <<= 1
+    LW   R0, R3, 0x03   ; R0 = dq
+    ADD  R0, R0, R0     ; R0 <<= 1
+    SW   R0, R3, 0x03   ; dq = R0
+    LW   R2, R3, 0x04   ; R2 = sh
+    ADDI R2, R2, 0xff   ; R2--
+    SW   R2, R3, 0x04   ; sh = R2
+    JMP  loop           ; goto loop
+done:
+    LW   R2, R1, 0xfe
+    LW   R0, R3, 0x03
+    SW   R0, R2, 0x03   ; dq = arg[0]
+    LW   R0, R3, 0x01
+    SW   R0, R2, 0x04   ; dp_H = arg[1]
+    RET

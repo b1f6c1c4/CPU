@@ -1,0 +1,37 @@
+    ; Fib: Fibonacci number calculator
+    ;     for recurison demonstration
+    ; arg[0]: ith
+    ; return: F_i, with F_0 = 0, F_1 = 1
+Fib:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xfe
+    LW   R2, R3, 0x03   ; arg[0]
+    BEQ  R2, R1, out0
+    ADDI R2, R2, 0xff
+    BEQ  R2, R1, out1
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 0xfe
+    SW   R3, R1, 0xff
+    SW   R1, R3, 0x01
+    SW   R2, R3, 0x00
+    CALL Fib
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x01
+    LW   R2, R3, 0x00
+    ADDI R2, R2, 0xff
+    SW   R2, R3, 0x00
+    CALL Fib
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x01
+    ADD  R0, R0, R2
+    RET
+out0:
+    ANDI R0, R0, 0x00
+    RET
+out1:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0x01
+    RET

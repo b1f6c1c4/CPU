@@ -1,0 +1,62 @@
+    ; Mult: Integer Multiplier
+    ; arg[0]: a -> (a*b)_L
+    ; arg[1]: b -> (a*b)_H
+Mult:
+    PUSH BP
+    ; mr = sp+4
+    ; sum_H = sp+3
+    ; sum_L = sp+2
+    ; mp_H = sp+1
+    ; mp_L = sp
+    ; bit = sp+5
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 0xfa
+    SW   R3, R1, 0xff   ; sp -= 6
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x04   ; mr = arg[0]
+    SW   R1, R3, 0x03
+    SW   R1, R3, 0x02   ; sum = 0
+    SW   R1, R3, 0x01
+    LW   R0, R2, 0x04
+    SW   R0, R3, 0x00   ; mp = arg[1]
+    ADDI R2, R1, 0x01
+    SW   R2, R3, 0x05   ; bit = 0x01
+loop:
+    LW   R0, R3, 0x04
+    LW   R2, R3, 0x05
+    AND  R0, R0, R2
+    BEQ  R0, R1, added  ; if (!(bit & mr)) goto added
+    ; sum += mp
+    LW   R0, R3, 0x00   ; R0 = mp_L
+    LW   R2, R3, 0x02   ; R2 = sum_L
+    ADD  R2, R2, R0     ; R2 + c += R0
+    SW   R2, R3, 0x02   ; sum_L = R2
+    LW   R0, R3, 0x01   ; R0 = mp_H
+    LW   R2, R3, 0x03   ; R2 = sum_H
+    ADDC R2, R2, R0     ; R2 += R0 + c
+    SW   R2, R3, 0x03   ; sum_H = R2
+added:
+    ; bit <<= 1
+    LW   R2, R3, 0x05
+    ADD  R2, R2, R2
+    SW   R2, R3, 0x05
+    BEQ  R2, R1, done   ; if (!(bit)) goto done
+    ; mp <<= 1
+    LW   R0, R3, 0x00   ; R0 = mp_L
+    ADD  R0, R0, R0     ; R0 + c <<= 1
+    ADDC R2, R1, R1     ; R2 = c
+    SW   R0, R3, 0x00   ; mp_L = R0
+    LW   R0, R3, 0x01   ; R0 = mp_H
+    ADD  R0, R0, R0     ; R0 <<= 1
+    ADD  R0, R0, R2     ; R0 += R2
+    SW   R0, R3, 0x01   ; mp_H = R0
+    JMP  loop
+done:
+    LW   R2, R1, 0xfe
+    LW   R0, R3, 0x02
+    SW   R0, R2, 0x03   ; sum_L = arg[0]
+    LW   R0, R3, 0x03
+    SW   R0, R2, 0x04   ; sum_H = arg[1]
+    RET

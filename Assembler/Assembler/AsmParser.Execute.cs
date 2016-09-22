@@ -32,11 +32,13 @@ namespace Assembler
                         context.Registers[RegisterNumber(Rd)] =
                             (byte)(context.Registers[RegisterNumber(Rs)] &
                                    context.Registers[RegisterNumber(Rt)]);
+                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                         return null;
                     case "OR":
                         context.Registers[RegisterNumber(Rd)] =
                             (byte)(context.Registers[RegisterNumber(Rs)] |
                                    context.Registers[RegisterNumber(Rt)]);
+                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                         return null;
                     case "ADD":
                         {
@@ -44,6 +46,7 @@ namespace Assembler
                                     context.Registers[RegisterNumber(Rt)];
                             context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
+                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                             return null;
                         }
                     case "SUB":
@@ -52,6 +55,7 @@ namespace Assembler
                                     context.Registers[RegisterNumber(Rt)];
                             context.CFlag = (s & ~0xff) == 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
+                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                             return null;
                         }
                     case "ADDC":
@@ -61,6 +65,7 @@ namespace Assembler
                                     (context.CFlag ? 1 : 0);
                             context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
+                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                             return null;
                         }
                     case "SUBC":
@@ -70,6 +75,7 @@ namespace Assembler
                                     (context.CFlag ? 0 : 1);
                             context.CFlag = (s & ~0xff) == 0;
                             context.Registers[RegisterNumber(Rd)] = (byte)s;
+                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                             return null;
                         }
                     case "SLT":
@@ -78,6 +84,7 @@ namespace Assembler
                              context.Registers[RegisterNumber(Rt)])
                                 ? (byte)1
                                 : (byte)0;
+                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
                         return null;
                     default:
                         throw new InvalidOperationException();
@@ -95,11 +102,13 @@ namespace Assembler
                         context.Registers[RegisterNumber(Rt)] =
                             (byte)(context.Registers[RegisterNumber(Rs)] &
                                    number());
+                        context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
                         return null;
                     case "ORI":
                         context.Registers[RegisterNumber(Rt)] =
                             (byte)(context.Registers[RegisterNumber(Rs)] |
                                    number());
+                        context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
                         return null;
                     case "ADDI":
                         {
@@ -107,6 +116,7 @@ namespace Assembler
                                     number();
                             context.CFlag = (s & ~0xff) != 0;
                             context.Registers[RegisterNumber(Rt)] = (byte)s;
+                            context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
                             return null;
                         }
                     case "LW":
