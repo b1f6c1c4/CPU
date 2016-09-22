@@ -33,7 +33,7 @@ module CPU_tb;
 
    initial
       begin
-         #(4*100) $finish;
+         #(4*1000) $finish;
       end
 
 endmodule
