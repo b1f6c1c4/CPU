@@ -23,10 +23,10 @@ namespace Assembler
 
         public sealed partial class ObjContext
         {
-            public int Serialize(IInstruction inst, SymbolResolver symbols, bool absolute)
+            public int Serialize(SymbolResolver symbols, bool absolute)
             {
                 if (number() != null)
-                    return number();
+                    return (sbyte)(int)number();
                 if (Name() != null)
                     return symbols(Name().Symbol.Text, absolute);
                 throw new InvalidOperationException();
@@ -79,18 +79,19 @@ namespace Assembler
             public int Serialize(SymbolResolver symbols)
             {
                 bool br;
-                var op = GetOpcode((TypeI() ?? TypeIJ()).Symbol.Text, out br);
+                var node = (TypeI() ?? TypeIJ());
+                var op = GetOpcode(node.Symbol.Text, out br);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
                 int imm;
                 if (TypeI() != null)
                     imm = number();
                 else if (TypeIJ() != null)
-                    imm = obj().Serialize(this, symbols, false);
+                    imm = obj().Serialize(symbols, false);
                 else
                     throw new InvalidOperationException();
                 if (br && (imm > 0x7f || imm < -0x80))
-                    throw new ApplicationException($"BEQ/BNE at line {TypeI().Symbol.Line} jump too long; use JMP");
+                    throw new ApplicationException($"BEQ/BNE at line {node.Symbol.Line} jump too long ({imm}); use JMP");
                 return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
@@ -126,7 +127,7 @@ namespace Assembler
             public int Serialize(SymbolResolver symbols)
             {
                 var op = GetOpcode(TypeJ().Symbol.Text);
-                var imm = obj().Serialize(this, symbols, true);
+                var imm = obj().Serialize(symbols, true);
                 return (op << 12) | (imm & 0xfff);
             }
 

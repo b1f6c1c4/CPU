@@ -73,12 +73,12 @@ namespace Assembler
                     Do(
                        run,
                        debug,
-                       fin.Select<string, Action<Action<TextReader>>>
+                       fin.Select<string, Action<Action<TextReader, string>>>
                            (
                             f => a =>
                                  {
                                      using (var sin = new StreamReader(f))
-                                         a(sin);
+                                         a(sin, f);
                                  }),
                        fout,
                        isHex);
@@ -86,7 +86,12 @@ namespace Assembler
                 {
                     if (!ConsoleEx.IsInputRedirected)
                         Console.WriteLine("Use Ctrl+Z to stop input and execute");
-                    Do(run, debug, new Action<Action<TextReader>>[] { a => a(Console.In) }, fout, isHex);
+                    Do(
+                       run,
+                       debug,
+                       new Action<Action<TextReader, string>>[] { a => a(Console.In, "Console") },
+                       fout,
+                       isHex);
                 }
             }
             catch (Exception e)
@@ -97,7 +102,7 @@ namespace Assembler
             }
         }
 
-        private static void Do(bool run, bool debug, IEnumerable<Action<Action<TextReader>>> feeder, string fout,
+        private static void Do(bool run, bool debug, IEnumerable<Action<Action<TextReader, string>>> feeder, string fout,
                                bool isHex)
         {
             if (run)
@@ -109,7 +114,14 @@ namespace Assembler
                 DoAssembly(isHex, true, feeder, Console.Out);
         }
 
-        private static void DoRun(bool debug, IEnumerable<Action<Action<TextReader>>> feeder)
+        private static void DoAsmProg(IEnumerable<Action<Action<TextReader, string>>> feeder, AsmProgBase asm)
+        {
+            foreach (var action in feeder)
+                action((sin, f) => asm.Feed(Parse(sin).line(), f));
+            asm.Done();
+        }
+
+        private static void DoRun(bool debug, IEnumerable<Action<Action<TextReader, string>>> feeder)
         {
             var asm = new AsmExecuter();
             if (debug)
@@ -120,9 +132,8 @@ namespace Assembler
                                         Console.Read();
                                         Console.Read();
                                     };
-            foreach (var action in feeder)
-                action(sin => asm.Feed(Parse(sin).line()));
-            asm.Done();
+
+            DoAsmProg(feeder, asm);
             PrintContext(asm.CPU);
         }
 
@@ -140,7 +151,8 @@ namespace Assembler
             }
         }
 
-        private static void DoAssembly(bool isHex, bool isConsole, IEnumerable<Action<Action<TextReader>>> feeder,
+        private static void DoAssembly(bool isHex, bool isConsole,
+                                       IEnumerable<Action<Action<TextReader, string>>> feeder,
                                        TextWriter sout)
         {
             TextAssembler asm;
@@ -151,9 +163,7 @@ namespace Assembler
             else
                 asm = new IntelAssembler(sout);
 
-            foreach (var action in feeder)
-                action(sin => asm.Feed(Parse(sin).line()));
-            asm.Done();
+            DoAsmProg(feeder, asm);
         }
 
         private static AsmParser.ProgContext Parse(TextReader sin)

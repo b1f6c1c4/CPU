@@ -72,6 +72,7 @@ SW   R0, R1, 0xff   ; sp--
 SW   R0, R1, 0xfe   ; bp = sp
 LW   R0, R0, 0xff   ; R0 = MEM[sp-1]
 ";
+
             private const string Pop = @"
 ANDI R1, R1, 0x00
 LW   R1, R1, 0xff
@@ -79,6 +80,10 @@ ADDI {0}, R1, 0x01
 ANDI R1, R1, 0x00
 SW   {0}, R1, 0xff  ; sp++
 LW   {0}, {0}, 0xff  ; {0} = MEM[sp-1]
+";
+
+            private const string Halt = @"
+BEQ R1, R1, 0xff
 ";
 
             public IReadOnlyList<IExecutableInstruction> Flatten()
@@ -91,9 +96,16 @@ LW   {0}, {0}, 0xff  ; {0} = MEM[sp-1]
                         return Parse(string.Format(Call, obj().GetText()));
                     case "RET":
                         return Parse(Ret);
+                    case "HALT":
+                        return Parse(Halt);
                     case "PUSH":
+                        if (Rx.Text != "BP" &&
+                            RegisterNumber(Rx) == 1)
+                            throw new ApplicationException("Cannot PUSH R1!");
                         return Parse(Rx.Text == "BP" ? PushBp : string.Format(Push, Rx.Text));
                     case "POP":
+                        if (RegisterNumber(Rx) == 1)
+                            throw new ApplicationException("Cannot POP R1!");
                         return Parse(string.Format(Pop, Rx.Text));
                     default:
                         throw new InvalidOperationException();

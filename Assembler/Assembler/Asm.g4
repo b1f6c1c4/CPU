@@ -46,6 +46,7 @@ macro
 	Op='INIT'
 	| Op='CALL' obj
 	| Op='RET'
+	| Op='HALT'
 	| Op='PUSH' Rx=('BP' | Register)
 	| Op='POP'  Rx=Register
 	)
@@ -101,7 +102,7 @@ Register
     ;
 
 Name
-    : [a-zA-Z] [a-zA-Z0-9\-_]*
+    : [_a-zA-Z] [a-zA-Z0-9\-_]*
     ;
 
 Comment

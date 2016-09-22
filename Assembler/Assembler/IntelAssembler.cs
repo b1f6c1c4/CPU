@@ -33,6 +33,6 @@ namespace Assembler
             m_Address ++; // += Width / 8;
         }
 
-        protected override void PutFinal() => Writer.WriteLine($":00000001FF");
+        protected override void PutFinal() => Writer.WriteLine(":00000001FF");
     }
 }

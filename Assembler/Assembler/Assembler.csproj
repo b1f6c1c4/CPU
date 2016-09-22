@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="AsmExecuter.cs" />
     <Compile Include="AsmParser.Serialize.cs" />
+    <Compile Include="AsmProgBase.cs" />
     <Compile Include="AsmSerializer.cs" />
     <Compile Include="BinAssembler.cs" />
     <Compile Include="AsmMacro.cs" />
