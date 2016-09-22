@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using Antlr4.Runtime;
 using NDesk.Options;
 
 namespace Assembler
@@ -27,11 +25,13 @@ namespace Assembler
             var debug = false;
             var isHex = false;
             var help = false;
+            var noHalt = false;
 
             var opt =
                 new OptionSet
                     {
                         { "r|run", "don't assembly, just run", v => run = v != null },
+                        { "n|no-hale", "don't append HALT after each file", v => noHalt = v != null },
                         { "d|debug", "pause at every symbol to debug", v => debug = v != null },
                         { "o|output=", "output {FILE}", v => fout = v },
                         { "H|hex", "output hex instead of binary", v => isHex = v != null },
@@ -67,31 +67,69 @@ namespace Assembler
                 return;
             }
 
+            var isTmp = (fin.Count == 0);
             try
             {
-                if (fin.Count > 0)
-                    Do(
-                       run,
-                       debug,
-                       fin.Select<string, Action<Action<TextReader, string>>>
-                           (
-                            f => a =>
-                                 {
-                                     using (var sin = new StreamReader(f))
-                                         a(sin, f);
-                                 }),
-                       fout,
-                       isHex);
-                else
+                if (isTmp)
                 {
                     if (!ConsoleEx.IsInputRedirected)
                         Console.WriteLine("Use Ctrl+Z to stop input and execute");
-                    Do(
-                       run,
-                       debug,
-                       new Action<Action<TextReader, string>>[] { a => a(Console.In, "Console") },
-                       fout,
-                       isHex);
+
+                    var ftmp = Path.GetTempFileName();
+                    using (var tmpOut = new StreamWriter(ftmp))
+                    {
+                        string s;
+                        while ((s = Console.In.ReadLine()) != null)
+                            tmpOut.WriteLine(s);
+                    }
+                    fin.Add(ftmp);
+                }
+
+                var pre = new Preprocessor(fin);
+                Action<AsmProgBase> action =
+                    apb =>
+                    {
+                        foreach (var f in pre)
+                            apb.Feed(f, !noHalt);
+                        apb.Done();
+                    };
+
+                if (run)
+                {
+                    var asm = new AsmExecuter();
+                    if (debug)
+                        asm.OnBreakPoint +=
+                            s =>
+                            {
+                                Console.WriteLine($"BreakPoint: {s}");
+                                PrintContext(asm.CPU);
+                                Console.Read();
+                                Console.Read();
+                            };
+
+                    action(asm);
+                    PrintContext(asm.CPU);
+                }
+                else
+                {
+                    var sout = string.IsNullOrEmpty(fout) ? Console.Out : new StreamWriter(fout);
+                    try
+                    {
+                        TextAssembler asm;
+                        if (isHex)
+                            asm = new HexAssembler(sout);
+                        else if (sout.Equals(Console.Out))
+                            asm = new BinAssembler(sout);
+                        else
+                            asm = new IntelAssembler(sout);
+
+                        action(asm);
+                    }
+                    finally
+                    {
+                        if (!sout.Equals(Console.Out))
+                            sout.Dispose();
+                    }
                 }
             }
             catch (Exception e)
@@ -100,41 +138,11 @@ namespace Assembler
                 Console.Error.WriteLine(e.ToString());
                 Environment.Exit(1);
             }
-        }
-
-        private static void Do(bool run, bool debug, IEnumerable<Action<Action<TextReader, string>>> feeder, string fout,
-                               bool isHex)
-        {
-            if (run)
-                DoRun(debug, feeder);
-            else if (!string.IsNullOrEmpty(fout))
-                using (var sout = new StreamWriter(fout))
-                    DoAssembly(isHex, false, feeder, sout);
-            else
-                DoAssembly(isHex, true, feeder, Console.Out);
-        }
-
-        private static void DoAsmProg(IEnumerable<Action<Action<TextReader, string>>> feeder, AsmProgBase asm)
-        {
-            foreach (var action in feeder)
-                action((sin, f) => asm.Feed(Parse(sin).line(), f));
-            asm.Done();
-        }
-
-        private static void DoRun(bool debug, IEnumerable<Action<Action<TextReader, string>>> feeder)
-        {
-            var asm = new AsmExecuter();
-            if (debug)
-                asm.OnBreakPoint += s =>
-                                    {
-                                        Console.WriteLine($"BreakPoint: {s}");
-                                        PrintContext(asm.CPU);
-                                        Console.Read();
-                                        Console.Read();
-                                    };
-
-            DoAsmProg(feeder, asm);
-            PrintContext(asm.CPU);
+            finally
+            {
+                if (isTmp && fin.Count > 0)
+                    File.Delete(fin[0]);
+            }
         }
 
         private static void PrintContext(Context cpu)
@@ -149,29 +157,6 @@ namespace Assembler
                     Console.Write($"0x{cpu.Ram[j]:x2} ({cpu.Ram[j]})".PadRight(11));
                 Console.WriteLine();
             }
-        }
-
-        private static void DoAssembly(bool isHex, bool isConsole,
-                                       IEnumerable<Action<Action<TextReader, string>>> feeder,
-                                       TextWriter sout)
-        {
-            TextAssembler asm;
-            if (isHex)
-                asm = new HexAssembler(sout);
-            else if (isConsole)
-                asm = new BinAssembler(sout);
-            else
-                asm = new IntelAssembler(sout);
-
-            DoAsmProg(feeder, asm);
-        }
-
-        private static AsmParser.ProgContext Parse(TextReader sin)
-        {
-            var lexer = new AsmLexer(new AntlrInputStream(sin));
-            var parser = new AsmParser(new CommonTokenStream(lexer)); // { ErrorHandler = new BailErrorStrategy() };
-            var prog = parser.prog();
-            return prog;
         }
     }
 

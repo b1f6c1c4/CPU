@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Antlr4.Runtime;
 
 namespace Assembler
@@ -22,17 +23,23 @@ namespace Assembler
             Symbols = new Dictionary<string, int>();
         }
 
-        public void Feed(IEnumerable<AsmParser.LineContext> prog, string filename = "")
+        public void Feed(string filename, bool halt = false)
         {
-            if (Instructions.Count != 0)
+            using (var sin = new StreamReader(filename))
+            {
+                var lexer = new AsmLexer(new AntlrInputStream(sin));
+                var parser = new AsmParser(new CommonTokenStream(lexer)); // { ErrorHandler = new BailErrorStrategy() };
+                var prog = parser.prog();
+                foreach (var context in prog.line())
+                    Parse(context, filename);
+            }
+
+            if (halt)
             {
                 var lexer = new AsmLexer(new AntlrInputStream("HALT" + Environment.NewLine));
                 var parser = new AsmParser(new CommonTokenStream(lexer));
-                Parse(parser.line(), "Before " + filename);
+                Parse(parser.line(), "After " + filename);
             }
-
-            foreach (var context in prog)
-                Parse(context, filename);
         }
 
         public abstract void Done();
