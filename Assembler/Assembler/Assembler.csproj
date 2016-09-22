@@ -58,6 +58,7 @@
     <Compile Include="AsmParser.Serialize.cs" />
     <Compile Include="AsmSerializer.cs" />
     <Compile Include="BinAssembler.cs" />
+    <Compile Include="AsmMacro.cs" />
     <Compile Include="HexAssembler.cs" />
     <Compile Include="IExecutableInstruction.cs" />
     <Compile Include="IInstruction.cs" />

@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Assembler
 {
+    public delegate int SymbolResolver(string symbol, bool isAbs);
+
+    public interface IFlattenable<out TOut>
+    {
+        IReadOnlyList<TOut> Flatten();
+    }
+
     public interface IInstruction
     {
-        int Length { get; }
-
-        List<int> Serialize(Func<IInstruction, string, bool, int> symbols);
+        int Serialize(SymbolResolver resolver);
     }
 }

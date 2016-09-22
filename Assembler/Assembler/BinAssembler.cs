@@ -9,7 +9,7 @@ namespace Assembler
 
         public BinAssembler(TextWriter writer, int width = 16, string d = " ") : base(writer, width) { m_D = d; }
 
-        protected override void PutValue(int v)
+        protected override void Put(int v)
         {
             var s = Convert.ToString(v, 2);
             s = s.PadLeft(Width, '0');

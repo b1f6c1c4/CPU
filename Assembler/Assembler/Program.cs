@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using Antlr4.Runtime;
 using NDesk.Options;
 
 namespace Assembler
@@ -18,7 +21,7 @@ namespace Assembler
 
         private static void Main(string[] args)
         {
-            string fin;
+            List<string> fin;
             string fout = null;
             var run = false;
             var debug = false;
@@ -37,18 +40,13 @@ namespace Assembler
 
             try
             {
-                var extra = opt.Parse(args);
+                fin = opt.Parse(args);
 
                 if (help)
                 {
                     ShowHelp(opt);
                     return;
                 }
-
-                fin = extra.Count == 0 ? null : extra[0];
-
-                if (extra.Count > 1)
-                    throw new ApplicationException("extra command line argument(s):" + string.Join(" ", extra));
 
                 if (!run && debug)
                     throw new ApplicationException("cann't assembly with --debug");
@@ -71,36 +69,47 @@ namespace Assembler
 
             try
             {
-                if (fin != null)
-                    using (var sin = new StreamReader(fin))
-                        Do(run, debug, sin, fout, isHex);
+                if (fin.Count > 0)
+                    Do(
+                       run,
+                       debug,
+                       fin.Select<string, Action<Action<TextReader>>>
+                           (
+                            f => a =>
+                                 {
+                                     using (var sin = new StreamReader(f))
+                                         a(sin);
+                                 }),
+                       fout,
+                       isHex);
                 else
                 {
                     if (!ConsoleEx.IsInputRedirected)
                         Console.WriteLine("Use Ctrl+Z to stop input and execute");
-                    Do(run, debug, Console.In, fout, isHex);
+                    Do(run, debug, new Action<Action<TextReader>>[] { a => a(Console.In) }, fout, isHex);
                 }
             }
             catch (Exception e)
             {
                 Console.Error.Write("Assembler: ");
-                Console.Error.WriteLine(e.Message);
+                Console.Error.WriteLine(e.ToString());
                 Environment.Exit(1);
             }
         }
 
-        private static void Do(bool run, bool debug, TextReader sin, string fout, bool isHex)
+        private static void Do(bool run, bool debug, IEnumerable<Action<Action<TextReader>>> feeder, string fout,
+                               bool isHex)
         {
             if (run)
-                DoRun(debug, sin);
+                DoRun(debug, feeder);
             else if (!string.IsNullOrEmpty(fout))
                 using (var sout = new StreamWriter(fout))
-                    DoAssembly(isHex, false, sin, sout);
+                    DoAssembly(isHex, false, feeder, sout);
             else
-                DoAssembly(isHex, true, sin, Console.Out);
+                DoAssembly(isHex, true, feeder, Console.Out);
         }
 
-        private static void DoRun(bool debug, TextReader sin)
+        private static void DoRun(bool debug, IEnumerable<Action<Action<TextReader>>> feeder)
         {
             var asm = new AsmExecuter();
             if (debug)
@@ -111,13 +120,15 @@ namespace Assembler
                                         Console.Read();
                                         Console.Read();
                                     };
-            asm.Feed(sin);
+            foreach (var action in feeder)
+                action(sin => asm.Feed(Parse(sin).line()));
+            asm.Done();
             PrintContext(asm.CPU);
         }
 
         private static void PrintContext(Context cpu)
         {
-            Console.WriteLine($"CFlag: {cpu.CFlag}  ZeroFlag: {cpu.ZeroFlag}");
+            Console.WriteLine($"PC: {cpu.PC} CFlag: {cpu.CFlag}  ZeroFlag: {cpu.ZeroFlag}");
             for (var i = 0; i < cpu.Registers.Length; i++)
                 Console.WriteLine($"R{i} = 0x{cpu.Registers[i]:x2} ({cpu.Registers[i]})");
             for (var i = 0; i < cpu.Ram.Length; i += 8)
@@ -129,7 +140,8 @@ namespace Assembler
             }
         }
 
-        private static void DoAssembly(bool isHex, bool isConsole, TextReader sin, TextWriter sout)
+        private static void DoAssembly(bool isHex, bool isConsole, IEnumerable<Action<Action<TextReader>>> feeder,
+                                       TextWriter sout)
         {
             TextAssembler asm;
             if (isHex)
@@ -138,7 +150,18 @@ namespace Assembler
                 asm = new BinAssembler(sout);
             else
                 asm = new IntelAssembler(sout);
-            asm.Feed(sin);
+
+            foreach (var action in feeder)
+                action(sin => asm.Feed(Parse(sin).line()));
+            asm.Done();
+        }
+
+        private static AsmParser.ProgContext Parse(TextReader sin)
+        {
+            var lexer = new AsmLexer(new AntlrInputStream(sin));
+            var parser = new AsmParser(new CommonTokenStream(lexer)); // { ErrorHandler = new BailErrorStrategy() };
+            var prog = parser.prog();
+            return prog;
         }
     }
 
@@ -151,10 +174,24 @@ namespace Assembler
         public static bool IsErrorRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stderr));
 
         // P/Invoke:
-        private enum FileType { Unknown, Disk, Char, Pipe };
-        private enum StdHandle { Stdin = -10, Stdout = -11, Stderr = -12 };
+        private enum FileType
+        {
+            Unknown,
+            Disk,
+            Char,
+            Pipe
+        };
+
+        private enum StdHandle
+        {
+            Stdin = -10,
+            Stdout = -11,
+            Stderr = -12
+        };
+
         [DllImport("kernel32.dll")]
         private static extern FileType GetFileType(IntPtr hdl);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetStdHandle(StdHandle std);
     }

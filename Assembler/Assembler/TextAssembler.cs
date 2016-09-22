@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace Assembler
 {
@@ -13,13 +12,5 @@ namespace Assembler
             Writer = writer;
             Width = width;
         }
-
-        protected override void Put(List<int> res)
-        {
-            foreach (var v in res)
-                PutValue(v & ((1 << Width) - 1));
-        }
-
-        protected abstract void PutValue(int v);
     }
 }

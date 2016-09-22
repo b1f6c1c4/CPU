@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Antlr4.Runtime;
 
 namespace Assembler
 {
     public abstract class AsmSerializer
     {
-        private int m_Position;
+        private readonly List<IInstruction> m_Instructions;
 
         private readonly Dictionary<string, int> m_Symbols;
 
-        protected AsmSerializer(int initial = 0)
+        protected AsmSerializer()
         {
-            m_Position = initial;
+            m_Instructions = new List<IInstruction>();
             m_Symbols = new Dictionary<string, int>();
         }
 
-        public void Feed(TextReader reader)
+        public void Feed(IEnumerable<AsmParser.LineContext> prog)
         {
-            var lexer = new AsmLexer(new AntlrInputStream(reader));
-            var parser = new AsmParser(new CommonTokenStream(lexer)) { ErrorHandler = new BailErrorStrategy() };
-            var prog = parser.prog();
-
-            var ini = m_Position;
-
-            foreach (var context in prog.line())
+            foreach (var context in prog)
                 Parse(context);
+        }
 
-            m_Position = ini;
-
-            foreach (var context in prog.line())
-                Serialize(context);
+        public void Done()
+        {
+            for (var i = 0; i < m_Instructions.Count; i++)
+            {
+                var inst = m_Instructions[i];
+                var i1 = i;
+                Put(inst.Serialize((s, a) => GetSymbol(i1, s, a)));
+            }
 
             PutFinal();
         }
@@ -43,36 +40,28 @@ namespace Assembler
                 var lbl = context.label().Name().Symbol.Text;
                 if (m_Symbols.ContainsKey(lbl))
                     throw new ApplicationException("duplicate labels");
-                m_Symbols.Add(lbl, m_Position);
+                m_Symbols.Add(lbl, m_Instructions.Count);
             }
 
             if (context.instruction() != null)
-                m_Position += context.instruction().Length;
+                m_Instructions.Add(context.instruction());
+            else if (context.macro() != null)
+                m_Instructions.AddRange(context.macro().Flatten());
         }
 
-        private void Serialize(AsmParser.LineContext context)
-        {
-            if (context.instruction() != null)
-            {
-                var res = context.instruction().Serialize(GetSymbol);
-                Put(res);
-                m_Position += res.Count;
-            }
-        }
-
-        protected abstract void Put(List<int> res);
+        protected abstract void Put(int res);
 
         protected virtual void PutFinal() { }
 
-        private int GetSymbol(IInstruction inst, string symbol, bool absolute)
+        private int GetSymbol(int now, string symbol, bool isAbs)
         {
             int pos;
             if (!m_Symbols.TryGetValue(symbol, out pos))
                 throw new KeyNotFoundException($"Symbol {symbol} not found.");
 
-            if (absolute)
+            if (isAbs)
                 return pos;
-            return pos - (m_Position + inst.Length);
+            return pos - (now + 1);
         }
     }
 }

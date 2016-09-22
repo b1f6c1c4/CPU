@@ -8,7 +8,7 @@ namespace Assembler
 
         public IntelAssembler(TextWriter writer, int width = 16) : base(writer, width) { m_Address = 0; }
 
-        protected override void PutValue(int v)
+        protected override void Put(int v)
         {
             Writer.Write($":{Width / 8:X2}{m_Address:X4}00");
             var fmt = "{0:X" + (Width / 4) + "}";

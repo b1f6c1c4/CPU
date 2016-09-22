@@ -6,7 +6,7 @@ namespace Assembler
     {
         public sealed partial class InstructionContext : IExecutableInstruction
         {
-            public string Execute(Context context) => GetInst().Execute(context);
+            public PCTarget Execute(Context context) => GetInst().Execute(context);
 
             private IExecutableInstruction GetInst()
             {
@@ -16,13 +16,15 @@ namespace Assembler
                     return typeR();
                 if (typeJ() != null)
                     return typeJ();
+                if (typeP() != null)
+                    return typeP();
                 throw new InvalidOperationException();
             }
         }
 
         public sealed partial class TypeRContext : IExecutableInstruction
         {
-            public string Execute(Context context)
+            public PCTarget Execute(Context context)
             {
                 switch (TypeR().Symbol.Text)
                 {
@@ -85,7 +87,7 @@ namespace Assembler
 
         public sealed partial class TypeIContext : IExecutableInstruction
         {
-            public string Execute(Context context)
+            public PCTarget Execute(Context context)
             {
                 switch ((TypeI() ?? TypeIJ()).Symbol.Text)
                 {
@@ -121,19 +123,11 @@ namespace Assembler
                         }
                     case "BEQ":
                         if (context.Registers[RegisterNumber(Rs)] == context.Registers[RegisterNumber(Rt)])
-                        {
-                            if (obj().Name() == null)
-                                throw new NotSupportedException();
-                            return obj().Name().Symbol.Text;
-                        }
+                            return obj().Name() == null ? (PCTarget)(int)obj().number() : obj().Name().Symbol.Text;
                         return null;
                     case "BNE":
                         if (context.Registers[RegisterNumber(Rs)] != context.Registers[RegisterNumber(Rt)])
-                        {
-                            if (obj().Name() == null)
-                                throw new NotSupportedException();
-                            return obj().Name().Symbol.Text;
-                        }
+                            return obj().Name() == null ? (PCTarget)(int)obj().number() : obj().Name().Symbol.Text;
                         return null;
                     default:
                         throw new InvalidOperationException();
@@ -143,14 +137,36 @@ namespace Assembler
 
         public sealed partial class TypeJContext : IExecutableInstruction
         {
-            public string Execute(Context context)
+            public PCTarget Execute(Context context)
             {
                 switch (TypeJ().Symbol.Text)
                 {
                     case "JMP":
-                        if (obj().Name() == null)
-                            throw new NotSupportedException();
-                        return obj().Name().Symbol.Text;
+                        return obj().Name() == null ? new PCTarget(obj().number(), true) : obj().Name().Symbol.Text;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        public sealed partial class TypePContext : IExecutableInstruction
+        {
+            public PCTarget Execute(Context context)
+            {
+                switch (Op.Text)
+                {
+                    case "LPCH":
+                        context.Registers[RegisterNumber(Rt)] = (byte)((context.PC + 1) >> 8);
+                        return null;
+                    case "LPCL":
+                        context.Registers[RegisterNumber(Rt)] = (byte)(context.PC + 1);
+                        return null;
+                    case "SPC":
+                        return new PCTarget(
+                            (context.Registers[RegisterNumber(Rd)] << 8) |
+                            context.Registers[RegisterNumber(Rt)],
+                            true
+                            );
                     default:
                         throw new InvalidOperationException();
                 }

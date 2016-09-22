@@ -12,6 +12,7 @@ line
     : Comment
     | label Comment?
     | instruction Comment?
+	| macro Comment?
     ;
 
 label
@@ -19,7 +20,7 @@ label
     ;
 
 instruction
-    : Debug = '#'? (typeR | typeI | typeJ)
+    : Debug='#'? (typeR | typeI | typeJ | typeP)
     ;
 
 typeR
@@ -34,6 +35,21 @@ typeI
 typeJ
     : TypeJ obj
     ;
+
+typeP
+	: Op=('LPCL' | 'LPCH') Rt=Register
+	| Op='SPC' Rd=Register ',' Rt=Register
+	;
+
+macro
+	: Debug='#'? (
+	Op='INIT'
+	| Op='CALL' obj
+	| Op='RET'
+	| Op='PUSH' Rx=('BP' | Register)
+	| Op='POP'  Rx=Register
+	)
+	;
 
 obj
     : number

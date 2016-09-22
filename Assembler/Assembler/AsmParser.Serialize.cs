@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Antlr4.Runtime;
 
 namespace Assembler
@@ -24,38 +23,31 @@ namespace Assembler
 
         public sealed partial class ObjContext
         {
-            public int Serialize(IInstruction inst, Func<IInstruction, string, bool, int> symbols, bool absolute)
+            public int Serialize(IInstruction inst, SymbolResolver symbols, bool absolute)
             {
                 if (number() != null)
                     return number();
                 if (Name() != null)
-                    return symbols(inst, Name().Symbol.Text, absolute);
+                    return symbols(Name().Symbol.Text, absolute);
                 throw new InvalidOperationException();
             }
         }
 
         public sealed partial class InstructionContext : IInstruction
         {
-            public int Length => Debug != null ? 0 : GetInst().Length;
-
-            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols) =>
-                Debug != null ? new List<int>() : GetInst().Serialize(symbols);
+            public int Serialize(SymbolResolver symbols) =>
+                Debug != null ? new int() : GetInst().Serialize(symbols);
         }
 
         public sealed partial class TypeRContext : IInstruction
         {
-            public int Length => 1;
-
-            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols)
+            public int Serialize(SymbolResolver symbols)
             {
                 var op = GetOpcode(TypeR().Symbol.Text);
                 var rd = RegisterNumber(Rd);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
-                return new List<int>
-                           {
-                               (op << 12) | (rs << 10) | (rt << 8) | (rd << 6)
-                           };
+                return (op << 12) | (rs << 10) | (rt << 8) | (rd << 6);
             }
 
             private static int GetOpcode(string text)
@@ -84,9 +76,7 @@ namespace Assembler
 
         public sealed partial class TypeIContext : IInstruction
         {
-            public int Length => 1;
-
-            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols)
+            public int Serialize(SymbolResolver symbols)
             {
                 bool br;
                 var op = GetOpcode((TypeI() ?? TypeIJ()).Symbol.Text, out br);
@@ -101,10 +91,7 @@ namespace Assembler
                     throw new InvalidOperationException();
                 if (br && (imm > 0x7f || imm < -0x80))
                     throw new ApplicationException($"BEQ/BNE at line {TypeI().Symbol.Line} jump too long; use JMP");
-                return new List<int>
-                           {
-                               (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff)
-                           };
+                return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
             private static int GetOpcode(string text, out bool br)
@@ -136,16 +123,11 @@ namespace Assembler
 
         public sealed partial class TypeJContext : IInstruction
         {
-            public int Length => 1;
-
-            public List<int> Serialize(Func<IInstruction, string, bool, int> symbols)
+            public int Serialize(SymbolResolver symbols)
             {
                 var op = GetOpcode(TypeJ().Symbol.Text);
                 var imm = obj().Serialize(this, symbols, true);
-                return new List<int>
-                           {
-                               (op << 12) | (imm & 0xfff)
-                           };
+                return (op << 12) | (imm & 0xfff);
             }
 
             private static int GetOpcode(string text)
@@ -156,6 +138,24 @@ namespace Assembler
                         return 0x7;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(text));
+                }
+            }
+        }
+
+        public sealed partial class TypePContext : IInstruction
+        {
+            public int Serialize(SymbolResolver symbols)
+            {
+                switch (Op.Text)
+                {
+                    case "LPCH":
+                        return 0xf000 | (RegisterNumber(Rt) << 8);
+                    case "LPCL":
+                        return 0xf400 | (RegisterNumber(Rt) << 8);
+                    case "SPC":
+                        return 0xf800 | (RegisterNumber(Rt) << 8) | (RegisterNumber(Rd) << 6);
+                    default:
+                        throw new InvalidOperationException();
                 }
             }
         }

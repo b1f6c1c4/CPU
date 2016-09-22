@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Antlr4.Runtime;
 
 namespace Assembler
 {
@@ -17,7 +15,7 @@ namespace Assembler
 
         private readonly Dictionary<string, int> m_Symbols;
 
-        public Context CPU { get; private set; }
+        public Context CPU { get; }
 
         public AsmExecuter()
         {
@@ -27,39 +25,46 @@ namespace Assembler
 
             CPU = new Context
                       {
+                          PC = 0,
                           Registers = new byte[4],
                           Ram = new byte[256]
                       };
         }
 
-        public void Feed(TextReader reader)
+        public void Feed(IEnumerable<AsmParser.LineContext> prog, string filename = "")
         {
-            var lexer = new AsmLexer(new AntlrInputStream(reader));
-            var parser = new AsmParser(new CommonTokenStream(lexer)) { ErrorHandler = new BailErrorStrategy() };
-            var prog = parser.prog();
+            foreach (var context in prog)
+                Parse(context, filename);
+        }
 
-            foreach (var context in prog.line())
-                Parse(context);
-
-            var id = 0;
-            while (id < m_Instructions.Count)
+        public void Done()
+        {
+            while (CPU.PC < m_Instructions.Count)
             {
-                if (m_Symbols.ContainsValue(id))
-                    OnBreakPoint?.Invoke(m_Lines[id]);
+                if (m_Symbols.ContainsValue(CPU.PC))
+                    OnBreakPoint?.Invoke(m_Lines[CPU.PC]);
 
-                var symbol = m_Instructions[id].Execute(CPU);
-                if (symbol == null)
+                var res = m_Instructions[CPU.PC].Execute(CPU);
+                if (res == null)
                 {
-                    id ++;
+                    CPU.PC++;
                     continue;
                 }
 
-                if (!m_Symbols.TryGetValue(symbol, out id))
-                    throw new KeyNotFoundException($"Symbol {symbol} not found.");
+                if (res.IsSymbol)
+                {
+                    if (!m_Symbols.TryGetValue(res.Symbol, out CPU.PC))
+                        throw new KeyNotFoundException($"Symbol {res.Symbol} not found.");
+                    continue;
+                }
+                if (res.IsAbs)
+                    CPU.PC = res.Position;
+                else
+                    CPU.PC += res.Position + 1;
             }
         }
 
-        private void Parse(AsmParser.LineContext context)
+        private void Parse(AsmParser.LineContext context, string filename)
         {
             if (context.label() != null)
             {
@@ -71,8 +76,17 @@ namespace Assembler
 
             if (context.instruction() != null)
             {
-                m_Lines.Add(m_Instructions.Count, context.GetText());
+                m_Lines.Add(
+                            m_Instructions.Count,
+                            $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
                 m_Instructions.Add(context.instruction());
+            }
+            else if (context.macro() != null)
+            {
+                m_Lines.Add(
+                            m_Instructions.Count,
+                            $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
+                m_Instructions.AddRange(context.macro().Flatten());
             }
         }
     }
