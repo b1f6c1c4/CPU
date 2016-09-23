@@ -14,6 +14,8 @@ namespace AssemblerGui
 
         private bool m_Edited;
 
+        private int m_LineNumberLength;
+
         private void SetupEditor()
         {
             SetupScintilla();
@@ -42,12 +44,48 @@ namespace AssemblerGui
             scintilla.SetKeywords(1, "INIT PUSH POP CALL RET".ToLower());
             scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
 
-            scintilla.TextChanged +=
-                (s, e) =>
-                {
-                    m_Edited = true;
-                    UpdateTitle();
-                };
+            scintilla.Margins[1].Type = MarginType.Number;
+            scintilla.Margins[1].Width = 16;
+            scintilla.Margins[1].Mask = 0;
+
+            scintilla.Margins[0].Type = MarginType.Symbol;
+            scintilla.Margins[0].Sensitive = true;
+            scintilla.Margins[0].Mask = 1;
+            scintilla.Margins[0].Cursor = MarginCursor.Arrow;
+            scintilla.Margins[0].Width = 16;
+
+            scintilla.Markers[0].Symbol = MarkerSymbol.Circle;
+            scintilla.Markers[0].SetBackColor(Color.FromArgb(229, 20, 0));
+            scintilla.Markers[0].SetForeColor(Color.White);
+        }
+
+        private void scintilla_TextChanged(object s, EventArgs e)
+        {
+            var length = scintilla.Lines.Count.ToString().Length;
+            if (length == m_LineNumberLength)
+                return;
+
+            m_LineNumberLength = length;
+
+            const int padding = 2;
+            scintilla.Margins[1].Width = scintilla.TextWidth(Style.LineNumber, new string('9', length + 1)) + padding;
+
+            m_Edited = true;
+            UpdateTitle();
+        }
+
+        private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
+        {
+            if (e.Margin == 0)
+                ToggleBreakPoint(scintilla.Lines[scintilla.LineFromPosition(e.Position)]);
+        }
+
+        private static void ToggleBreakPoint(Line line)
+        {
+            if ((line.MarkerGet() & 1) != 0)
+                line.MarkerDelete(0);
+            else
+                line.MarkerAdd(0);
         }
 
         private void LoadEmptyDoc()
@@ -69,6 +107,9 @@ namespace AssemblerGui
 
         private bool PromptForSave()
         {
+            if (!m_Edited)
+                return true;
+
             var res = MessageBox.Show($"{m_FileName} 尚未保存，是否要保存？", "MIPS编辑器", MessageBoxButtons.YesNoCancel);
             if (res == DialogResult.Cancel)
                 return false;
@@ -79,12 +120,8 @@ namespace AssemblerGui
             return PerformSave();
         }
 
-        private bool PerformSave(bool force = false)
+        private bool PerformSave()
         {
-            if (!m_Edited &&
-                !force)
-                return true;
-
             if (m_FilePath == null)
                 if (!PromptSaveAs())
                     return false;
@@ -154,7 +191,7 @@ namespace AssemblerGui
         }
 
         private void 保存SToolStripMenuItem_Click(object sender, EventArgs e) =>
-            PerformSave(true);
+            PerformSave();
 
         private void 另存为AToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -181,6 +218,12 @@ namespace AssemblerGui
                 return;
 
             Environment.Exit(0);
+        }
+
+        private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (scintilla.Focused)
+                ToggleBreakPoint(scintilla.Lines[scintilla.CurrentLine]);
         }
     }
 }

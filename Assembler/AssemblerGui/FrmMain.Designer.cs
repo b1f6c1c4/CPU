@@ -70,11 +70,13 @@
             this.scintilla.Lexer = ScintillaNET.Lexer.Asm;
             this.scintilla.Location = new System.Drawing.Point(0, 25);
             this.scintilla.Margin = new System.Windows.Forms.Padding(2);
+            this.scintilla.Margins.Left = 16;
             this.scintilla.Name = "scintilla";
             this.scintilla.Size = new System.Drawing.Size(743, 560);
             this.scintilla.TabIndex = 0;
-            this.scintilla.TabStop = false;
             this.scintilla.WrapMode = ScintillaNET.WrapMode.Char;
+            this.scintilla.TextChanged += scintilla_TextChanged;
+            this.scintilla.MarginClick += scintilla_MarginClick;
             // 
             // panel1
             // 
@@ -312,6 +314,7 @@
             this.切换断点BToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
             this.切换断点BToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.切换断点BToolStripMenuItem.Text = "切换断点(&B)";
+            this.切换断点BToolStripMenuItem.Click += new System.EventHandler(this.切换断点BToolStripMenuItem_Click);
             // 
             // FrmMain
             // 
