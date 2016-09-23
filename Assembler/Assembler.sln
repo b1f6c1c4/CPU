@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembler", "Assembler\Asse
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblerCli", "AssemblerCli\AssemblerCli.csproj", "{10502087-1685-44FE-B01F-A3EC3988F85A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblerGui", "AssemblerGui\AssemblerGui.csproj", "{05A95CC3-6FC6-43CE-8F6E-012FB1773FBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{10502087-1685-44FE-B01F-A3EC3988F85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10502087-1685-44FE-B01F-A3EC3988F85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10502087-1685-44FE-B01F-A3EC3988F85A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05A95CC3-6FC6-43CE-8F6E-012FB1773FBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05A95CC3-6FC6-43CE-8F6E-012FB1773FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05A95CC3-6FC6-43CE-8F6E-012FB1773FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05A95CC3-6FC6-43CE-8F6E-012FB1773FBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
