@@ -51,29 +51,48 @@ namespace AssemblerGui
 
         private void ExportFile(Type t, Func<string> prompt)
         {
-            var pre = new Preprocessor(new[] { m_FilePath });
-            string fn;
-            using (var mem = new MemoryStream())
+            try
             {
-                var asm = (TextAssembler)Activator.CreateInstance(t, new StreamWriter(mem), 16);
-                foreach (var p in pre)
-                    asm.Feed(p);
-                asm.Done();
-                mem.Position = 0;
-                fn = prompt();
-                using (var ou = File.OpenWrite(fn))
-                    mem.CopyTo(ou);
-            }
-            var msg = MessageBox.Show(
-                                      "导出成功，是否要用记事本打开？",
-                                      "MIPS汇编器",
-                                      MessageBoxButtons.YesNo,
-                                      MessageBoxIcon.Question,
-                                      MessageBoxDefaultButton.Button2);
-            if (msg != DialogResult.Yes)
-                return;
+                var pre = new Preprocessor(new[] { m_FilePath });
+                string fn;
+                using (var mem = new MemoryStream())
+                {
+                    var asm = (TextAssembler)Activator.CreateInstance(t, new StreamWriter(mem), 16);
+                    try
+                    {
+                        foreach (var p in pre)
+                            asm.Feed(p);
+                        asm.Done();
+                    }
+                    catch (AssemblyException e)
+                    {
+                        MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        LoadDoc(e.FilePath, e.Line, e.CharPos);
+                        return;
+                    }
+                    mem.Position = 0;
+                    fn = prompt();
+                    if (fn == null)
+                        return;
 
-            Process.Start("notepad", fn);
+                    using (var ou = File.OpenWrite(fn))
+                        mem.CopyTo(ou);
+                }
+                var msg = MessageBox.Show(
+                                          "导出成功，是否要用记事本打开？",
+                                          "MIPS汇编器",
+                                          MessageBoxButtons.YesNo,
+                                          MessageBoxIcon.Question,
+                                          MessageBoxDefaultButton.Button2);
+                if (msg != DialogResult.Yes)
+                    return;
+
+                Process.Start("notepad", fn);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -84,7 +103,7 @@ namespace AssemblerGui
 
         private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave())
+            if (!PromptForSave(true))
                 return;
 
             ExportFile(typeof(IntelAssembler), () => PromptSaveDialog("hex", "Intel Hex文件", "导出"));
@@ -92,7 +111,7 @@ namespace AssemblerGui
 
         private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave())
+            if (!PromptForSave(true))
                 return;
 
             ExportFile(typeof(BinAssembler), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
@@ -100,7 +119,7 @@ namespace AssemblerGui
 
         private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave())
+            if (!PromptForSave(true))
                 return;
 
             ExportFile(typeof(HexAssembler), () => PromptSaveDialog("txt", "纯文本文件", "导出"));

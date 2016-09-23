@@ -75,6 +75,8 @@
             this.scintilla.Size = new System.Drawing.Size(743, 560);
             this.scintilla.TabIndex = 0;
             this.scintilla.WrapMode = ScintillaNET.WrapMode.Char;
+            this.scintilla.TextChanged += scintilla_TextChanged;
+            this.scintilla.MarginClick += scintilla_MarginClick;
             // 
             // panel1
             // 

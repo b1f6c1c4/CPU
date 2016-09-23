@@ -28,10 +28,38 @@ namespace Assembler
             using (var sin = new StreamReader(filename))
             {
                 var lexer = new AsmLexer(new AntlrInputStream(sin));
-                var parser = new AsmParser(new CommonTokenStream(lexer)); // { ErrorHandler = new BailErrorStrategy() };
-                var prog = parser.prog();
+                var parser = new AsmParser(new CommonTokenStream(lexer));
+                parser.AddErrorListener(new AssemblyHandler(filename));
+                AsmParser.ProgContext prog;
+                try
+                {
+                    prog = parser.prog();
+                }
+                catch (AssemblyException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw new AssemblyException(e.Message, e) { FilePath = filename };
+                }
                 foreach (var context in prog.line())
-                    Parse(context, filename);
+                    try
+                    {
+                        Parse(context, filename);
+                    }
+                    catch (AssemblyException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new AssemblyException(e.Message, e)
+                                  {
+                                      FilePath = filename,
+                                      Line = context.start.Line
+                                  };
+                    }
             }
 
             if (halt)

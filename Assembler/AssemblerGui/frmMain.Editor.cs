@@ -61,6 +61,9 @@ namespace AssemblerGui
 
         private void scintilla_TextChanged(object s, EventArgs e)
         {
+            m_Edited = true;
+            UpdateTitle();
+
             var length = scintilla.Lines.Count.ToString().Length;
             if (length == m_LineNumberLength)
                 return;
@@ -69,9 +72,6 @@ namespace AssemblerGui
 
             const int padding = 2;
             scintilla.Margins[1].Width = scintilla.TextWidth(Style.LineNumber, new string('9', length + 1)) + padding;
-
-            m_Edited = true;
-            UpdateTitle();
         }
 
         private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
@@ -86,6 +86,12 @@ namespace AssemblerGui
                 line.MarkerDelete(0);
             else
                 line.MarkerAdd(0);
+        }
+
+        private void SetFile(string filePath)
+        {
+            m_FilePath = filePath;
+            m_FileName = Path.GetFileNameWithoutExtension(m_FilePath);
         }
 
         private void LoadEmptyDoc()
@@ -105,7 +111,7 @@ namespace AssemblerGui
             UpdateTitle();
         }
 
-        private bool PromptForSave()
+        private bool PromptForSave(bool forbidNo = false)
         {
             if (!m_Edited)
                 return true;
@@ -113,7 +119,7 @@ namespace AssemblerGui
             var res = MessageBox.Show(
                                       $"{m_FileName} 尚未保存，是否要保存？",
                                       "MIPS编辑器",
-                                      MessageBoxButtons.YesNoCancel,
+                                      forbidNo ? MessageBoxButtons.OKCancel : MessageBoxButtons.YesNoCancel,
                                       MessageBoxIcon.Exclamation);
             if (res == DialogResult.Cancel)
                 return false;
@@ -140,12 +146,11 @@ namespace AssemblerGui
 
         private bool PromptSaveAs()
         {
-            var res = PromptSaveDialog("misp", "MIPS文件", "另存为");
+            var res = PromptSaveDialog("mips", "MIPS文件", "另存为");
             if (res == null)
                 return false;
 
-            m_FilePath = res;
-            m_FileName = Path.GetFileNameWithoutExtension(m_FilePath);
+            SetFile(res);
             return true;
         }
 
@@ -166,8 +171,7 @@ namespace AssemblerGui
             if (res == DialogResult.Cancel)
                 return false;
 
-            m_FilePath = dialog.FileName;
-            m_FileName = Path.GetFileNameWithoutExtension(m_FilePath);
+            SetFile(dialog.FileName);
 
             return true;
         }
@@ -214,6 +218,23 @@ namespace AssemblerGui
         {
             if (scintilla.Focused)
                 ToggleBreakPoint(scintilla.Lines[scintilla.CurrentLine]);
+        }
+
+        private void LoadDoc(string filePath, int? line, int? charPos)
+        {
+            if (filePath == null)
+                return;
+
+            if (!PromptForSave())
+                return;
+
+            SetFile(filePath);
+            LoadDoc();
+
+            if (!line.HasValue)
+                return;
+
+            scintilla.GotoPosition(scintilla.Lines[line.Value - 1].Position + (charPos ?? 0));
         }
     }
 }
