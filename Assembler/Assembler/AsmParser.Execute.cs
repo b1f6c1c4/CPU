@@ -133,11 +133,11 @@ namespace Assembler
                         }
                     case "BEQ":
                         if (context.Registers[RegisterNumber(Rs)] == context.Registers[RegisterNumber(Rt)])
-                            return obj().Name() == null ? (PCTarget)(int)obj().number() : obj().Name().Symbol.Text;
+                            return obj().Name() == null ? (PCTarget)(sbyte)(int)obj().number() : obj().Name().Symbol.Text;
                         return null;
                     case "BNE":
                         if (context.Registers[RegisterNumber(Rs)] != context.Registers[RegisterNumber(Rt)])
-                            return obj().Name() == null ? (PCTarget)(int)obj().number() : obj().Name().Symbol.Text;
+                            return obj().Name() == null ? (PCTarget)(sbyte)(int)obj().number() : obj().Name().Symbol.Text;
                         return null;
                     default:
                         throw new InvalidOperationException();
@@ -173,8 +173,8 @@ namespace Assembler
                         return null;
                     case "SPC":
                         return new PCTarget(
-                            (context.Registers[RegisterNumber(Rd)] << 8) |
-                            context.Registers[RegisterNumber(Rt)],
+                            ((context.Registers[RegisterNumber(Rd)] << 8) |
+                            context.Registers[RegisterNumber(Rt)]) & 0x0fff,
                             true
                             );
                     default:

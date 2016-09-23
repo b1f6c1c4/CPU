@@ -64,13 +64,15 @@ namespace Assembler
             }
             else if (context.macro() != null)
             {
-                Lines.Add(
-                          Instructions.Count,
-                          $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
                 var instructions = context.macro().Flatten();
-                Instructions.AddRange(instructions);
-                for (var i = 0; i < instructions.Count; i++)
+                foreach (var inst in instructions)
+                {
+                    Lines.Add(
+                              Instructions.Count,
+                              $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
+                    Instructions.Add(inst);
                     m_Filenames.Add(filename);
+                }
             }
         }
 

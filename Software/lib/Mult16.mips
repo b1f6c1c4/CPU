@@ -1,0 +1,173 @@
+    ; Mult16: 16bit signed multiplier
+    ; arg[3..2] a -> (a*b)_H
+    ; arg[1..0] b -> (a*b)_L
+;include Mult.mips
+Mult16:
+    PUSH BP
+    ; sp+7..4 = sum
+    ; sp+3 = |a|_H
+    ; sp+2 = |a|_L
+    ; sp+1 = |b|_H
+    ; sp   = |b|_L
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 0xf8
+    SW   R3, R1, 0xff
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_a
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x04
+    SW   R0, R3, 0x03
+    JMP done_a
+inv_a:
+    LW   R0, R2, 0x03
+    SUB  R0, R1, R0
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x04
+    SUBC R0, R1, R0
+    SW   R0, R3, 0x03
+done_a:
+    LW   R0, R2, 0x06
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_b
+    LW   R0, R2, 0x05
+    SW   R0, R3, 0x00
+    LW   R0, R2, 0x06
+    SW   R0, R3, 0x01
+    JMP done_b
+inv_b:
+    LW   R0, R2, 0x05
+    SUB  R0, R1, R0
+    SW   R0, R3, 0x00
+    LW   R0, R2, 0x06
+    SUBC R0, R1, R0
+    SW   R0, R3, 0x01
+done_b:
+    ; sum = 0
+    SW   R1, R3, 0x04
+    SW   R1, R3, 0x05
+    SW   R1, R3, 0x06
+    SW   R1, R3, 0x07
+    ; sum += |a|_L * |b|_L
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x00
+    LW   R0, R3, 0x02
+    PUSH R2
+    PUSH R0
+    CALL Mult
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x06
+    LW   R2, R3, 0x00
+    ADD  R0, R0, R2
+    SW   R0, R3, 0x06
+    LW   R0, R3, 0x07
+    LW   R2, R3, 0x01
+    ADDC R0, R0, R2
+    SW   R0, R3, 0x07
+    LW   R0, R3, 0x08
+    ADDC R0, R0, R1
+    SW   R0, R3, 0x08
+    LW   R0, R3, 0x09
+    ADDC R0, R0, R1
+    SW   R0, R3, 0x09
+    POP  R0
+    POP  R2
+    ; sum += (|a|_H * |b|_L) << 8
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x00
+    LW   R0, R3, 0x03
+    PUSH R2
+    PUSH R0
+    CALL Mult
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x07
+    LW   R2, R3, 0x00
+    ADD  R0, R0, R2
+    SW   R0, R3, 0x07
+    LW   R0, R3, 0x08
+    LW   R2, R3, 0x01
+    ADDC R0, R0, R2
+    SW   R0, R3, 0x08
+    LW   R0, R3, 0x09
+    ADDC R0, R0, R1
+    SW   R0, R3, 0x09
+    POP  R0
+    POP  R2
+    ; sum += (|a|_L * |b|_H) << 8
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x01
+    LW   R0, R3, 0x02
+    PUSH R2
+    PUSH R0
+    CALL Mult
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x07
+    LW   R2, R3, 0x00
+    ADD  R0, R0, R2
+    SW   R0, R3, 0x07
+    LW   R0, R3, 0x08
+    LW   R2, R3, 0x01
+    ADDC R0, R0, R2
+    SW   R0, R3, 0x08
+    LW   R0, R3, 0x09
+    ADDC R0, R0, R1
+    SW   R0, R3, 0x09
+    POP  R0
+    POP  R2
+    ; sum += (|a|_H * |b|_H) << 16
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x02
+    LW   R0, R3, 0x03
+    PUSH R2
+    PUSH R0
+    CALL Mult
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x08
+    LW   R2, R3, 0x00
+    ADD  R0, R0, R2
+    SW   R0, R3, 0x08
+    LW   R0, R3, 0x09
+    LW   R2, R3, 0x01
+    ADDC R0, R0, R2
+    SW   R0, R3, 0x09
+    POP  R0
+    POP  R2
+    ; return
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    ANDI R3, R0, 0x80
+    LW   R0, R2, 0x06
+    ANDI R0, R0, 0x80
+    ADD  R0, R0, R3
+    LW   R3, R1, 0xff
+    BNE  R0, R1, inv_sum
+    LW   R0, R3, 0x04
+    SW   R0, R2, 0x03
+    LW   R0, R3, 0x05
+    SW   R0, R2, 0x04
+    LW   R0, R3, 0x06
+    SW   R0, R2, 0x05
+    LW   R0, R3, 0x07
+    SW   R0, R2, 0x06
+    RET
+inv_sum:
+    LW   R0, R3, 0x04
+    SUB  R0, R1, R0
+    SW   R0, R2, 0x03
+    LW   R0, R3, 0x05
+    SUBC R0, R1, R0
+    SW   R0, R2, 0x04
+    LW   R0, R3, 0x06
+    SUBC R0, R1, R0
+    SW   R0, R2, 0x05
+    LW   R0, R3, 0x07
+    SUBC R0, R1, R0
+    SW   R0, R2, 0x06
+    RET

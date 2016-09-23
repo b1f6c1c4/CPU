@@ -1,7 +1,9 @@
-;include lib/ReadKey.mips
+;include lib/Mult16.mips
     INIT
-loop:
-    CALL ReadKey
     ANDI R1, R1, 0x00
-    SW   R0, R1, 0x00
-    JMP  loop
+    ADDI R0, R1, 0x5a
+    PUSH R0
+    PUSH R0
+    PUSH R0
+    PUSH R0
+    CALL Mult16
