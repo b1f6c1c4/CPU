@@ -116,7 +116,8 @@ namespace AssemblerGui
 
         private bool PromptForSave(bool forbidNo = false)
         {
-            if (!m_Edited)
+            if ((!forbidNo || m_FilePath != null) &&
+                !m_Edited)
                 return true;
 
             var res = MessageBox.Show(

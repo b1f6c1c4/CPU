@@ -31,8 +31,6 @@
             this.scintilla = new ScintillaNET.Scintilla();
             this.panel1 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Addr = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,6 +56,8 @@
             this.跳出JToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Addr = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -110,27 +110,10 @@
             this.dataGridView1.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValidated);
             this.dataGridView1.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dataGridView1_CellValidating);
             // 
-            // Addr
-            // 
-            this.Addr.DataPropertyName = "Addr";
-            this.Addr.HeaderText = "Addr";
-            this.Addr.Name = "Addr";
-            this.Addr.ReadOnly = true;
-            this.Addr.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Addr.Width = 70;
-            // 
-            // Data
-            // 
-            this.Data.DataPropertyName = "Data";
-            this.Data.HeaderText = "Data";
-            this.Data.Name = "Data";
-            this.Data.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Data.Width = 70;
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
@@ -337,6 +320,23 @@
             this.切换断点BToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.切换断点BToolStripMenuItem.Text = "切换断点(&B)";
             this.切换断点BToolStripMenuItem.Click += new System.EventHandler(this.切换断点BToolStripMenuItem_Click);
+            // 
+            // Addr
+            // 
+            this.Addr.DataPropertyName = "Key";
+            this.Addr.HeaderText = "Addr";
+            this.Addr.Name = "Addr";
+            this.Addr.ReadOnly = true;
+            this.Addr.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Addr.Width = 70;
+            // 
+            // Data
+            // 
+            this.Data.DataPropertyName = "Value";
+            this.Data.HeaderText = "Data";
+            this.Data.Name = "Data";
+            this.Data.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Data.Width = 70;
             // 
             // FrmMain
             // 

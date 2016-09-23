@@ -59,7 +59,7 @@ namespace AssemblerGui
                     try
                     {
                         foreach (var p in pre)
-                            asm.Feed(p);
+                            asm.Feed(p, true);
                         asm.Done();
                     }
                     catch (AssemblyException e)

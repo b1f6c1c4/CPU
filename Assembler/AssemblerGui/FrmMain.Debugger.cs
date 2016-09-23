@@ -14,13 +14,41 @@ namespace AssemblerGui
 
         private void SetupDebugger()
         {
+            for (var i = 0; i <= 0xff; i++)
+                dataGridView1
+                    .Rows
+                    .Add(
+                         new DataGridViewRow
+                             {
+                                 Cells =
+                                     {
+                                         new DataGridViewTextBoxCell { Value = $"0x{i:x2}" },
+                                         new DataGridViewTextBoxCell()
+                                     }
+                             });
             StopDebugger();
 
             AddReg(tableLayoutPanel1, "PC", () => m_Debugger.CPU.PC, v => m_Debugger.CPU.PC = v, newRow: false);
-            AddReg(tableLayoutPanel1, "R0", () => m_Debugger.CPU.Registers[0], v => m_Debugger.CPU.Registers[0] = (byte)v);
-            AddReg(tableLayoutPanel1, "R1", () => m_Debugger.CPU.Registers[1], v => m_Debugger.CPU.Registers[1] = (byte)v);
-            AddReg(tableLayoutPanel1, "R2", () => m_Debugger.CPU.Registers[2], v => m_Debugger.CPU.Registers[2] = (byte)v);
-            AddReg(tableLayoutPanel1, "R3", () => m_Debugger.CPU.Registers[3], v => m_Debugger.CPU.Registers[3] = (byte)v);
+            AddReg(
+                   tableLayoutPanel1,
+                   "R0",
+                   () => m_Debugger.CPU.Registers[0],
+                   v => m_Debugger.CPU.Registers[0] = (byte)v);
+            AddReg(
+                   tableLayoutPanel1,
+                   "R1",
+                   () => m_Debugger.CPU.Registers[1],
+                   v => m_Debugger.CPU.Registers[1] = (byte)v);
+            AddReg(
+                   tableLayoutPanel1,
+                   "R2",
+                   () => m_Debugger.CPU.Registers[2],
+                   v => m_Debugger.CPU.Registers[2] = (byte)v);
+            AddReg(
+                   tableLayoutPanel1,
+                   "R3",
+                   () => m_Debugger.CPU.Registers[3],
+                   v => m_Debugger.CPU.Registers[3] = (byte)v);
             AddReg(
                    tableLayoutPanel1,
                    "Flag",
@@ -40,7 +68,7 @@ namespace AssemblerGui
             try
             {
                 foreach (var p in pre)
-                    m_Debugger.Feed(p);
+                    m_Debugger.Feed(p, true);
                 m_Debugger.Done();
             }
             catch (AssemblyException e)
@@ -52,7 +80,12 @@ namespace AssemblerGui
             }
 
             m_Debugger.OnUpdated += () => OnUpdated?.Invoke();
-            m_Debugger.OnUpdated += () => LoadDoc(m_Debugger.Source.FilePath, m_Debugger.Source.Line, null);
+            m_Debugger.OnUpdated += () => LoadDoc(m_Debugger.Source.FilePath, m_Debugger.Source.Line);
+            m_Debugger.OnUpdated += () =>
+                                    {
+                                        for (var i = 0; i < m_Debugger.CPU.Ram.Length; i++)
+                                            dataGridView1.Rows[i].Cells[1].Value = $"0x{m_Debugger.CPU.Ram[i]:x2}";
+                                    };
 
             foreach (var line in scintilla.Lines)
                 if ((line.MarkerGet() & 1) != 0)
@@ -164,17 +197,7 @@ namespace AssemblerGui
             }
         }
 
-        private void 开始执行SToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!PromptForSave(true))
-                return;
-
-            StartDebugger();
-        }
-
-        private void 停止执行XToolStripMenuItem_Click(object sender, EventArgs e) { StopDebugger(); }
-
-        private void 逐指令IToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RunDebugger(Action<AsmDebugger> f)
         {
             if (m_Debugger == null)
             {
@@ -184,42 +207,32 @@ namespace AssemblerGui
                 StartDebugger();
             }
 
-            // ReSharper disable once PossibleNullReferenceException
-            m_Debugger.NextInstruction();
-        }
-
-        private void 逐语句SToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (m_Debugger == null)
+            try
             {
-                if (!PromptForSave(true))
-                    return;
-
-                StartDebugger();
+                f(m_Debugger);
             }
-
-            // ReSharper disable once PossibleNullReferenceException
-            m_Debugger.NextStatement();
-        }
-
-        private void 逐过程OToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (m_Debugger == null)
+            catch (HaltException)
             {
-                if (!PromptForSave(true))
-                    return;
-
-                StartDebugger();
+                StopDebugger();
             }
-
-            // ReSharper disable once PossibleNullReferenceException
-            m_Debugger.NextProcedure();
         }
 
-        private void 跳出JToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            m_Debugger.JumpOut();
-        }
+        private void 开始执行SToolStripMenuItem_Click(object sender, EventArgs e) =>
+            RunDebugger(d => d.Run());
+
+        private void 停止执行XToolStripMenuItem_Click(object sender, EventArgs e) => StopDebugger();
+
+        private void 逐指令IToolStripMenuItem_Click(object sender, EventArgs e) =>
+            RunDebugger(d => d.NextInstruction());
+
+        private void 逐语句SToolStripMenuItem_Click(object sender, EventArgs e) =>
+            RunDebugger(d => d.NextStatement());
+
+        private void 逐过程OToolStripMenuItem_Click(object sender, EventArgs e) =>
+            RunDebugger(d => d.NextProcedure());
+
+        private void 跳出JToolStripMenuItem_Click(object sender, EventArgs e) =>
+            RunDebugger(d => d.JumpOut());
 
         private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {

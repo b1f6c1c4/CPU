@@ -52,8 +52,9 @@ namespace Assembler
             Symbols = new Dictionary<string, int>();
         }
 
-        public void Feed(string filename, bool halt = false)
+        public void Feed(string filename, bool halt)
         {
+            var last = 0;
             using (var sin = new StreamReader(filename))
             {
                 var lexer = new AsmLexer(new AntlrInputStream(sin));
@@ -76,6 +77,7 @@ namespace Assembler
                     try
                     {
                         Parse(context, filename);
+                        last = context.Start.Line;
                     }
                     catch (AssemblyException)
                     {
@@ -95,13 +97,13 @@ namespace Assembler
             {
                 var lexer = new AsmLexer(new AntlrInputStream("HALT" + Environment.NewLine));
                 var parser = new AsmParser(new CommonTokenStream(lexer));
-                Parse(parser.line(), "After " + filename);
+                Parse(parser.line(), filename, last);
             }
         }
 
         public abstract void Done();
 
-        private void Parse(AsmParser.LineContext context, string filename)
+        private void Parse(AsmParser.LineContext context, string filename, int diff = 0)
         {
             if (context.label() != null)
             {
@@ -115,7 +117,7 @@ namespace Assembler
             {
                 Lines.Add(
                           Instructions.Count,
-                          new SourcePosition(filename, context.Start.Line));
+                          new SourcePosition(filename, diff + context.Start.Line));
                 Instructions.Add(context.instruction());
                 m_Filenames.Add(filename);
             }
@@ -126,7 +128,7 @@ namespace Assembler
                 {
                     Lines.Add(
                               Instructions.Count,
-                              new SourcePosition(filename, context.Start.Line));
+                              new SourcePosition(filename, diff + context.Start.Line));
                     Instructions.Add(inst);
                     m_Filenames.Add(filename);
                 }
