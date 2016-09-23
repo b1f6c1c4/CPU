@@ -75,8 +75,6 @@
             this.scintilla.Size = new System.Drawing.Size(743, 560);
             this.scintilla.TabIndex = 0;
             this.scintilla.WrapMode = ScintillaNET.WrapMode.Char;
-            this.scintilla.TextChanged += scintilla_TextChanged;
-            this.scintilla.MarginClick += scintilla_MarginClick;
             // 
             // panel1
             // 
@@ -214,18 +212,21 @@
             this.intelHex文件ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
             this.intelHex文件ToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.intelHex文件ToolStripMenuItem.Text = "&Intel Hex文件...";
+            this.intelHex文件ToolStripMenuItem.Click += new System.EventHandler(this.intelHex文件ToolStripMenuItem_Click);
             // 
             // 二进制机器码BToolStripMenuItem
             // 
             this.二进制机器码BToolStripMenuItem.Name = "二进制机器码BToolStripMenuItem";
             this.二进制机器码BToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.二进制机器码BToolStripMenuItem.Text = "二进制机器码(&B)...";
+            this.二进制机器码BToolStripMenuItem.Click += new System.EventHandler(this.二进制机器码BToolStripMenuItem_Click);
             // 
             // 十六进制机器码HToolStripMenuItem
             // 
             this.十六进制机器码HToolStripMenuItem.Name = "十六进制机器码HToolStripMenuItem";
             this.十六进制机器码HToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.十六进制机器码HToolStripMenuItem.Text = "十六进制机器码(&H)...";
+            this.十六进制机器码HToolStripMenuItem.Click += new System.EventHandler(this.十六进制机器码HToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 

@@ -110,7 +110,11 @@ namespace AssemblerGui
             if (!m_Edited)
                 return true;
 
-            var res = MessageBox.Show($"{m_FileName} 尚未保存，是否要保存？", "MIPS编辑器", MessageBoxButtons.YesNoCancel);
+            var res = MessageBox.Show(
+                                      $"{m_FileName} 尚未保存，是否要保存？",
+                                      "MIPS编辑器",
+                                      MessageBoxButtons.YesNoCancel,
+                                      MessageBoxIcon.Exclamation);
             if (res == DialogResult.Cancel)
                 return false;
 
@@ -136,26 +140,12 @@ namespace AssemblerGui
 
         private bool PromptSaveAs()
         {
-            var dialog =
-                new SaveFileDialog
-                    {
-                        AddExtension = true,
-                        AutoUpgradeEnabled = true,
-                        CheckFileExists = false,
-                        CheckPathExists = true,
-                        CreatePrompt = false,
-                        DefaultExt = "mips",
-                        Filter = "MIPS文件 (*.mips)|*.mips|所有文件 (*)|*",
-                        FileName = m_FileName,
-                        Title = "另存为"
-                    };
-            var res = dialog.ShowDialog();
-            if (res == DialogResult.Cancel)
+            var res = PromptSaveDialog("misp", "MIPS文件", "另存为");
+            if (res == null)
                 return false;
 
-            m_FilePath = dialog.FileName;
+            m_FilePath = res;
             m_FileName = Path.GetFileNameWithoutExtension(m_FilePath);
-
             return true;
         }
 
