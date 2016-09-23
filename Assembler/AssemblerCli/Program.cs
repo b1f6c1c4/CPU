@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using Assembler;
 using NDesk.Options;
 
-namespace Assembler
+namespace AssemblerCli
 {
     internal class Program
     {

@@ -1,6 +1,6 @@
 param([string] $File)
 
-./Assembler/Assembler/bin/Release/Assembler.exe -o ./prog.hex $File
+./AssemblerCli.exe -o ./prog.hex $File
 
 if ($LastExitCode -ne 0)
 {
