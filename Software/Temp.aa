@@ -1,12 +1,7 @@
-;include lib/Fib.aa
+;include lib/ReadKey.aa
     INIT
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x00
 loop:
-    PUSH R0
-    CALL Fib
+    CALL ReadKey
     ANDI R1, R1, 0x00
     SW   R0, R1, 0x00
-    POP  R0
-    ADDI R0, R0, 0x01
     JMP  loop

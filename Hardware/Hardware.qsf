@@ -88,9 +88,8 @@ set_global_assignment -name VERILOG_FILE buffer.v
 set_global_assignment -name VERILOG_FILE latch_buffer.v
 set_global_assignment -name VERILOG_INCLUDE_FILE INPUT_INTERNAL.v
 set_global_assignment -name VERILOG_INCLUDE_FILE INPUT_INTERFACE.v
-set_global_assignment -name VERILOG_FILE key_scan.v
+set_global_assignment -name VERILOG_FILE Input.v
 set_global_assignment -name VERILOG_FILE Input_debouncer.v
-set_global_assignment -name VERILOG_FILE Input_diff.v
 set_global_assignment -name VERILOG_FILE Input_encoder.v
 set_global_assignment -name VERILOG_FILE Input_keyboard.v
 set_global_assignment -name VERILOG_FILE Input_buffer.v

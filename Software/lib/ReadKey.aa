@@ -1,0 +1,12 @@
+    ; ReadKey: Wait for input of IO2
+    ; return: KeyCode
+ReadKey:
+    PUSH BP
+    ANDI R1, R1, 0x00
+loop:
+    LW   R0, R1, 0x02
+    ADDI R2, R0, 0x01
+    BEQ  R2, R1, loop
+    ADDI R2, R1, 0xff
+    SW   R2, R1, 0x02
+    RET

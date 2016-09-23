@@ -7,12 +7,7 @@ module Input_debouncer(
    input btn,
    output reg Q
    );
-`ifdef SIMULATION
-   parameter div = 16'd2;
-`else
    parameter div = 16'd25000;
-`endif
-
    localparam dv = |div ? div - 16'd1 : 16'd0;
 
    reg [15:0] count;
