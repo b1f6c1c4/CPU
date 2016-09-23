@@ -1,32 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Assembler;
-using ScintillaNET;
 
 namespace AssemblerGui
 {
-    public partial class frmMain : Form
+    public partial class FrmMain
     {
-        [DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
-
         private bool m_Debugging;
-
-        private Context m_CPU;
-
-        public frmMain()
-        {
-            SetProcessDPIAware();
-            InitializeComponent();
-
-            SetupScintilla();
-            SetupDebugger();
-
-            MakeCPU();
-        }
 
         private delegate void CpuUpdateEventHandler();
 
@@ -45,6 +27,9 @@ namespace AssemblerGui
 
         private void SetupDebugger()
         {
+            m_Debugging = false;
+            panel1.Hide();
+
             AddReg(tableLayoutPanel1, "PC", () => m_CPU.PC, v => m_CPU.PC = v, newRow: false);
             AddReg(tableLayoutPanel1, "R0", () => m_CPU.Registers[0], v => m_CPU.Registers[0] = (byte)v);
             AddReg(tableLayoutPanel1, "R1", () => m_CPU.Registers[1], v => m_CPU.Registers[1] = (byte)v);
@@ -126,28 +111,6 @@ namespace AssemblerGui
             table.Controls.Add(txt, 1, row);
             table.RowStyles[row].Height = h;
             table.Height = h * table.RowCount;
-        }
-
-        private void SetupScintilla()
-        {
-            scintilla.StyleResetDefault();
-            scintilla.Styles[Style.Default].Font = "Microsoft YaHei Mono";
-            scintilla.Styles[Style.Default].SizeF = 10F;
-            scintilla.StyleClearAll();
-
-            scintilla.Styles[Style.Asm.Default].ForeColor = Color.Silver;
-            scintilla.Styles[Style.Asm.CpuInstruction].ForeColor = Color.Blue;
-            scintilla.Styles[Style.Asm.MathInstruction].ForeColor = Color.DarkBlue;
-            scintilla.Styles[Style.Asm.Comment].ForeColor = Color.FromArgb(0, 139, 139);
-            scintilla.Styles[Style.Asm.Register].ForeColor = Color.Magenta;
-            scintilla.Styles[Style.Asm.Number].ForeColor = Color.Black;
-            scintilla.Styles[Style.Asm.Identifier].ForeColor = Color.FromArgb(128, 0, 128);
-
-            scintilla.SetKeywords(
-                                  0,
-                                  "AND ANDI OR ORI ADD ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC".ToLower());
-            scintilla.SetKeywords(1, "INIT PUSH POP CALL RET".ToLower());
-            scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
         }
     }
 }
