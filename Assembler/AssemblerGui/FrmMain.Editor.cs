@@ -57,6 +57,9 @@ namespace AssemblerGui
             scintilla.Markers[0].Symbol = MarkerSymbol.Circle;
             scintilla.Markers[0].SetBackColor(Color.FromArgb(229, 20, 0));
             scintilla.Markers[0].SetForeColor(Color.White);
+
+            scintilla.TextChanged += scintilla_TextChanged;
+            scintilla.MarginClick += scintilla_MarginClick;
         }
 
         private void scintilla_TextChanged(object s, EventArgs e)
@@ -77,15 +80,7 @@ namespace AssemblerGui
         private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
         {
             if (e.Margin == 0)
-                ToggleBreakPoint(scintilla.Lines[scintilla.LineFromPosition(e.Position)]);
-        }
-
-        private static void ToggleBreakPoint(Line line)
-        {
-            if ((line.MarkerGet() & 1) != 0)
-                line.MarkerDelete(0);
-            else
-                line.MarkerAdd(0);
+                ToggleBreakPoint(scintilla.LineFromPosition(e.Position));
         }
 
         private void SetFile(string filePath)
@@ -99,14 +94,22 @@ namespace AssemblerGui
             m_FileName = @"新建文件";
             m_FilePath = null;
 
+            var b = scintilla.ReadOnly;
+            scintilla.ReadOnly = false;
             scintilla.Text = "";
+            scintilla.ReadOnly = b;
+
             m_Edited = false;
             UpdateTitle();
         }
 
         private void LoadDoc()
         {
+            var b = scintilla.ReadOnly;
+            scintilla.ReadOnly = false;
             scintilla.Text = File.ReadAllText(m_FilePath);
+            scintilla.ReadOnly = b;
+
             m_Edited = false;
             UpdateTitle();
         }
@@ -217,19 +220,22 @@ namespace AssemblerGui
         private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (scintilla.Focused)
-                ToggleBreakPoint(scintilla.Lines[scintilla.CurrentLine]);
+                ToggleBreakPoint(scintilla.CurrentLine);
         }
 
-        private void LoadDoc(string filePath, int? line, int? charPos)
+        private void LoadDoc(string filePath, int? line = null, int? charPos = null)
         {
             if (filePath == null)
                 return;
 
-            if (!PromptForSave())
-                return;
+            if (filePath != m_FilePath)
+            {
+                if (!PromptForSave())
+                    return;
 
-            SetFile(filePath);
-            LoadDoc();
+                SetFile(filePath);
+                LoadDoc();
+            }
 
             if (!line.HasValue)
                 return;

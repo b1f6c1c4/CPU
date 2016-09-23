@@ -12,8 +12,6 @@ namespace AssemblerGui
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
-        private Context m_CPU;
-
         public FrmMain()
         {
             SetProcessDPIAware();
@@ -26,7 +24,7 @@ namespace AssemblerGui
         }
 
         private void UpdateTitle() =>
-            Text = m_Debugging
+            Text = (m_Debugger != null)
                        ? $"MIPS调试器 - [{m_FileName}]"
                        : $"MIPS编辑器 - [{m_FileName}]{(m_Edited ? "*" : "")}";
 

@@ -30,8 +30,9 @@
         {
             this.scintilla = new ScintillaNET.Scintilla();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Addr = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +59,7 @@
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,12 +76,10 @@
             this.scintilla.Size = new System.Drawing.Size(743, 560);
             this.scintilla.TabIndex = 0;
             this.scintilla.WrapMode = ScintillaNET.WrapMode.Char;
-            this.scintilla.TextChanged += scintilla_TextChanged;
-            this.scintilla.MarginClick += scintilla_MarginClick;
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.panel2);
+            this.panel1.Controls.Add(this.dataGridView1);
             this.panel1.Controls.Add(this.tableLayoutPanel1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel1.Location = new System.Drawing.Point(743, 25);
@@ -89,30 +88,44 @@
             this.panel1.Size = new System.Drawing.Size(190, 560);
             this.panel1.TabIndex = 1;
             // 
-            // panel2
+            // dataGridView1
             // 
-            this.panel2.AutoScroll = true;
-            this.panel2.Controls.Add(this.tableLayoutPanel2);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 64);
-            this.panel2.Margin = new System.Windows.Forms.Padding(2);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(190, 496);
-            this.panel2.TabIndex = 1;
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Addr,
+            this.Data});
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 64);
+            this.dataGridView1.MultiSelect = false;
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersWidth = 16;
+            this.dataGridView1.RowTemplate.Height = 23;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(190, 496);
+            this.dataGridView1.TabIndex = 1;
+            this.dataGridView1.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValidated);
+            this.dataGridView1.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dataGridView1_CellValidating);
             // 
-            // tableLayoutPanel2
+            // Addr
             // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(190, 64);
-            this.tableLayoutPanel2.TabIndex = 1;
+            this.Addr.DataPropertyName = "Addr";
+            this.Addr.HeaderText = "Addr";
+            this.Addr.Name = "Addr";
+            this.Addr.ReadOnly = true;
+            this.Addr.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Addr.Width = 70;
+            // 
+            // Data
+            // 
+            this.Data.DataPropertyName = "Data";
+            this.Data.HeaderText = "Data";
+            this.Data.Name = "Data";
+            this.Data.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Data.Width = 70;
             // 
             // tableLayoutPanel1
             // 
@@ -265,6 +278,7 @@
             this.开始执行SToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.开始执行SToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.开始执行SToolStripMenuItem.Text = "开始执行(&R)";
+            this.开始执行SToolStripMenuItem.Click += new System.EventHandler(this.开始执行SToolStripMenuItem_Click);
             // 
             // 停止执行XToolStripMenuItem
             // 
@@ -272,6 +286,7 @@
             this.停止执行XToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));
             this.停止执行XToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.停止执行XToolStripMenuItem.Text = "停止执行(&X)";
+            this.停止执行XToolStripMenuItem.Click += new System.EventHandler(this.停止执行XToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
@@ -284,6 +299,7 @@
             this.逐指令IToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F11)));
             this.逐指令IToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.逐指令IToolStripMenuItem.Text = "逐指令(&I)";
+            this.逐指令IToolStripMenuItem.Click += new System.EventHandler(this.逐指令IToolStripMenuItem_Click);
             // 
             // 逐语句SToolStripMenuItem
             // 
@@ -291,6 +307,7 @@
             this.逐语句SToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
             this.逐语句SToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.逐语句SToolStripMenuItem.Text = "逐语句(&S)";
+            this.逐语句SToolStripMenuItem.Click += new System.EventHandler(this.逐语句SToolStripMenuItem_Click);
             // 
             // 逐过程OToolStripMenuItem
             // 
@@ -298,6 +315,7 @@
             this.逐过程OToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
             this.逐过程OToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.逐过程OToolStripMenuItem.Text = "逐过程(&O)";
+            this.逐过程OToolStripMenuItem.Click += new System.EventHandler(this.逐过程OToolStripMenuItem_Click);
             // 
             // 跳出JToolStripMenuItem
             // 
@@ -305,6 +323,7 @@
             this.跳出JToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F11)));
             this.跳出JToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
             this.跳出JToolStripMenuItem.Text = "跳出(&J)";
+            this.跳出JToolStripMenuItem.Click += new System.EventHandler(this.跳出JToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
@@ -333,7 +352,7 @@
             this.Text = "MIPS汇编器";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -346,8 +365,6 @@
         private ScintillaNET.Scintilla scintilla;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 文件FToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 新建NToolStripMenuItem;
@@ -372,6 +389,9 @@
         private System.Windows.Forms.ToolStripMenuItem 跳出JToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem 切换断点BToolStripMenuItem;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Addr;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Data;
     }
 }
 

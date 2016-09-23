@@ -5,13 +5,42 @@ using Antlr4.Runtime;
 
 namespace Assembler
 {
+    public class SourcePosition : IEquatable<SourcePosition>
+    {
+        public string FilePath { get; }
+
+        public int Line { get; }
+
+        public SourcePosition(string f, int l)
+        {
+            FilePath = f;
+            Line = l;
+        }
+
+        public override bool Equals(object obj) => obj is SourcePosition && Equals((SourcePosition)obj);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((FilePath?.GetHashCode() ?? 0) * 397) ^ Line;
+            }
+        }
+
+        public bool Equals(SourcePosition other) => FilePath == other.FilePath && Line == other.Line;
+
+        public static bool operator ==(SourcePosition x, SourcePosition y) => x.Equals(y);
+
+        public static bool operator !=(SourcePosition x, SourcePosition y) => !x.Equals(y);
+    }
+
     public abstract class AsmProgBase
     {
         protected readonly List<IExecutableInstruction> Instructions;
 
         private readonly List<string> m_Filenames;
 
-        protected readonly Dictionary<int, string> Lines;
+        protected readonly Dictionary<int, SourcePosition> Lines;
 
         protected readonly Dictionary<string, int> Symbols;
 
@@ -19,7 +48,7 @@ namespace Assembler
         {
             Instructions = new List<IExecutableInstruction>();
             m_Filenames = new List<string>();
-            Lines = new Dictionary<int, string>();
+            Lines = new Dictionary<int, SourcePosition>();
             Symbols = new Dictionary<string, int>();
         }
 
@@ -86,7 +115,7 @@ namespace Assembler
             {
                 Lines.Add(
                           Instructions.Count,
-                          $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
+                          new SourcePosition(filename, context.Start.Line));
                 Instructions.Add(context.instruction());
                 m_Filenames.Add(filename);
             }
@@ -97,7 +126,7 @@ namespace Assembler
                 {
                     Lines.Add(
                               Instructions.Count,
-                              $"{filename}:{context.Start.Line},{context.Start.Column} {context.GetText()}");
+                              new SourcePosition(filename, context.Start.Line));
                     Instructions.Add(inst);
                     m_Filenames.Add(filename);
                 }

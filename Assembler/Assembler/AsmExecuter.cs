@@ -2,7 +2,7 @@
 {
     public class AsmExecuter : AsmProgBase
     {
-        public delegate void OnBreakPointEventHandler(string line);
+        public delegate void OnBreakPointEventHandler(SourcePosition pos);
 
         public event OnBreakPointEventHandler OnBreakPoint;
 
