@@ -41,7 +41,7 @@ namespace AssemblerGui
             scintilla.SetKeywords(
                                   0,
                                   "AND ANDI OR ORI ADD ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC".ToLower());
-            scintilla.SetKeywords(1, "INIT PUSH POP CALL RET".ToLower());
+            scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT".ToLower());
             scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
 
             scintilla.Margins[1].Type = MarginType.Number;

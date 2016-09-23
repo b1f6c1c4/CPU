@@ -39,5 +39,7 @@
                     break;
             }
         }
+
+        protected override bool ExpansionDebug => true;
     }
 }

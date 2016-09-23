@@ -1,12 +1,10 @@
-﻿using System.IO;
-
-namespace Assembler
+﻿namespace Assembler
 {
     public class IntelAssembler : TextAssembler
     {
         private int m_Address;
 
-        public IntelAssembler(TextWriter writer, int width = 16) : base(writer, width) { m_Address = 0; }
+        public IntelAssembler() { m_Address = 0; }
 
         protected override void Put(int v)
         {

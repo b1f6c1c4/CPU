@@ -23,6 +23,8 @@ namespace AssemblerCli
             List<string> fin;
             string fout = null;
             var run = false;
+            var prettify = false;
+            var expand = false;
             var debug = false;
             var isHex = false;
             var help = false;
@@ -32,7 +34,9 @@ namespace AssemblerCli
                 new OptionSet
                     {
                         { "r|run", "don't assembly, just run", v => run = v != null },
-                        { "n|no-hale", "don't append HALT after each file", v => noHalt = v != null },
+                        { "n|no-halt", "don't append HALT after each file", v => noHalt = v != null },
+                        { "p|prettify", "don't assembly, prettify asm", v => prettify = v != null },
+                        { "e|expand", "when prettify, expand macros", v => expand = v != null },
                         { "d|debug", "pause at every symbol to debug", v => debug = v != null },
                         { "o|output=", "output {FILE}", v => fout = v },
                         { "H|hex", "output hex instead of binary", v => isHex = v != null },
@@ -54,6 +58,15 @@ namespace AssemblerCli
 
                 if (run && isHex)
                     throw new ApplicationException("cann't run with --hex");
+
+                if (run && prettify)
+                    throw new ApplicationException("cann't run with --prettify");
+
+                if (prettify && isHex)
+                    throw new ApplicationException("cann't prettify with --hex");
+
+                if (expand && !prettify)
+                    throw new ApplicationException("cann't expand macros without --prettify");
 
                 if (run && !string.IsNullOrEmpty(fout))
                     throw new ApplicationException("cann't run with --output");
@@ -116,13 +129,15 @@ namespace AssemblerCli
                     var sout = string.IsNullOrEmpty(fout) ? Console.Out : new StreamWriter(fout);
                     try
                     {
-                        TextAssembler asm;
-                        if (isHex)
-                            asm = new HexAssembler(sout);
+                        AsmProgBase asm;
+                        if (prettify)
+                            asm = new AsmPrettifier(expand);
+                        else if (isHex)
+                            asm = new HexAssembler();
                         else if (sout.Equals(Console.Out))
-                            asm = new BinAssembler(sout);
+                            asm = new BinAssembler();
                         else
-                            asm = new IntelAssembler(sout);
+                            asm = new IntelAssembler();
 
                         action(asm);
                     }

@@ -38,6 +38,8 @@ namespace AssemblerGui
 
         public override void Done() { }
 
+        protected override bool ExpansionDebug => true;
+
         public void ForceUpdate() => OnUpdated?.Invoke();
 
         public void AddBreakPoint(string filename, int id) =>

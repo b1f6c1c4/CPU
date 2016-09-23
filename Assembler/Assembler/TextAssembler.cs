@@ -2,15 +2,20 @@
 
 namespace Assembler
 {
-    public abstract class TextAssembler : AsmSerializer
+    public interface IWriter
     {
-        protected readonly TextWriter Writer;
+        void SetWriter(TextWriter writer);
+    }
+
+    public abstract class TextAssembler : AsmSerializer, IWriter
+    {
+        protected TextWriter Writer;
         protected readonly int Width;
 
-        protected TextAssembler(TextWriter writer, int width = 16)
-        {
-            Writer = writer;
-            Width = width;
-        }
+        protected TextAssembler() { Width = 16; }
+
+        public void SetWriter(TextWriter writer) => Writer = writer;
+
+        protected override bool ExpansionDebug => false;
     }
 }

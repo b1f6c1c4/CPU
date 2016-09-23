@@ -31,6 +31,8 @@
             this.scintilla = new ScintillaNET.Scintilla();
             this.panel1 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Addr = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.文件FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,6 +48,8 @@
             this.十六进制机器码HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.退出QToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.编辑EToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.格式化代码FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.调试DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.开始执行SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.停止执行XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,8 +60,7 @@
             this.跳出JToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Addr = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.原始汇编AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -110,6 +113,23 @@
             this.dataGridView1.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValidated);
             this.dataGridView1.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dataGridView1_CellValidating);
             // 
+            // Addr
+            // 
+            this.Addr.DataPropertyName = "Key";
+            this.Addr.HeaderText = "Addr";
+            this.Addr.Name = "Addr";
+            this.Addr.ReadOnly = true;
+            this.Addr.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Addr.Width = 70;
+            // 
+            // Data
+            // 
+            this.Data.DataPropertyName = "Value";
+            this.Data.HeaderText = "Data";
+            this.Data.Name = "Data";
+            this.Data.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Data.Width = 70;
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
@@ -128,6 +148,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.文件FToolStripMenuItem,
+            this.编辑EToolStripMenuItem,
             this.调试DToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -199,7 +220,8 @@
             this.导出EToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.intelHex文件ToolStripMenuItem,
             this.二进制机器码BToolStripMenuItem,
-            this.十六进制机器码HToolStripMenuItem});
+            this.十六进制机器码HToolStripMenuItem,
+            this.原始汇编AToolStripMenuItem});
             this.导出EToolStripMenuItem.Name = "导出EToolStripMenuItem";
             this.导出EToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
             this.导出EToolStripMenuItem.Text = "导出(&E)";
@@ -238,6 +260,23 @@
             this.退出QToolStripMenuItem.Size = new System.Drawing.Size(215, 22);
             this.退出QToolStripMenuItem.Text = "退出(&Q)";
             this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
+            // 
+            // 编辑EToolStripMenuItem
+            // 
+            this.编辑EToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.格式化代码FToolStripMenuItem});
+            this.编辑EToolStripMenuItem.Name = "编辑EToolStripMenuItem";
+            this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
+            this.编辑EToolStripMenuItem.Text = "编辑(&E)";
+            // 
+            // 格式化代码FToolStripMenuItem
+            // 
+            this.格式化代码FToolStripMenuItem.Name = "格式化代码FToolStripMenuItem";
+            this.格式化代码FToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.F)));
+            this.格式化代码FToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.格式化代码FToolStripMenuItem.Text = "格式化代码(&F)";
+            this.格式化代码FToolStripMenuItem.Click += new System.EventHandler(this.格式化代码FToolStripMenuItem_Click);
             // 
             // 调试DToolStripMenuItem
             // 
@@ -321,22 +360,12 @@
             this.切换断点BToolStripMenuItem.Text = "切换断点(&B)";
             this.切换断点BToolStripMenuItem.Click += new System.EventHandler(this.切换断点BToolStripMenuItem_Click);
             // 
-            // Addr
+            // 原始汇编AToolStripMenuItem
             // 
-            this.Addr.DataPropertyName = "Key";
-            this.Addr.HeaderText = "Addr";
-            this.Addr.Name = "Addr";
-            this.Addr.ReadOnly = true;
-            this.Addr.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Addr.Width = 70;
-            // 
-            // Data
-            // 
-            this.Data.DataPropertyName = "Value";
-            this.Data.HeaderText = "Data";
-            this.Data.Name = "Data";
-            this.Data.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Data.Width = 70;
+            this.原始汇编AToolStripMenuItem.Name = "原始汇编AToolStripMenuItem";
+            this.原始汇编AToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.原始汇编AToolStripMenuItem.Text = "原始汇编(&A)...";
+            this.原始汇编AToolStripMenuItem.Click += new System.EventHandler(this.原始汇编AToolStripMenuItem_Click);
             // 
             // FrmMain
             // 
@@ -392,6 +421,9 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Addr;
         private System.Windows.Forms.DataGridViewTextBoxColumn Data;
+        private System.Windows.Forms.ToolStripMenuItem 编辑EToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 格式化代码FToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 原始汇编AToolStripMenuItem;
     }
 }
 

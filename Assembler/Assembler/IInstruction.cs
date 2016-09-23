@@ -6,11 +6,13 @@ namespace Assembler
 
     public interface IFlattenable<out TOut>
     {
-        IReadOnlyList<TOut> Flatten();
+        IReadOnlyList<TOut> Flatten(bool debug);
     }
 
     public interface IInstruction
     {
         int Serialize(SymbolResolver resolver);
+
+        string Prettify();
     }
 }

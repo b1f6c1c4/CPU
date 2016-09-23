@@ -47,15 +47,17 @@ namespace AssemblerGui
             return res == DialogResult.Cancel ? null : dialog.FileName;
         }
 
-        private void ExportFile(Type t, Func<string> prompt)
+        private void ExportFile<T>(T asm, Func<string> prompt)
+            where T : AsmProgBase, IWriter
         {
             try
             {
                 var pre = new Preprocessor(new[] { m_FilePath });
                 string fn;
                 using (var mem = new MemoryStream())
+                using (var sw = new StreamWriter(mem))
                 {
-                    var asm = (TextAssembler)Activator.CreateInstance(t, new StreamWriter(mem), 16);
+                    asm.SetWriter(sw);
                     try
                     {
                         foreach (var p in pre)
@@ -68,6 +70,8 @@ namespace AssemblerGui
                         LoadDoc(e.FilePath, e.Line, e.CharPos);
                         return;
                     }
+                    sw.Flush();
+
                     mem.Position = 0;
                     fn = prompt();
                     if (fn == null)
@@ -93,6 +97,41 @@ namespace AssemblerGui
             }
         }
 
+        private void Cycle<T>(T asm)
+            where T : AsmProgBase, IWriter
+        {
+            try
+            {
+                using (var mem = new MemoryStream())
+                using (var sw = new StreamWriter(mem))
+                {
+                    asm.SetWriter(sw);
+                    try
+                    {
+                        asm.Feed(m_FilePath, false);
+                        asm.Done();
+                    }
+                    catch (AssemblyException e)
+                    {
+                        MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        LoadDoc(e.FilePath, e.Line, e.CharPos);
+                        return;
+                    }
+                    sw.Flush();
+
+                    mem.Position = 0;
+
+                    using (var ou = File.OpenWrite(m_FilePath))
+                        mem.CopyTo(ou);
+                }
+                LoadDoc();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!PromptForSave())
@@ -104,7 +143,7 @@ namespace AssemblerGui
             if (!PromptForSave(true))
                 return;
 
-            ExportFile(typeof(IntelAssembler), () => PromptSaveDialog("hex", "Intel Hex文件", "导出"));
+            ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出"));
         }
 
         private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e)
@@ -112,7 +151,7 @@ namespace AssemblerGui
             if (!PromptForSave(true))
                 return;
 
-            ExportFile(typeof(BinAssembler), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
+            ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
         }
 
         private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e)
@@ -120,7 +159,23 @@ namespace AssemblerGui
             if (!PromptForSave(true))
                 return;
 
-            ExportFile(typeof(HexAssembler), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
+            ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
+        }
+
+        private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PromptForSave(true))
+                return;
+
+            ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出"));
+        }
+
+        private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!PromptForSave(true))
+                return;
+
+            Cycle(new AsmPrettifier());
         }
     }
 }

@@ -24,31 +24,31 @@ instruction
     ;
 
 typeR
-    : TypeR Rd=Register ',' Rs=Register ',' Rt=Register
+    : Op=(AND | OR | ADD | SUB | SLT | SUBC | ADDC) Rd=Register ',' Rs=Register ',' Rt=Register
     ;
 
 typeI
-    : TypeI Rt=Register ',' Rs=Register ',' number
-    | TypeIJ Rs=Register ',' Rt=Register ',' obj
+    : Op=(ANDI | ORI | ADDI | LW | SW) Rt=Register ',' Rs=Register ',' number
+    | Op=(BEQ | BNE) Rs=Register ',' Rt=Register ',' obj
     ;
 
 typeJ
-    : TypeJ obj
+    : Op=JMP obj
     ;
 
 typeP
-	: Op=('LPCL' | 'LPCH') Rt=Register
-	| Op='SPC' Rd=Register ',' Rt=Register
+	: Op=(LPCL | LPCH) Rt=Register
+	| Op=SPC Rd=Register ',' Rt=Register
 	;
 
 macro
 	: Debug='#'? (
-	Op='INIT'
-	| Op='CALL' obj
-	| Op='RET'
-	| Op='HALT'
-	| Op='PUSH' Rx=('BP' | Register)
-	| Op='POP'  Rx=Register
+	Op=INIT
+	| Op=CALL obj
+	| Op=RET
+	| Op=HALT
+	| Op=PUSH Rx=(BP | Register)
+	| Op=POP  Rx=Register
 	)
 	;
 
@@ -65,21 +65,60 @@ number
  * Lexer Rules
  */
 
-TypeR
-    : 'AND' | 'OR' | 'ADD' | 'SUB' | 'SLT' | 'SUBC' | 'ADDC'
-    ;
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
 
-TypeI
-    : 'ANDI' | 'ORI' | 'ADDI' | 'LW' | 'SW'
-    ;
+AND : A N D;
+OR  : O R;
+ADD : A D D;
+SUB : S U B;
+SLT : S L T;
+SUBC: S U B C;
+ADDC: A D D C;
+ANDI: A N D I;
+ORI : O R I;
+ADDI: A D D I;
+LW  : L W;
+SW  : S W;
+BEQ : B E Q;
+BNE : B N E;
+JMP : J M P;
+LPCL: L P C L;
+LPCH: L P C H;
+SPC : S P C;
 
-TypeIJ
-    : 'BEQ' | 'BNE'
-    ;
+INIT: I N I T;
+PUSH: P U S H;
+POP : P O P;
+CALL: C A L L;
+RET : R E T;
+HALT: H A L T;
 
-TypeJ
-    : 'JMP'
-    ;
+BP  : B P;
 
 Decimal
     : [0-9]+
@@ -98,7 +137,7 @@ Number
     ;
 
 Register
-    : 'R0' | 'R1' | 'R2' | 'R3'
+    : ('R' | 'r') [0-3]
     ;
 
 Name
@@ -106,7 +145,7 @@ Name
     ;
 
 Comment
-    : ';' ~ [\r\n]* -> skip
+    : ';' ~ [\r\n]*
     ;
 
 EOL

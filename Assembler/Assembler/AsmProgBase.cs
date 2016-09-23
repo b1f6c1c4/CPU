@@ -103,7 +103,7 @@ namespace Assembler
 
         public abstract void Done();
 
-        private void Parse(AsmParser.LineContext context, string filename, int diff = 0)
+        protected virtual void Parse(AsmParser.LineContext context, string filename, int diff = 0)
         {
             if (context.label() != null)
             {
@@ -123,7 +123,7 @@ namespace Assembler
             }
             else if (context.macro() != null)
             {
-                var instructions = context.macro().Flatten();
+                var instructions = context.macro().Flatten(ExpansionDebug);
                 foreach (var inst in instructions)
                 {
                     Lines.Add(
@@ -134,6 +134,8 @@ namespace Assembler
                 }
             }
         }
+
+        protected abstract bool ExpansionDebug { get; }
 
         private static string MakeUniqueSymbol(string lbl, string filename) =>
             !char.IsUpper(lbl, 0) ? lbl + "@" + filename : lbl;

@@ -26,7 +26,7 @@ namespace Assembler
         {
             public PCTarget Execute(Context context)
             {
-                switch (TypeR().Symbol.Text)
+                switch (Op.Text.ToUpper())
                 {
                     case "AND":
                         context.Registers[RegisterNumber(Rd)] =
@@ -96,7 +96,7 @@ namespace Assembler
         {
             public PCTarget Execute(Context context)
             {
-                switch ((TypeI() ?? TypeIJ()).Symbol.Text)
+                switch (Op.Text.ToUpper())
                 {
                     case "ANDI":
                         context.Registers[RegisterNumber(Rt)] =
@@ -153,7 +153,7 @@ namespace Assembler
         {
             public PCTarget Execute(Context context)
             {
-                switch (TypeJ().Symbol.Text)
+                switch (Op.Text.ToUpper())
                 {
                     case "JMP":
                         return obj().Name() == null ? new PCTarget(obj().number(), true) : obj().Name().Symbol.Text;

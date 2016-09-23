@@ -37,22 +37,27 @@ namespace Assembler
         {
             public int Serialize(SymbolResolver symbols) =>
                 Debug != null ? new int() : GetInst().Serialize(symbols);
+
+            public string Prettify() => (Debug != null ? "#   " : "    ") + GetInst().Prettify();
         }
 
         public sealed partial class TypeRContext : IInstruction
         {
             public int Serialize(SymbolResolver symbols)
             {
-                var op = GetOpcode(TypeR().Symbol.Text);
+                var op = GetOpcode(Op.Text);
                 var rd = RegisterNumber(Rd);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
                 return (op << 12) | (rs << 10) | (rt << 8) | (rd << 6);
             }
 
+            public string Prettify() =>
+                $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rd)}, R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}";
+
             private static int GetOpcode(string text)
             {
-                switch (text)
+                switch (text.ToUpper())
                 {
                     case "AND":
                         return 0x0;
@@ -78,27 +83,30 @@ namespace Assembler
         {
             public int Serialize(SymbolResolver symbols)
             {
-                bool br;
-                var node = (TypeI() ?? TypeIJ());
-                var op = GetOpcode(node.Symbol.Text, out br);
+                var op = GetOpcode(Op.Text);
                 var rs = RegisterNumber(Rs);
                 var rt = RegisterNumber(Rt);
                 int imm;
-                if (TypeI() != null)
+                if (number() != null)
                     imm = number();
-                else if (TypeIJ() != null)
+                else if (obj() != null)
                     imm = obj().Serialize(symbols, false);
                 else
                     throw new InvalidOperationException();
-                if (br && (imm > 0x7f || imm < -0x80))
-                    throw new ApplicationException($"BEQ/BNE at line {node.Symbol.Line} jump too long ({imm}); use JMP");
+                if (obj() != null &&
+                    (imm > 0x7f || imm < -0x80))
+                    throw new ApplicationException($"BEQ/BNE at line {Op.Line} jump too long ({imm}); use JMP");
                 return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
-            private static int GetOpcode(string text, out bool br)
+            public string Prettify() =>
+                obj() != null
+                    ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}, R{RegisterNumber(Rs)}, {obj().GetText()}"
+                    : $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {number().GetText()}";
+
+            private static int GetOpcode(string text)
             {
-                br = false;
-                switch (text)
+                switch (text.ToUpper())
                 {
                     case "ANDI":
                         return 0x8;
@@ -111,10 +119,8 @@ namespace Assembler
                     case "SW":
                         return 0xc;
                     case "BEQ":
-                        br = true;
                         return 0xd;
                     case "BNE":
-                        br = true;
                         return 0xe;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(text));
@@ -126,14 +132,17 @@ namespace Assembler
         {
             public int Serialize(SymbolResolver symbols)
             {
-                var op = GetOpcode(TypeJ().Symbol.Text);
+                var op = GetOpcode(Op.Text);
                 var imm = obj().Serialize(symbols, true);
                 return (op << 12) | (imm & 0xfff);
             }
 
+            public string Prettify() =>
+                $"{Op.Text.ToUpper().PadRight(4)} {obj().GetText()}";
+
             private static int GetOpcode(string text)
             {
-                switch (text)
+                switch (text.ToUpper())
                 {
                     case "JMP":
                         return 0x7;
@@ -147,7 +156,7 @@ namespace Assembler
         {
             public int Serialize(SymbolResolver symbols)
             {
-                switch (Op.Text)
+                switch (Op.Text.ToUpper())
                 {
                     case "LPCH":
                         return 0xf000 | (RegisterNumber(Rt) << 8);
@@ -155,6 +164,21 @@ namespace Assembler
                         return 0xf400 | (RegisterNumber(Rt) << 8);
                     case "SPC":
                         return 0xf800 | (RegisterNumber(Rt) << 8) | (RegisterNumber(Rd) << 6);
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+
+            public string Prettify()
+            {
+                switch (Op.Text.ToUpper())
+                {
+                    case "LPCH":
+                        return $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}";
+                    case "LPCL":
+                        return $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}";
+                    case "SPC":
+                        return $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rd)}, R{RegisterNumber(Rt)}";
                     default:
                         throw new InvalidOperationException();
                 }

@@ -86,33 +86,63 @@ LW   {0}, {0}, 0xff  ; {0} = MEM[sp-1]
 BEQ R1, R1, 0xff
 ";
 
-            public IReadOnlyList<IExecutableInstruction> Flatten()
+            public IReadOnlyList<IExecutableInstruction> Flatten(bool debug)
             {
-                switch (Op.Text)
+                if (Debug != null &&
+                    !debug)
+                    return new List<IExecutableInstruction>();
+
+                switch (Op.Text.ToUpper())
                 {
                     case "INIT":
-                        return Parse(Init);
+                        return Parse(Init, debug);
                     case "CALL":
-                        return Parse(string.Format(Call, obj().GetText()));
+                        return Parse(string.Format(Call, obj().GetText()), debug);
                     case "RET":
-                        return Parse(Ret);
+                        return Parse(Ret, debug);
                     case "HALT":
-                        return Parse(Halt);
+                        return Parse(Halt, debug);
                     case "PUSH":
-                        if (Rx.Text != "BP" &&
+                        if (Rx.Text.ToUpper() != "BP" &&
                             RegisterNumber(Rx) == 1)
                             throw new ApplicationException("Cannot PUSH R1!");
-                        return Parse(Rx.Text == "BP" ? PushBp : string.Format(Push, Rx.Text));
+                        return Parse(Rx.Text.ToUpper() == "BP" ? PushBp : string.Format(Push, Rx.Text), debug);
                     case "POP":
                         if (RegisterNumber(Rx) == 1)
                             throw new ApplicationException("Cannot POP R1!");
-                        return Parse(string.Format(Pop, Rx.Text));
+                        return Parse(string.Format(Pop, Rx.Text), debug);
                     default:
                         throw new InvalidOperationException();
                 }
             }
 
-            private static IReadOnlyList<IExecutableInstruction> Parse(string str)
+            public string Prettify()
+            {
+                string str;
+                switch (Op.Text.ToUpper())
+                {
+                    case "INIT":
+                    case "RET":
+                    case "HALT":
+                        str = $"{Op.Text.ToUpper()}";
+                        break;
+                    case "CALL":
+                        str = $"{Op.Text.ToUpper().PadRight(4)} {obj().GetText()}";
+                        break;
+                    case "PUSH":
+                        str =
+                            $"{Op.Text.ToUpper().PadRight(4)} {(Rx.Text.ToUpper() == "BP" ? "BP" : $"R{RegisterNumber(Rx)}")}";
+                        break;
+                    case "POP":
+                        str = $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rx)}";
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+                return (Debug != null ? "#   " : "    ") + str;
+            }
+
+            private static IReadOnlyList<IExecutableInstruction> Parse(string str, bool debug)
             {
                 var lexer = new AsmLexer(new AntlrInputStream(str));
                 var parser = new AsmParser(new CommonTokenStream(lexer));
@@ -125,7 +155,7 @@ BEQ R1, R1, 0xff
                                         if (l.instruction() != null)
                                             return new[] { l.instruction() as IExecutableInstruction };
                                         if (l.macro() != null)
-                                            return l.macro().Flatten();
+                                            return l.macro().Flatten(debug);
                                         return Enumerable.Empty<IExecutableInstruction>();
                                     }).ToList();
             }

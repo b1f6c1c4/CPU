@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Assembler
 {
@@ -7,7 +6,7 @@ namespace Assembler
     {
         private readonly string m_D;
 
-        public BinAssembler(TextWriter writer, int width = 16, string d = " ") : base(writer, width) { m_D = d; }
+        public BinAssembler(string d = " ") { m_D = d; }
 
         protected override void Put(int v)
         {

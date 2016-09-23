@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="AsmExecuter.cs" />
     <Compile Include="AsmParser.Serialize.cs" />
+    <Compile Include="AsmPrettifier.cs" />
     <Compile Include="AsmProgBase.cs" />
     <Compile Include="AsmSerializer.cs" />
     <Compile Include="AssemblyException.cs" />
