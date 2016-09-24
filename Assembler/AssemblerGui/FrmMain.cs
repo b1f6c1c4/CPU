@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Assembler;
 
@@ -12,23 +13,48 @@ namespace AssemblerGui
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
+        private event SimpleEventHandler OnStateChanged;
+
+        private bool m_Downloading;
+
         public FrmMain()
         {
             SetProcessDPIAware();
             InitializeComponent();
 
-            SetupEditor();
+            OnStateChanged += UpdateTitle;
+            OnStateChanged += ToggleEditorMenus;
+            OnStateChanged += ToggleAssemblerMenus;
+            OnStateChanged += ToggleDebuggerMenus;
+
+            NewFile();
+
             SetupDebugger();
 
             UpdateTitle();
         }
 
-        private void UpdateTitle() =>
-            Text = (m_Debugger != null)
-                       ? (!m_IsRunning
-                              ? $"MIPS调试器 - [{m_FileName}]"
-                              : $"MIPS调试器 - [{m_FileName}] - Running")
-                       : $"MIPS编辑器 - [{m_FileName}]{(m_Edited ? "*" : "")}";
+        private void UpdateTitle()
+        {
+            var sb = new StringBuilder();
+
+            if (m_Debugger != null)
+                sb.Append("MIPS调试器");
+            else
+                sb.Append("MIPS编辑器");
+
+            if (TheEditor != null)
+            {
+                sb.Append($"- [{TheEditor.FileName}]");
+                if (TheEditor.Edited)
+                    sb.Append("*");
+            }
+
+            if (m_Debugger != null && m_IsRunning)
+                sb.Append(" - Running");
+
+            Text = sb.ToString();
+        }
 
         private string PromptSaveDialog(string ext, string desc, string title)
         {
@@ -42,7 +68,7 @@ namespace AssemblerGui
                         CreatePrompt = false,
                         DefaultExt = ext,
                         Filter = $"{desc} (*.{ext})|*.{ext}|所有文件 (*)|*",
-                        FileName = m_FileName,
+                        FileName = TheEditor.FileName,
                         Title = title
                     };
             var res = dialog.ShowDialog();
@@ -54,7 +80,7 @@ namespace AssemblerGui
         {
             try
             {
-                var pre = new Preprocessor(new[] { m_FilePath });
+                var pre = new Preprocessor(new[] { TheEditor.FilePath });
                 string fn;
                 using (var mem = new MemoryStream())
                 using (var sw = new StreamWriter(mem))
@@ -69,7 +95,7 @@ namespace AssemblerGui
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        LoadDoc(e.FilePath, e.Line, e.CharPos);
+                        OpenFile(e.FilePath, e.Line, e.CharPos);
                         return false;
                     }
                     sw.Flush();
@@ -115,23 +141,23 @@ namespace AssemblerGui
                     asm.SetWriter(sw);
                     try
                     {
-                        asm.Feed(m_FilePath, false);
+                        asm.Feed(TheEditor.FilePath, false);
                         asm.Done();
                     }
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        LoadDoc(e.FilePath, e.Line, e.CharPos);
+                        OpenFile(e.FilePath, e.Line, e.CharPos);
                         return;
                     }
                     sw.Flush();
 
                     mem.Position = 0;
 
-                    using (var ou = File.OpenWrite(m_FilePath))
+                    using (var ou = File.OpenWrite(TheEditor.FilePath))
                         mem.CopyTo(ou);
                 }
-                LoadDoc();
+                OpenFile(TheEditor.FilePath);
             }
             catch (Exception e)
             {
@@ -139,15 +165,41 @@ namespace AssemblerGui
             }
         }
 
+        private void ToggleAssemblerMenus()
+        {
+            if (m_Downloading || m_Debugger != null)
+            {
+                intelHex文件ToolStripMenuItem.Enabled = false;
+                二进制机器码BToolStripMenuItem.Enabled = false;
+                十六进制机器码HToolStripMenuItem.Enabled = false;
+                原始汇编AToolStripMenuItem.Enabled = false;
+
+                下载DToolStripMenuItem.Enabled = false;
+
+                格式化代码FToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                intelHex文件ToolStripMenuItem.Enabled = TheEditor != null;
+                二进制机器码BToolStripMenuItem.Enabled = TheEditor != null;
+                十六进制机器码HToolStripMenuItem.Enabled = TheEditor != null;
+                原始汇编AToolStripMenuItem.Enabled = TheEditor != null;
+
+                下载DToolStripMenuItem.Enabled = TheEditor != null;
+
+                格式化代码FToolStripMenuItem.Enabled = TheEditor != null;
+            }
+        }
+
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!PromptForSave())
+            if (!SaveAll())
                 e.Cancel = true;
         }
 
         private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave(true))
+            if (!SaveAll(true))
                 return;
 
             ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出"));
@@ -155,7 +207,7 @@ namespace AssemblerGui
 
         private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave(true))
+            if (!SaveAll(true))
                 return;
 
             ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
@@ -163,7 +215,7 @@ namespace AssemblerGui
 
         private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave(true))
+            if (!SaveAll(true))
                 return;
 
             ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
@@ -171,7 +223,7 @@ namespace AssemblerGui
 
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave(true))
+            if (!SaveAll(true))
                 return;
 
             ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出"));
@@ -179,7 +231,7 @@ namespace AssemblerGui
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave(true))
+            if (!SaveAll(true))
                 return;
 
             Cycle(new AsmPrettifier());
@@ -196,7 +248,9 @@ namespace AssemblerGui
             if (!ExportFile(new IntelAssembler(), () => hexPath, false))
                 return;
 
-            下载DToolStripMenuItem.Enabled = false;
+            m_Downloading = true;
+            OnStateChanged?.Invoke();
+
             var downloader = new Downloader(hexPath);
             downloader.OnExited +=
                 msg =>
@@ -206,10 +260,13 @@ namespace AssemblerGui
                     else
                         MessageBox.Show("下载失败，错误信息：" + msg, "MIPS汇编器", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                    下载DToolStripMenuItem.Enabled = true;
                     File.Delete(hexPath);
+                    m_Downloading = false;
+                    InvokeOnMainThread(OnStateChanged)();
                 };
             downloader.Start();
         }
+
+        private void tabControl1_Selected(object sender, TabControlEventArgs e) => OnStateChanged?.Invoke();
     }
-}   
+}

@@ -67,7 +67,7 @@ namespace AssemblerGui
                        m_RawDebugger.CPU.ZeroFlag = (v & 0x0f) != 0;
                    });
 
-            OnPause += () => LoadDoc(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line);
+            OnPause += () => OpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line);
             OnPause += () =>
                        {
                            for (var i = 0; i < m_RawDebugger.CPU.Ram.Length; i++)
@@ -77,15 +77,8 @@ namespace AssemblerGui
                 () =>
                 {
                     m_IsRunning = true;
-                    scintilla.MarkerDeleteAll(1);
+                    // TODO: scintilla.MarkerDeleteAll(1);
                     dataGridView1.Enabled = false;
-                    开始执行SToolStripMenuItem.Enabled = false;
-                    暂停PToolStripMenuItem.Enabled = true;
-                    跳出JToolStripMenuItem.Enabled = false;
-                    逐指令IToolStripMenuItem.Enabled = false;
-                    逐语句SToolStripMenuItem.Enabled = false;
-                    逐过程OToolStripMenuItem.Enabled = false;
-                    跳出JToolStripMenuItem.Enabled = false;
 
                     UpdateTitle();
                 };
@@ -94,13 +87,6 @@ namespace AssemblerGui
                 {
                     m_IsRunning = false;
                     dataGridView1.Enabled = true;
-                    开始执行SToolStripMenuItem.Enabled = true;
-                    暂停PToolStripMenuItem.Enabled = false;
-                    跳出JToolStripMenuItem.Enabled = true;
-                    逐指令IToolStripMenuItem.Enabled = true;
-                    逐语句SToolStripMenuItem.Enabled = true;
-                    逐过程OToolStripMenuItem.Enabled = true;
-                    跳出JToolStripMenuItem.Enabled = true;
 
                     UpdateTitle();
                 };
@@ -120,7 +106,7 @@ namespace AssemblerGui
         {
             m_RawDebugger = new AsmDebugger();
 
-            var pre = new Preprocessor(new[] { m_FilePath });
+            var pre = new Preprocessor(new[] { TheEditor.FilePath });
             try
             {
                 foreach (var p in pre)
@@ -130,13 +116,13 @@ namespace AssemblerGui
             catch (AssemblyException e)
             {
                 MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LoadDoc(e.FilePath, e.Line, e.CharPos);
+                OpenFile(e.FilePath, e.Line, e.CharPos);
                 return;
             }
 
-            foreach (var line in scintilla.Lines)
+           /* TODO: foreach (var line in scintilla.Lines)
                 if ((line.MarkerGet() & 1) != 0)
-                    m_RawDebugger.AddBreakPoint(m_FilePath, line.Index + 1);
+                    m_RawDebugger.AddBreakPoint(m_FilePath, line.Index + 1); */
 
             m_Debugger = new AsmAsyncDebugger(m_RawDebugger);
 
@@ -145,14 +131,9 @@ namespace AssemblerGui
             m_Debugger.OnExited += InvokeOnMainThread(OnExited);
 
             panel1.Show();
+            ToggleDebuggerMenus();
 
-            开始执行SToolStripMenuItem.Enabled = true;
-            暂停PToolStripMenuItem.Enabled = true;
-            停止执行XToolStripMenuItem.Enabled = true;
-            跳出JToolStripMenuItem.Enabled = true;
-            格式化代码FToolStripMenuItem.Enabled = false;
-
-            scintilla.ReadOnly = true;
+            // TODO: scintilla.ReadOnly = true;
             m_IsRunning = false;
 
             UpdateTitle();
@@ -165,21 +146,63 @@ namespace AssemblerGui
             m_Debugger = null;
             panel1.Hide();
 
-            开始执行SToolStripMenuItem.Enabled = true;
-            暂停PToolStripMenuItem.Enabled = false;
-            停止执行XToolStripMenuItem.Enabled = false;
-            跳出JToolStripMenuItem.Enabled = false;
-            格式化代码FToolStripMenuItem.Enabled = true;
-            逐指令IToolStripMenuItem.Enabled = true;
-            逐语句SToolStripMenuItem.Enabled = true;
-            逐过程OToolStripMenuItem.Enabled = true;
-            跳出JToolStripMenuItem.Enabled = false;
-
-            scintilla.MarkerDeleteAll(1);
-            scintilla.ReadOnly = false;
+            // TODO: scintilla.MarkerDeleteAll(1);
+            // TODO: scintilla.ReadOnly = false;
             m_IsRunning = false;
 
             UpdateTitle();
+        }
+
+        private void ToggleDebuggerMenus()
+        {
+            if (m_Downloading)
+            {
+                开始执行SToolStripMenuItem.Enabled = false;
+                暂停PToolStripMenuItem.Enabled = false;
+                停止执行XToolStripMenuItem.Enabled = false;
+
+                跳出JToolStripMenuItem.Enabled = false;
+                逐指令IToolStripMenuItem.Enabled = false;
+                逐语句SToolStripMenuItem.Enabled = false;
+                逐过程OToolStripMenuItem.Enabled = false;
+                跳出JToolStripMenuItem.Enabled = false;
+            }
+            else if (m_Debugger == null)
+            {
+                开始执行SToolStripMenuItem.Enabled = TheEditor != null;
+                暂停PToolStripMenuItem.Enabled = false;
+                停止执行XToolStripMenuItem.Enabled = false;
+
+                逐指令IToolStripMenuItem.Enabled = TheEditor != null;
+                逐语句SToolStripMenuItem.Enabled = TheEditor != null;
+                逐过程OToolStripMenuItem.Enabled = TheEditor != null;
+                跳出JToolStripMenuItem.Enabled = false;
+                切换断点BToolStripMenuItem.Enabled = TheEditor != null;
+            }
+            else if (m_IsRunning)
+            {
+                开始执行SToolStripMenuItem.Enabled = false;
+                暂停PToolStripMenuItem.Enabled = true;
+                停止执行XToolStripMenuItem.Enabled = true;
+
+                跳出JToolStripMenuItem.Enabled = false;
+                逐指令IToolStripMenuItem.Enabled = false;
+                逐语句SToolStripMenuItem.Enabled = false;
+                逐过程OToolStripMenuItem.Enabled = false;
+                跳出JToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                开始执行SToolStripMenuItem.Enabled = true;
+                暂停PToolStripMenuItem.Enabled = false;
+                停止执行XToolStripMenuItem.Enabled = true;
+
+                跳出JToolStripMenuItem.Enabled = true;
+                逐指令IToolStripMenuItem.Enabled = true;
+                逐语句SToolStripMenuItem.Enabled = true;
+                逐过程OToolStripMenuItem.Enabled = true;
+                跳出JToolStripMenuItem.Enabled = true;
+            }
         }
 
         private void AddReg(TableLayoutPanel table, string name,
@@ -234,7 +257,7 @@ namespace AssemblerGui
 
         private void ToggleBreakPoint(int id)
         {
-            var line = scintilla.Lines[id];
+            /*var line = scintilla.Lines[id];
 
             if ((line.MarkerGet() & 1) != 0)
             {
@@ -245,7 +268,7 @@ namespace AssemblerGui
             {
                 line.MarkerAdd(0);
                 m_RawDebugger?.AddBreakPoint(m_FilePath, id);
-            }
+            }*/
         }
 
         private static int? TryParse(string str)
@@ -266,7 +289,7 @@ namespace AssemblerGui
         {
             if (m_Debugger == null)
             {
-                if (!PromptForSave(true))
+                if (!SaveAll(true))
                     return;
 
                 StartDebugger();

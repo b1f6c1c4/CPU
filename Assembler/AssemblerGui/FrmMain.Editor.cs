@@ -1,168 +1,17 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
-using ScintillaNET;
 
 namespace AssemblerGui
 {
     public partial class FrmMain
     {
-        private string m_FileName;
+        private Editor TheEditor => tabControl1.SelectedTab as Editor;
 
-        private string m_FilePath;
+        private IEnumerable<Editor> Editors => tabControl1.TabPages.Cast<Editor>();
 
-        private bool m_Edited;
-
-        private int m_LineNumberLength;
-
-        private void SetupEditor()
-        {
-            SetupScintilla();
-
-            LoadEmptyDoc();
-        }
-
-        private void SetupScintilla()
-        {
-            scintilla.StyleResetDefault();
-            scintilla.Styles[Style.Default].Font = "Microsoft YaHei Mono";
-            scintilla.Styles[Style.Default].SizeF = 10F;
-            scintilla.StyleClearAll();
-
-            scintilla.Styles[Style.Asm.Default].ForeColor = Color.Silver;
-            scintilla.Styles[Style.Asm.CpuInstruction].ForeColor = Color.Blue;
-            scintilla.Styles[Style.Asm.MathInstruction].ForeColor = Color.DarkBlue;
-            scintilla.Styles[Style.Asm.Comment].ForeColor = Color.FromArgb(0, 139, 139);
-            scintilla.Styles[Style.Asm.Register].ForeColor = Color.Magenta;
-            scintilla.Styles[Style.Asm.Number].ForeColor = Color.Black;
-            scintilla.Styles[Style.Asm.Identifier].ForeColor = Color.FromArgb(128, 0, 128);
-
-            scintilla.SetKeywords(
-                                  0,
-                                  "AND ANDI OR ORI ADD ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC".ToLower());
-            scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT".ToLower());
-            scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
-
-            scintilla.Margins[1].Type = MarginType.Number;
-            scintilla.Margins[1].Width = 16;
-            scintilla.Margins[1].Mask = 0;
-
-            scintilla.Margins[0].Type = MarginType.Symbol;
-            scintilla.Margins[0].Sensitive = true;
-            scintilla.Margins[0].Mask = 1 | 2;
-            scintilla.Margins[0].Cursor = MarginCursor.Arrow;
-            scintilla.Margins[0].Width = 16;
-
-            scintilla.Markers[0].Symbol = MarkerSymbol.Circle;
-            scintilla.Markers[0].SetBackColor(Color.FromArgb(229, 20, 0));
-            scintilla.Markers[0].SetForeColor(Color.White);
-
-            scintilla.Markers[1].Symbol = MarkerSymbol.Arrow;
-            scintilla.Markers[1].SetBackColor(Color.Yellow);
-            scintilla.Markers[1].SetForeColor(Color.Black);
-
-            scintilla.TextChanged += scintilla_TextChanged;
-            scintilla.MarginClick += scintilla_MarginClick;
-        }
-
-        private void scintilla_TextChanged(object s, EventArgs e)
-        {
-            m_Edited = true;
-            UpdateTitle();
-
-            var length = scintilla.Lines.Count.ToString().Length;
-            if (length == m_LineNumberLength)
-                return;
-
-            m_LineNumberLength = length;
-
-            const int padding = 2;
-            scintilla.Margins[1].Width = scintilla.TextWidth(Style.LineNumber, new string('9', length + 1)) + padding;
-        }
-
-        private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
-        {
-            if (e.Margin == 0)
-                ToggleBreakPoint(scintilla.LineFromPosition(e.Position));
-        }
-
-        private void SetFile(string filePath)
-        {
-            m_FilePath = filePath;
-            m_FileName = Path.GetFileNameWithoutExtension(m_FilePath);
-        }
-
-        private void LoadEmptyDoc()
-        {
-            m_FileName = @"Untitled";
-            m_FilePath = null;
-
-            var b = scintilla.ReadOnly;
-            scintilla.ReadOnly = false;
-            scintilla.Text = "";
-            scintilla.ReadOnly = b;
-
-            m_Edited = false;
-            UpdateTitle();
-        }
-
-        private void LoadDoc()
-        {
-            var b = scintilla.ReadOnly;
-            scintilla.ReadOnly = false;
-            scintilla.Text = File.ReadAllText(m_FilePath);
-            scintilla.ReadOnly = b;
-
-            m_Edited = false;
-            UpdateTitle();
-        }
-
-        private bool PromptForSave(bool forbidNo = false)
-        {
-            if ((!forbidNo || m_FilePath != null) &&
-                !m_Edited)
-                return true;
-
-            var res = MessageBox.Show(
-                                      $"{m_FileName} 尚未保存，是否要保存？",
-                                      "MIPS编辑器",
-                                      forbidNo ? MessageBoxButtons.OKCancel : MessageBoxButtons.YesNoCancel,
-                                      MessageBoxIcon.Exclamation);
-            if (res == DialogResult.Cancel)
-                return false;
-
-            if (res == DialogResult.No)
-                return true;
-
-            return PerformSave();
-        }
-
-        private bool PerformSave()
-        {
-            if (m_FilePath == null)
-                if (!PromptSaveAs())
-                    return false;
-
-            // ReSharper disable once AssignNullToNotNullAttribute
-            File.WriteAllText(m_FilePath, scintilla.Text);
-            m_Edited = false;
-            UpdateTitle();
-
-            return true;
-        }
-
-        private bool PromptSaveAs()
-        {
-            var res = PromptSaveDialog("mips", "MIPS文件", "另存为");
-            if (res == null)
-                return false;
-
-            SetFile(res);
-            return true;
-        }
-
-        private bool PromptOpen()
+        private static string PromptOpen()
         {
             var dialog =
                 new OpenFileDialog
@@ -177,81 +26,105 @@ namespace AssemblerGui
                     };
             var res = dialog.ShowDialog();
             if (res == DialogResult.Cancel)
-                return false;
+                return null;
 
-            SetFile(dialog.FileName);
-
-            return true;
+            return dialog.FileName;
         }
 
-        private void 新建NToolStripMenuItem_Click(object sender, EventArgs e)
+        private void NewFile()
         {
-            if (!PromptForSave())
-                return;
-
-            LoadEmptyDoc();
+            var the = new Editor();
+            the.OnStateChanged += () => OnStateChanged?.Invoke();
+            tabControl1.TabPages.Add(the);
+            tabControl1.SelectedTab = the;
+            the.Focus();
+            OnStateChanged?.Invoke();
         }
 
-        private void 保存SToolStripMenuItem_Click(object sender, EventArgs e) =>
-            PerformSave();
+        private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false)
+        {
+            var the = Editors.FirstOrDefault(ed => ed.FilePath == str);
+            if (the == null)
+            {
+                the = new Editor();
+                the.OnStateChanged += () => OnStateChanged?.Invoke();
+                tabControl1.TabPages.Add(the);
+            }
+
+            tabControl1.SelectedTab = the;
+            the.Focus();
+            the.LoadDoc(str, line, charPos, debugging);
+            OnStateChanged?.Invoke();
+        }
+
+        private bool SaveAll(bool forbidNo = false) =>
+            Editors.All(ed => ed.PromptForSave(forbidNo));
+
+        private void ToggleEditorMenus()
+        {
+            if (m_Debugger == null)
+            {
+                新建NToolStripMenuItem.Enabled = true;
+                打开OToolStripMenuItem.Enabled = true;
+
+                保存SToolStripMenuItem.Enabled = TheEditor != null;
+                另存为AToolStripMenuItem.Enabled = TheEditor != null;
+
+                关闭CToolStripMenuItem.Enabled = TheEditor != null;
+            }
+            else
+            {
+                新建NToolStripMenuItem.Enabled = false;
+                打开OToolStripMenuItem.Enabled = true;
+
+                保存SToolStripMenuItem.Enabled = false;
+                另存为AToolStripMenuItem.Enabled = false;
+
+                关闭CToolStripMenuItem.Enabled = TheEditor != null;
+            }
+        }
+
+        private void 新建NToolStripMenuItem_Click(object sender, EventArgs e) => NewFile();
+
+        private void 保存SToolStripMenuItem_Click(object sender, EventArgs e) => TheEditor.PerformSave();
 
         private void 另存为AToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptSaveAs())
+            if (!TheEditor.PromptSaveAs())
                 return;
 
-            PerformSave();
+            TheEditor.PerformSave();
         }
 
         private void 打开OToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave())
+            var str = PromptOpen();
+            if (str == null)
                 return;
 
-            if (!PromptOpen())
-                return;
-
-            LoadDoc();
+            OpenFile(str);
         }
 
         private void 退出QToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!PromptForSave())
+            if (!SaveAll())
                 return;
 
             Environment.Exit(0);
         }
 
-        private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (scintilla.Focused)
-                ToggleBreakPoint(scintilla.CurrentLine);
-        }
+        private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e) =>
+            TheEditor?.ToggleBreakPoint();
 
-        private void LoadDoc(string filePath, int? line = null, int? charPos = null)
+        private void 关闭CToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (filePath == null)
+            if (!TheEditor.PromptForSave())
                 return;
 
-            if (filePath != m_FilePath)
-            {
-                if (!PromptForSave())
-                    return;
-
-                SetFile(filePath);
-                LoadDoc();
-            }
-
-            if (!line.HasValue)
-                return;
-
-            scintilla.GotoPosition(scintilla.Lines[line.Value - 1].Position + (charPos ?? 0));
-
-            if (m_Debugger != null)
-            {
-                scintilla.MarkerDeleteAll(1);
-                scintilla.Lines[line.Value - 1].MarkerAdd(1);
-            }
+            var id = tabControl1.SelectedIndex;
+            tabControl1.TabPages.RemoveAt(id);
+            tabControl1.SelectedIndex = id >= tabControl1.TabCount ? tabControl1.TabCount - 1 : id;
+            OnStateChanged?.Invoke();
         }
     }
 }
