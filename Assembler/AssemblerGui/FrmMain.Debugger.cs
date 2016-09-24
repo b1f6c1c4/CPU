@@ -14,9 +14,11 @@ namespace AssemblerGui
 
         private AsmAsyncDebugger m_Debugger;
 
-        private event AsmDebugger.UpdatedEventHandler OnPause;
+        private event SimpleEventHandler OnPause;
 
-        private event AsmDebugger.UpdatedEventHandler OnStarted;
+        private event SimpleEventHandler OnStarted;
+
+        private event SimpleEventHandler OnExited;
 
         private void SetupDebugger()
         {
@@ -102,7 +104,17 @@ namespace AssemblerGui
 
                     UpdateTitle();
                 };
+            OnExited += StopDebugger;
         }
+
+        private SimpleEventHandler InvokeOnMainThread(SimpleEventHandler handler) =>
+            () =>
+            {
+                if (InvokeRequired)
+                    Invoke(handler);
+                else
+                    handler?.Invoke();
+            };
 
         private void StartDebugger()
         {
@@ -128,22 +140,9 @@ namespace AssemblerGui
 
             m_Debugger = new AsmAsyncDebugger(m_RawDebugger);
 
-            m_Debugger.OnPause +=
-                () =>
-                {
-                    if (InvokeRequired)
-                        Invoke(OnPause);
-                    else
-                        OnPause?.Invoke();
-                };
-            m_Debugger.OnStarted +=
-                () =>
-                {
-                    if (InvokeRequired)
-                        Invoke(OnStarted);
-                    else
-                        OnStarted?.Invoke();
-                };
+            m_Debugger.OnPause += InvokeOnMainThread(OnPause);
+            m_Debugger.OnStarted += InvokeOnMainThread(OnStarted);
+            m_Debugger.OnExited += InvokeOnMainThread(OnExited);
 
             panel1.Show();
 
@@ -171,6 +170,10 @@ namespace AssemblerGui
             停止执行XToolStripMenuItem.Enabled = false;
             跳出JToolStripMenuItem.Enabled = false;
             格式化代码FToolStripMenuItem.Enabled = true;
+            逐指令IToolStripMenuItem.Enabled = true;
+            逐语句SToolStripMenuItem.Enabled = true;
+            逐过程OToolStripMenuItem.Enabled = true;
+            跳出JToolStripMenuItem.Enabled = false;
 
             scintilla.MarkerDeleteAll(1);
             scintilla.ReadOnly = false;

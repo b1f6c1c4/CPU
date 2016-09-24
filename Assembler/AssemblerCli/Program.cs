@@ -139,6 +139,8 @@ namespace AssemblerCli
                         else
                             asm = new IntelAssembler();
 
+                        ((IWriter)asm).SetWriter(sout);
+
                         action(asm);
                     }
                     finally

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="AsmAsyncDebugger.cs" />
     <Compile Include="AsmDebugger.cs" />
+    <Compile Include="Downloader.cs" />
     <Compile Include="FrmHelp.cs">
       <SubType>Form</SubType>
     </Compile>

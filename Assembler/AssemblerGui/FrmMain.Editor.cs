@@ -95,7 +95,7 @@ namespace AssemblerGui
 
         private void LoadEmptyDoc()
         {
-            m_FileName = @"新建文件";
+            m_FileName = @"Untitled";
             m_FilePath = null;
 
             var b = scintilla.ReadOnly;

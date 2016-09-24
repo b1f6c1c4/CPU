@@ -16,14 +16,15 @@ namespace AssemblerGui
             Quit
         }
 
-        public event AsmDebugger.UpdatedEventHandler OnPause;
+        public event SimpleEventHandler OnPause;
 
-        public event AsmDebugger.UpdatedEventHandler OnExited;
+        public event SimpleEventHandler OnExited;
 
-        public event AsmDebugger.UpdatedEventHandler OnStarted;
+        public event SimpleEventHandler OnStarted;
 
         private readonly AsmDebugger m_Debugger;
 
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly Thread m_Worker;
 
         private bool m_Disposed;
@@ -134,10 +135,7 @@ namespace AssemblerGui
                 return;
 
             if (disposing)
-            {
-                m_Source?.Cancel();
-                RequestRunning(Executing.Quit);
-            }
+                Stop();
 
             m_Disposed = true;
         }

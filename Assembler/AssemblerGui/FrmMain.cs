@@ -49,7 +49,7 @@ namespace AssemblerGui
             return res == DialogResult.Cancel ? null : dialog.FileName;
         }
 
-        private void ExportFile<T>(T asm, Func<string> prompt)
+        private bool ExportFile<T>(T asm, Func<string> prompt, bool open = true)
             where T : AsmProgBase, IWriter
         {
             try
@@ -70,18 +70,21 @@ namespace AssemblerGui
                     {
                         MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         LoadDoc(e.FilePath, e.Line, e.CharPos);
-                        return;
+                        return false;
                     }
                     sw.Flush();
 
                     mem.Position = 0;
                     fn = prompt();
                     if (fn == null)
-                        return;
+                        return false;
 
                     using (var ou = File.OpenWrite(fn))
                         mem.CopyTo(ou);
                 }
+                if (!open)
+                    return true;
+
                 var msg = MessageBox.Show(
                                           "导出成功，是否要用记事本打开？",
                                           "MIPS汇编器",
@@ -89,13 +92,15 @@ namespace AssemblerGui
                                           MessageBoxIcon.Question,
                                           MessageBoxDefaultButton.Button2);
                 if (msg != DialogResult.Yes)
-                    return;
+                    return true;
 
                 Process.Start("notepad", fn);
+                return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
@@ -181,5 +186,30 @@ namespace AssemblerGui
         }
 
         private void 查看帮助VToolStripMenuItem_Click(object sender, EventArgs e) => FrmHelp.ShowHelp(this);
+
+        private void 下载DToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var path = Path.GetTempFileName();
+            File.Move(path, path + ".hex");
+            var hexPath = path + ".hex";
+
+            if (!ExportFile(new IntelAssembler(), () => hexPath, false))
+                return;
+
+            下载DToolStripMenuItem.Enabled = false;
+            var downloader = new Downloader(hexPath);
+            downloader.OnExited +=
+                msg =>
+                {
+                    if (msg == null)
+                        MessageBox.Show("下载成功！", "MIPS汇编器", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        MessageBox.Show("下载失败，错误信息：" + msg, "MIPS汇编器", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    下载DToolStripMenuItem.Enabled = true;
+                    File.Delete(hexPath);
+                };
+            downloader.Start();
+        }
     }
-}
+}   

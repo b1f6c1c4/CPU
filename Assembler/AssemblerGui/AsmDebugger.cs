@@ -7,6 +7,8 @@ using Assembler;
 
 namespace AssemblerGui
 {
+    public delegate void SimpleEventHandler();
+
     public class HaltException : ApplicationException
     {
         public HaltException() : base("HALT") { }
@@ -14,9 +16,7 @@ namespace AssemblerGui
 
     public class AsmDebugger : AsmProgBase
     {
-        public delegate void UpdatedEventHandler();
-
-        public event UpdatedEventHandler OnPause;
+        public event SimpleEventHandler OnPause;
 
         public Context CPU { get; }
 

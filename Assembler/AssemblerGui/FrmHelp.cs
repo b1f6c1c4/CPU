@@ -11,7 +11,8 @@ namespace AssemblerGui
 
         public static void ShowHelp(IWin32Window owner)
         {
-            if (m_Instance == null || m_Instance.IsDisposed)
+            if (m_Instance == null ||
+                m_Instance.IsDisposed)
                 m_Instance = new FrmHelp();
 
             if (!m_Instance.Visible)
