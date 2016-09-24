@@ -53,6 +53,7 @@
             this.格式化代码FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.调试DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.开始执行SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.暂停PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.停止执行XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.逐指令IToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +62,8 @@
             this.跳出JToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.暂停PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.查看帮助VToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -152,7 +154,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.文件FToolStripMenuItem,
             this.编辑EToolStripMenuItem,
-            this.调试DToolStripMenuItem});
+            this.调试DToolStripMenuItem,
+            this.帮助HToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
@@ -314,6 +317,14 @@
             this.开始执行SToolStripMenuItem.Text = "开始执行(&R)";
             this.开始执行SToolStripMenuItem.Click += new System.EventHandler(this.开始执行SToolStripMenuItem_Click);
             // 
+            // 暂停PToolStripMenuItem
+            // 
+            this.暂停PToolStripMenuItem.Name = "暂停PToolStripMenuItem";
+            this.暂停PToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
+            this.暂停PToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
+            this.暂停PToolStripMenuItem.Text = "暂停(&P)";
+            this.暂停PToolStripMenuItem.Click += new System.EventHandler(this.暂停PToolStripMenuItem_Click);
+            // 
             // 停止执行XToolStripMenuItem
             // 
             this.停止执行XToolStripMenuItem.Name = "停止执行XToolStripMenuItem";
@@ -372,13 +383,21 @@
             this.切换断点BToolStripMenuItem.Text = "切换断点(&B)";
             this.切换断点BToolStripMenuItem.Click += new System.EventHandler(this.切换断点BToolStripMenuItem_Click);
             // 
-            // 暂停PToolStripMenuItem
+            // 帮助HToolStripMenuItem
             // 
-            this.暂停PToolStripMenuItem.Name = "暂停PToolStripMenuItem";
-            this.暂停PToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
-            this.暂停PToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
-            this.暂停PToolStripMenuItem.Text = "暂停(&P)";
-            this.暂停PToolStripMenuItem.Click += new System.EventHandler(this.暂停PToolStripMenuItem_Click);
+            this.帮助HToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.查看帮助VToolStripMenuItem});
+            this.帮助HToolStripMenuItem.Name = "帮助HToolStripMenuItem";
+            this.帮助HToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
+            this.帮助HToolStripMenuItem.Text = "帮助(&H)";
+            // 
+            // 查看帮助VToolStripMenuItem
+            // 
+            this.查看帮助VToolStripMenuItem.Name = "查看帮助VToolStripMenuItem";
+            this.查看帮助VToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this.查看帮助VToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
+            this.查看帮助VToolStripMenuItem.Text = "查看帮助(&V)...";
+            this.查看帮助VToolStripMenuItem.Click += new System.EventHandler(this.查看帮助VToolStripMenuItem_Click);
             // 
             // FrmMain
             // 
@@ -438,6 +457,8 @@
         private System.Windows.Forms.ToolStripMenuItem 格式化代码FToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 原始汇编AToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 暂停PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 帮助HToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 查看帮助VToolStripMenuItem;
     }
 }
 

@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Markdown, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1b320cc08ad5aa89, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdown.2.2.0\lib\net451\Markdown.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ScintillaNET, Version=3.5.10.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\jacobslusser.ScintillaNET.3.5.10\lib\net40\ScintillaNET.dll</HintPath>
       <Private>True</Private>
@@ -52,6 +56,12 @@
   <ItemGroup>
     <Compile Include="AsmAsyncDebugger.cs" />
     <Compile Include="AsmDebugger.cs" />
+    <Compile Include="FrmHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmHelp.Designer.cs">
+      <DependentUpon>FrmHelp.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmMain.Editor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +76,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FrmHelp.resx">
+      <DependentUpon>FrmHelp.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -88,6 +101,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Resources\AssemblerGui.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -100,7 +114,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll $(TargetDir)Markdown.dll</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

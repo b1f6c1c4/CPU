@@ -179,5 +179,7 @@ namespace AssemblerGui
 
             Cycle(new AsmPrettifier());
         }
+
+        private void 查看帮助VToolStripMenuItem_Click(object sender, EventArgs e) => FrmHelp.ShowHelp(this);
     }
 }
