@@ -30,7 +30,7 @@ namespace AssemblerGui
 
         public bool Edited { get; private set; }
 
-        public bool ReadOnly { get { return m_Scintilla.ReadOnly; } set { m_Scintilla.ReadOnly = value; } }
+        public bool ReadOnly { set { m_Scintilla.ReadOnly = value; } }
 
         private int m_LineNumberLength;
 
@@ -242,7 +242,7 @@ namespace AssemblerGui
 
         public void ToggleBreakPoint() => ToggleBreakPoint(m_Scintilla.CurrentLine + 1);
 
-        private void ToggleBreakPoint(int id)
+        public void ToggleBreakPoint(int id)
         {
             var line = m_Scintilla.Lines[id - 1];
 

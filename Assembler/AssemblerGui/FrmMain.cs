@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -236,7 +237,7 @@ namespace AssemblerGui
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!SaveAll(true))
+            if (!TheEditor.PromptForSave(true))
                 return;
 
             Cycle(new AsmPrettifier());
@@ -246,6 +247,9 @@ namespace AssemblerGui
 
         private void 下载DToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!SaveAll(true))
+                return;
+
             var path = Path.GetTempFileName();
             File.Move(path, path + ".hex");
             var hexPath = path + ".hex";
@@ -273,5 +277,19 @@ namespace AssemblerGui
         }
 
         private void tabControl1_Selected(object sender, TabControlEventArgs e) => OnStateChanged?.Invoke();
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e) => TheEditor?.Focus();
+
+        private void 全部关闭WToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            while (TheEditor != null)
+            {
+                if (TheEditor.Edited)
+                    if (!TheEditor.PromptForSave())
+                        break;
+
+                tabControl1.TabPages.RemoveAt(0);
+            }
+        }
     }
 }

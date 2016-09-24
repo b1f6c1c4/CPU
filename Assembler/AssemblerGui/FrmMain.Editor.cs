@@ -59,10 +59,15 @@ namespace AssemblerGui
 
             m_IsInitial = false;
 
-            var the = Editors.FirstOrDefault(ed => ed.FilePath == str) ?? MakeNewEditor();
+            var the = Editors.FirstOrDefault(ed => ed.FilePath == str);
+            var isNew = the == null;
+            the = the ?? MakeNewEditor();
             tabControl1.SelectedTab = the;
             the.Focus();
             the.LoadDoc(str, line, charPos, debugging);
+            if (isNew)
+                foreach (var s in m_BreakPoints.Where(s => s.FilePath == str))
+                    the.ToggleBreakPoint(s.Line);
             OnStateChanged?.Invoke();
         }
 
@@ -77,6 +82,7 @@ namespace AssemblerGui
                 打开OToolStripMenuItem.Enabled = true;
 
                 保存SToolStripMenuItem.Enabled = TheEditor != null;
+                全部保存LToolStripMenuItem.Enabled = TheEditor != null;
                 另存为AToolStripMenuItem.Enabled = TheEditor != null;
 
                 关闭CToolStripMenuItem.Enabled = TheEditor != null;
@@ -87,6 +93,7 @@ namespace AssemblerGui
                 打开OToolStripMenuItem.Enabled = true;
 
                 保存SToolStripMenuItem.Enabled = false;
+                全部保存LToolStripMenuItem.Enabled = false;
                 另存为AToolStripMenuItem.Enabled = false;
 
                 关闭CToolStripMenuItem.Enabled = TheEditor != null;
@@ -96,6 +103,13 @@ namespace AssemblerGui
         private void 新建NToolStripMenuItem_Click(object sender, EventArgs e) => NewFile();
 
         private void 保存SToolStripMenuItem_Click(object sender, EventArgs e) => TheEditor.PerformSave();
+
+        private void 全部保存LToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var ed in Editors)
+                if (!ed.PerformSave())
+                    break;
+        }
 
         private void 另存为AToolStripMenuItem_Click(object sender, EventArgs e)
         {
