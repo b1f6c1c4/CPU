@@ -101,8 +101,8 @@ namespace Assembler
 
             public string Prettify() =>
                 obj() != null
-                    ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}, R{RegisterNumber(Rs)}, {obj().GetText()}"
-                    : $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {number().GetText()}";
+                    ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {obj().GetText()}"
+                    : $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}, R{RegisterNumber(Rs)}, {number().GetText()}";
 
             private static int GetOpcode(string text)
             {

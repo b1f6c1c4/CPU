@@ -96,6 +96,7 @@ namespace AssemblerGui
             开始执行SToolStripMenuItem.Visible = false;
             停止执行XToolStripMenuItem.Visible = true;
             跳出JToolStripMenuItem.Enabled = true;
+            格式化代码FToolStripMenuItem.Enabled = false;
 
             scintilla.ReadOnly = true;
 
@@ -111,6 +112,7 @@ namespace AssemblerGui
             开始执行SToolStripMenuItem.Visible = true;
             停止执行XToolStripMenuItem.Visible = false;
             跳出JToolStripMenuItem.Enabled = false;
+            格式化代码FToolStripMenuItem.Enabled = true;
 
             scintilla.MarkerDeleteAll(1);
             scintilla.ReadOnly = false;
@@ -196,7 +198,7 @@ namespace AssemblerGui
             }
         }
 
-        private void RunDebugger(Action<AsmDebugger> f)
+        private void RunDebugger(Action<AsmDebugger> f, bool force = false)
         {
             if (m_Debugger == null)
             {
@@ -206,6 +208,9 @@ namespace AssemblerGui
                 StartDebugger();
 
                 if (m_Debugger == null)
+                    return;
+
+                if (!force)
                     return;
             }
 
@@ -220,7 +225,7 @@ namespace AssemblerGui
         }
 
         private void 开始执行SToolStripMenuItem_Click(object sender, EventArgs e) =>
-            RunDebugger(d => d.Run());
+            RunDebugger(d => d.Run(), true);
 
         private void 停止执行XToolStripMenuItem_Click(object sender, EventArgs e) => StopDebugger();
 
