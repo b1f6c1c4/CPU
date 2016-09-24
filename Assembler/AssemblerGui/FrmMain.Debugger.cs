@@ -98,7 +98,6 @@ namespace AssemblerGui
             跳出JToolStripMenuItem.Enabled = true;
 
             scintilla.ReadOnly = true;
-            scintilla.CaretLineVisible = true;
 
             UpdateTitle();
             m_Debugger.ForceUpdate();
@@ -113,8 +112,8 @@ namespace AssemblerGui
             停止执行XToolStripMenuItem.Visible = false;
             跳出JToolStripMenuItem.Enabled = false;
 
+            scintilla.MarkerDeleteAll(1);
             scintilla.ReadOnly = false;
-            scintilla.CaretLineVisible = false;
 
             UpdateTitle();
         }
@@ -205,6 +204,9 @@ namespace AssemblerGui
                     return;
 
                 StartDebugger();
+
+                if (m_Debugger == null)
+                    return;
             }
 
             try

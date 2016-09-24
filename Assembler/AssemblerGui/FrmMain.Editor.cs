@@ -50,13 +50,17 @@ namespace AssemblerGui
 
             scintilla.Margins[0].Type = MarginType.Symbol;
             scintilla.Margins[0].Sensitive = true;
-            scintilla.Margins[0].Mask = 1;
+            scintilla.Margins[0].Mask = 1 | 2;
             scintilla.Margins[0].Cursor = MarginCursor.Arrow;
             scintilla.Margins[0].Width = 16;
 
             scintilla.Markers[0].Symbol = MarkerSymbol.Circle;
             scintilla.Markers[0].SetBackColor(Color.FromArgb(229, 20, 0));
             scintilla.Markers[0].SetForeColor(Color.White);
+
+            scintilla.Markers[1].Symbol = MarkerSymbol.Arrow;
+            scintilla.Markers[1].SetBackColor(Color.Yellow);
+            scintilla.Markers[1].SetForeColor(Color.Black);
 
             scintilla.TextChanged += scintilla_TextChanged;
             scintilla.MarginClick += scintilla_MarginClick;
@@ -242,6 +246,12 @@ namespace AssemblerGui
                 return;
 
             scintilla.GotoPosition(scintilla.Lines[line.Value - 1].Position + (charPos ?? 0));
+
+            if (m_Debugger != null)
+            {
+                scintilla.MarkerDeleteAll(1);
+                scintilla.Lines[line.Value - 1].MarkerAdd(1);
+            }
         }
     }
 }
