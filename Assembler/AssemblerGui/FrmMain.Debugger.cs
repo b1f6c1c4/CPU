@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -20,8 +21,12 @@ namespace AssemblerGui
 
         private event SimpleEventHandler OnExited;
 
+        private HashSet<SourcePosition> m_BreakPoints;
+
         private void SetupDebugger()
         {
+            m_BreakPoints = new HashSet<SourcePosition>();
+
             for (var i = 0; i <= 0xff; i++)
                 dataGridView1
                     .Rows
@@ -67,7 +72,6 @@ namespace AssemblerGui
                        m_RawDebugger.CPU.ZeroFlag = (v & 0x0f) != 0;
                    });
 
-            OnPause += () => OpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line);
             OnPause += () =>
                        {
                            for (var i = 0; i < m_RawDebugger.CPU.Ram.Length; i++)
@@ -77,18 +81,17 @@ namespace AssemblerGui
                 () =>
                 {
                     m_IsRunning = true;
-                    // TODO: scintilla.MarkerDeleteAll(1);
+                    foreach (var ed in Editors)
+                        ed.ClearCurrentPositon();
                     dataGridView1.Enabled = false;
-
-                    UpdateTitle();
+                    OnStateChanged?.Invoke();
                 };
             OnPause +=
                 () =>
                 {
                     m_IsRunning = false;
                     dataGridView1.Enabled = true;
-
-                    UpdateTitle();
+                    OpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line, null, true);
                 };
             OnExited += StopDebugger;
         }
@@ -104,7 +107,7 @@ namespace AssemblerGui
 
         private void StartDebugger()
         {
-            m_RawDebugger = new AsmDebugger();
+            m_RawDebugger = new AsmDebugger(m_BreakPoints);
 
             var pre = new Preprocessor(new[] { TheEditor.FilePath });
             try
@@ -120,10 +123,6 @@ namespace AssemblerGui
                 return;
             }
 
-           /* TODO: foreach (var line in scintilla.Lines)
-                if ((line.MarkerGet() & 1) != 0)
-                    m_RawDebugger.AddBreakPoint(m_FilePath, line.Index + 1); */
-
             m_Debugger = new AsmAsyncDebugger(m_RawDebugger);
 
             m_Debugger.OnPause += InvokeOnMainThread(OnPause);
@@ -133,24 +132,23 @@ namespace AssemblerGui
             panel1.Show();
             ToggleDebuggerMenus();
 
-            // TODO: scintilla.ReadOnly = true;
             m_IsRunning = false;
 
-            UpdateTitle();
-            m_RawDebugger.ForceUpdate();
+            OnPause?.Invoke();
         }
 
         private void StopDebugger()
         {
+            m_Debugger?.Stop();
             m_Debugger?.Dispose();
             m_Debugger = null;
             panel1.Hide();
 
-            // TODO: scintilla.MarkerDeleteAll(1);
-            // TODO: scintilla.ReadOnly = false;
+            foreach (var ed in Editors)
+                ed.ClearCurrentPositon();
             m_IsRunning = false;
 
-            UpdateTitle();
+            OnStateChanged?.Invoke();
         }
 
         private void ToggleDebuggerMenus()
@@ -255,22 +253,6 @@ namespace AssemblerGui
             table.Height = h * table.RowCount;
         }
 
-        private void ToggleBreakPoint(int id)
-        {
-            /*var line = scintilla.Lines[id];
-
-            if ((line.MarkerGet() & 1) != 0)
-            {
-                line.MarkerDelete(0);
-                m_RawDebugger?.RemoveBreakPoint(m_FilePath, id);
-            }
-            else
-            {
-                line.MarkerAdd(0);
-                m_RawDebugger?.AddBreakPoint(m_FilePath, id);
-            }*/
-        }
-
         private static int? TryParse(string str)
         {
             try
@@ -309,6 +291,14 @@ namespace AssemblerGui
             {
                 StopDebugger();
             }
+        }
+
+        private void ToggledBreakPoint(string file, int line, bool isAdd)
+        {
+            if (isAdd)
+                m_BreakPoints.Add(new SourcePosition(file, line));
+            else
+                m_BreakPoints.Remove(new SourcePosition(file, line));
         }
 
         private void 开始执行SToolStripMenuItem_Click(object sender, EventArgs e) =>

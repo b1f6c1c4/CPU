@@ -10,7 +10,7 @@ namespace AssemblerGui
     {
         private static int m_ID = 1;
 
-        public delegate void ToggleBreakPointEventHandler(string file, int line);
+        public delegate void ToggleBreakPointEventHandler(string file, int line, bool isAdd);
 
         public event SimpleEventHandler OnStateChanged;
 
@@ -29,6 +29,8 @@ namespace AssemblerGui
         public string FilePath { get; private set; }
 
         public bool Edited { get; private set; }
+
+        public bool ReadOnly { get { return m_Scintilla.ReadOnly; } set { m_Scintilla.ReadOnly = value; } }
 
         private int m_LineNumberLength;
 
@@ -134,7 +136,7 @@ namespace AssemblerGui
         private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
         {
             if (e.Margin == 0)
-                OnToggleBreakPoint?.Invoke(FilePath, m_Scintilla.LineFromPosition(e.Position));
+                ToggleBreakPoint(m_Scintilla.LineFromPosition(e.Position));
         }
 
         private void SetFile(string filePath)
@@ -230,15 +232,29 @@ namespace AssemblerGui
 
         public bool PromptSaveAs()
         {
-            /*var res = PromptSaveDialog("mips", "MIPS文件", "另存为");
+            var res = FrmMain.PromptSaveDialog("mips", "MIPS文件", "另存为", FileName);
             if (res == null)
                 return false;
 
-            SetFile(res);*/
-            throw new NotImplementedException();
+            SetFile(res);
             return true;
         }
 
-        public void ToggleBreakPoint() { throw new NotImplementedException(); }
+        public void ToggleBreakPoint() => ToggleBreakPoint(m_Scintilla.CurrentLine + 1);
+
+        private void ToggleBreakPoint(int id)
+        {
+            var line = m_Scintilla.Lines[id - 1];
+
+            var had = (line.MarkerGet() & 1) != 0;
+            if (had)
+                line.MarkerDelete(0);
+            else
+                line.MarkerAdd(0);
+
+            OnToggleBreakPoint?.Invoke(FilePath, id, !had);
+        }
+
+        public void ClearCurrentPositon() => m_Scintilla.MarkerDeleteAll(1);
     }
 }

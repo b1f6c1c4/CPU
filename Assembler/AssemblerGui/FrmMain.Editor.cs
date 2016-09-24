@@ -7,6 +7,8 @@ namespace AssemblerGui
 {
     public partial class FrmMain
     {
+        private bool m_IsInitial = true;
+
         private Editor TheEditor => tabControl1.SelectedTab as Editor;
 
         private IEnumerable<Editor> Editors => tabControl1.TabPages.Cast<Editor>();
@@ -31,11 +33,18 @@ namespace AssemblerGui
             return dialog.FileName;
         }
 
-        private void NewFile()
+        private Editor MakeNewEditor()
         {
             var the = new Editor();
             the.OnStateChanged += () => OnStateChanged?.Invoke();
+            the.OnToggleBreakPoint += ToggledBreakPoint;
             tabControl1.TabPages.Add(the);
+            return the;
+        }
+
+        private void NewFile()
+        {
+            var the = MakeNewEditor();
             tabControl1.SelectedTab = the;
             the.Focus();
             OnStateChanged?.Invoke();
@@ -43,14 +52,14 @@ namespace AssemblerGui
 
         private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false)
         {
-            var the = Editors.FirstOrDefault(ed => ed.FilePath == str);
-            if (the == null)
-            {
-                the = new Editor();
-                the.OnStateChanged += () => OnStateChanged?.Invoke();
-                tabControl1.TabPages.Add(the);
-            }
+            if (m_IsInitial &&
+                tabControl1.TabCount == 1 &&
+                !TheEditor.Edited)
+                tabControl1.TabPages.RemoveAt(0);
 
+            m_IsInitial = false;
+
+            var the = Editors.FirstOrDefault(ed => ed.FilePath == str) ?? MakeNewEditor();
             tabControl1.SelectedTab = the;
             the.Focus();
             the.LoadDoc(str, line, charPos, debugging);
@@ -114,10 +123,11 @@ namespace AssemblerGui
         }
 
         private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e) =>
-            TheEditor?.ToggleBreakPoint();
+            TheEditor.ToggleBreakPoint();
 
         private void 关闭CToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            m_IsInitial = false;
             if (!TheEditor.PromptForSave())
                 return;
 

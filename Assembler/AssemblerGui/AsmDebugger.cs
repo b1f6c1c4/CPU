@@ -24,10 +24,9 @@ namespace AssemblerGui
 
         private readonly HashSet<SourcePosition> m_BreakPoints;
 
-        public AsmDebugger()
+        public AsmDebugger(HashSet<SourcePosition> breakPoints)
         {
-            m_BreakPoints = new HashSet<SourcePosition>();
-
+            m_BreakPoints = breakPoints;
             CPU =
                 new Context
                     {
@@ -42,12 +41,6 @@ namespace AssemblerGui
         protected override bool ExpansionDebug => true;
 
         public void ForceUpdate() => OnPause?.Invoke();
-
-        public void AddBreakPoint(string filename, int id) =>
-            m_BreakPoints.Add(new SourcePosition(filename, id));
-
-        public void RemoveBreakPoint(string filename, int id) =>
-            m_BreakPoints.Remove(new SourcePosition(filename, id));
 
         private void Advance()
         {

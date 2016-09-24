@@ -26,22 +26,24 @@ namespace AssemblerGui
             OnStateChanged += ToggleEditorMenus;
             OnStateChanged += ToggleAssemblerMenus;
             OnStateChanged += ToggleDebuggerMenus;
+            OnStateChanged += () =>
+                              {
+                                  foreach (var ed in Editors)
+                                      ed.ReadOnly = m_Downloading || m_Debugger != null;
+                              };
 
             NewFile();
 
             SetupDebugger();
 
-            UpdateTitle();
+            OnStateChanged?.Invoke();
         }
 
         private void UpdateTitle()
         {
             var sb = new StringBuilder();
 
-            if (m_Debugger != null)
-                sb.Append("MIPS调试器");
-            else
-                sb.Append("MIPS编辑器");
+            sb.Append(m_Debugger != null ? "MIPS调试器" : "MIPS编辑器");
 
             if (TheEditor != null)
             {
@@ -53,10 +55,13 @@ namespace AssemblerGui
             if (m_Debugger != null && m_IsRunning)
                 sb.Append(" - Running");
 
+            if (m_Downloading)
+                sb.Append(" - Downloading");
+
             Text = sb.ToString();
         }
 
-        private string PromptSaveDialog(string ext, string desc, string title)
+        public static string PromptSaveDialog(string ext, string desc, string title, string fileName)
         {
             var dialog =
                 new SaveFileDialog
@@ -68,7 +73,7 @@ namespace AssemblerGui
                         CreatePrompt = false,
                         DefaultExt = ext,
                         Filter = $"{desc} (*.{ext})|*.{ext}|所有文件 (*)|*",
-                        FileName = TheEditor.FileName,
+                        FileName = fileName,
                         Title = title
                     };
             var res = dialog.ShowDialog();
@@ -202,7 +207,7 @@ namespace AssemblerGui
             if (!SaveAll(true))
                 return;
 
-            ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出"));
+            ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出", TheEditor.FileName));
         }
 
         private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e)
@@ -210,7 +215,7 @@ namespace AssemblerGui
             if (!SaveAll(true))
                 return;
 
-            ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
+            ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
         }
 
         private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e)
@@ -218,7 +223,7 @@ namespace AssemblerGui
             if (!SaveAll(true))
                 return;
 
-            ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出"));
+            ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
         }
 
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e)
@@ -226,7 +231,7 @@ namespace AssemblerGui
             if (!SaveAll(true))
                 return;
 
-            ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出"));
+            ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
         }
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
