@@ -32,6 +32,8 @@ namespace AssemblerGui
 
         public bool ReadOnly { set { m_Scintilla.ReadOnly = value; } }
 
+        public Control ActiveControl => m_Scintilla;
+
         private int m_LineNumberLength;
 
         private Scintilla m_Scintilla;

@@ -33,11 +33,11 @@ namespace AssemblerGui
                                       ed.ReadOnly = m_Downloading || m_Debugger != null;
                               };
 
-            NewFile();
-
             SetupDebugger();
 
-            OnStateChanged?.Invoke();
+            NewFile();
+
+            ActiveControl = TheEditor?.ActiveControl;
         }
 
         private void UpdateTitle()
@@ -291,5 +291,7 @@ namespace AssemblerGui
                 tabControl1.TabPages.RemoveAt(0);
             }
         }
+
+        private void tabControl1_MouseClick(object sender, MouseEventArgs e) => TheEditor?.Focus();
     }
 }

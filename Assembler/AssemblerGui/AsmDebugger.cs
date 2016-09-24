@@ -40,8 +40,6 @@ namespace AssemblerGui
 
         protected override bool ExpansionDebug => true;
 
-        public void ForceUpdate() => OnPause?.Invoke();
-
         private void Advance()
         {
             var old = CPU.PC;

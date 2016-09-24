@@ -245,7 +245,8 @@ namespace AssemblerGui
                                  {
                                      // ReSharper disable once PossibleInvalidOperationException
                                      validated(TryParse(txt.Text).Value);
-                                     m_RawDebugger.ForceUpdate();
+                                     if (updated != null)
+                                         txt.Text = $"0x{updated():x2}";
                                  };
             table.Controls.Add(lbl, 0, row);
             table.Controls.Add(txt, 1, row);

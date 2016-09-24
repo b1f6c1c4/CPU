@@ -9,7 +9,7 @@ namespace AssemblerGui
     {
         private bool m_IsInitial = true;
 
-        private Editor TheEditor => tabControl1.SelectedTab as Editor;
+        private Editor TheEditor => tabControl1.TabCount > 0 ? tabControl1.SelectedTab as Editor : null;
 
         private IEnumerable<Editor> Editors => tabControl1.TabPages.Cast<Editor>();
 
