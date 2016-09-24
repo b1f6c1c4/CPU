@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmAsyncDebugger.cs" />
     <Compile Include="AsmDebugger.cs" />
     <Compile Include="FrmMain.Editor.cs">
       <SubType>Form</SubType>

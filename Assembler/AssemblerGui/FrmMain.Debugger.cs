@@ -8,9 +8,15 @@ namespace AssemblerGui
 {
     public partial class FrmMain
     {
-        private AsmDebugger m_Debugger;
+        private bool m_IsRunning;
 
-        private event AsmDebugger.UpdatedEventHandler OnUpdated;
+        private AsmDebugger m_RawDebugger;
+
+        private AsmAsyncDebugger m_Debugger;
+
+        private event AsmDebugger.UpdatedEventHandler OnPause;
+
+        private event AsmDebugger.UpdatedEventHandler OnStarted;
 
         private void SetupDebugger()
         {
@@ -28,94 +34,147 @@ namespace AssemblerGui
                              });
             StopDebugger();
 
-            AddReg(tableLayoutPanel1, "PC", () => m_Debugger.CPU.PC, v => m_Debugger.CPU.PC = v, newRow: false);
+            AddReg(tableLayoutPanel1, "PC", () => m_RawDebugger.CPU.PC, v => m_RawDebugger.CPU.PC = v, newRow: false);
             AddReg(
                    tableLayoutPanel1,
                    "R0",
-                   () => m_Debugger.CPU.Registers[0],
-                   v => m_Debugger.CPU.Registers[0] = (byte)v);
+                   () => m_RawDebugger.CPU.Registers[0],
+                   v => m_RawDebugger.CPU.Registers[0] = (byte)v);
             AddReg(
                    tableLayoutPanel1,
                    "R1",
-                   () => m_Debugger.CPU.Registers[1],
-                   v => m_Debugger.CPU.Registers[1] = (byte)v);
+                   () => m_RawDebugger.CPU.Registers[1],
+                   v => m_RawDebugger.CPU.Registers[1] = (byte)v);
             AddReg(
                    tableLayoutPanel1,
                    "R2",
-                   () => m_Debugger.CPU.Registers[2],
-                   v => m_Debugger.CPU.Registers[2] = (byte)v);
+                   () => m_RawDebugger.CPU.Registers[2],
+                   v => m_RawDebugger.CPU.Registers[2] = (byte)v);
             AddReg(
                    tableLayoutPanel1,
                    "R3",
-                   () => m_Debugger.CPU.Registers[3],
-                   v => m_Debugger.CPU.Registers[3] = (byte)v);
+                   () => m_RawDebugger.CPU.Registers[3],
+                   v => m_RawDebugger.CPU.Registers[3] = (byte)v);
             AddReg(
                    tableLayoutPanel1,
                    "Flag",
-                   () => (m_Debugger.CPU.CFlag ? 0x10 : 0x00) | (m_Debugger.CPU.ZeroFlag ? 0x01 : 0x00),
+                   () => (m_RawDebugger.CPU.CFlag ? 0x10 : 0x00) | (m_RawDebugger.CPU.ZeroFlag ? 0x01 : 0x00),
                    v =>
                    {
-                       m_Debugger.CPU.CFlag = (v & 0xf0) != 0;
-                       m_Debugger.CPU.ZeroFlag = (v & 0x0f) != 0;
+                       m_RawDebugger.CPU.CFlag = (v & 0xf0) != 0;
+                       m_RawDebugger.CPU.ZeroFlag = (v & 0x0f) != 0;
                    });
+
+            OnPause += () => LoadDoc(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line);
+            OnPause += () =>
+                       {
+                           for (var i = 0; i < m_RawDebugger.CPU.Ram.Length; i++)
+                               dataGridView1.Rows[i].Cells[1].Value = $"0x{m_RawDebugger.CPU.Ram[i]:x2}";
+                       };
+            OnStarted +=
+                () =>
+                {
+                    m_IsRunning = true;
+                    scintilla.MarkerDeleteAll(1);
+                    dataGridView1.Enabled = false;
+                    开始执行SToolStripMenuItem.Enabled = false;
+                    暂停PToolStripMenuItem.Enabled = true;
+                    跳出JToolStripMenuItem.Enabled = false;
+                    逐指令IToolStripMenuItem.Enabled = false;
+                    逐语句SToolStripMenuItem.Enabled = false;
+                    逐过程OToolStripMenuItem.Enabled = false;
+                    跳出JToolStripMenuItem.Enabled = false;
+
+                    UpdateTitle();
+                };
+            OnPause +=
+                () =>
+                {
+                    m_IsRunning = false;
+                    dataGridView1.Enabled = true;
+                    开始执行SToolStripMenuItem.Enabled = true;
+                    暂停PToolStripMenuItem.Enabled = false;
+                    跳出JToolStripMenuItem.Enabled = true;
+                    逐指令IToolStripMenuItem.Enabled = true;
+                    逐语句SToolStripMenuItem.Enabled = true;
+                    逐过程OToolStripMenuItem.Enabled = true;
+                    跳出JToolStripMenuItem.Enabled = true;
+
+                    UpdateTitle();
+                };
         }
 
         private void StartDebugger()
         {
-            m_Debugger = new AsmDebugger();
+            m_RawDebugger = new AsmDebugger();
 
             var pre = new Preprocessor(new[] { m_FilePath });
             try
             {
                 foreach (var p in pre)
-                    m_Debugger.Feed(p, true);
-                m_Debugger.Done();
+                    m_RawDebugger.Feed(p, true);
+                m_RawDebugger.Done();
             }
             catch (AssemblyException e)
             {
-                m_Debugger = null;
                 MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LoadDoc(e.FilePath, e.Line, e.CharPos);
                 return;
             }
 
-            m_Debugger.OnUpdated += () => OnUpdated?.Invoke();
-            m_Debugger.OnUpdated += () => LoadDoc(m_Debugger.Source.FilePath, m_Debugger.Source.Line);
-            m_Debugger.OnUpdated += () =>
-                                    {
-                                        for (var i = 0; i < m_Debugger.CPU.Ram.Length; i++)
-                                            dataGridView1.Rows[i].Cells[1].Value = $"0x{m_Debugger.CPU.Ram[i]:x2}";
-                                    };
-
             foreach (var line in scintilla.Lines)
                 if ((line.MarkerGet() & 1) != 0)
-                    m_Debugger.AddBreakPoint(m_FilePath, line.Index + 1);
+                    m_RawDebugger.AddBreakPoint(m_FilePath, line.Index + 1);
+
+            m_Debugger = new AsmAsyncDebugger(m_RawDebugger);
+
+            m_Debugger.OnPause +=
+                () =>
+                {
+                    if (InvokeRequired)
+                        Invoke(OnPause);
+                    else
+                        OnPause?.Invoke();
+                };
+            m_Debugger.OnStarted +=
+                () =>
+                {
+                    if (InvokeRequired)
+                        Invoke(OnStarted);
+                    else
+                        OnStarted?.Invoke();
+                };
 
             panel1.Show();
 
-            开始执行SToolStripMenuItem.Visible = false;
-            停止执行XToolStripMenuItem.Visible = true;
+            开始执行SToolStripMenuItem.Enabled = true;
+            暂停PToolStripMenuItem.Enabled = true;
+            停止执行XToolStripMenuItem.Enabled = true;
             跳出JToolStripMenuItem.Enabled = true;
             格式化代码FToolStripMenuItem.Enabled = false;
 
             scintilla.ReadOnly = true;
+            m_IsRunning = false;
 
             UpdateTitle();
-            m_Debugger.ForceUpdate();
+            m_RawDebugger.ForceUpdate();
         }
 
         private void StopDebugger()
         {
+            m_Debugger?.Dispose();
             m_Debugger = null;
             panel1.Hide();
 
-            开始执行SToolStripMenuItem.Visible = true;
-            停止执行XToolStripMenuItem.Visible = false;
+            开始执行SToolStripMenuItem.Enabled = true;
+            暂停PToolStripMenuItem.Enabled = false;
+            停止执行XToolStripMenuItem.Enabled = false;
             跳出JToolStripMenuItem.Enabled = false;
             格式化代码FToolStripMenuItem.Enabled = true;
 
             scintilla.MarkerDeleteAll(1);
             scintilla.ReadOnly = false;
+            m_IsRunning = false;
 
             UpdateTitle();
         }
@@ -147,8 +206,10 @@ namespace AssemblerGui
                         Dock = DockStyle.Fill,
                         Font = new Font("Microsoft YaHei Mono", 10F, FontStyle.Regular, GraphicsUnit.Point, 134)
                     };
+            OnStarted += () => txt.Enabled = false;
+            OnPause += () => txt.Enabled = true;
             if (updated != null)
-                OnUpdated += () => txt.Text = $"0x{updated():x2}";
+                OnPause += () => txt.Text = $"0x{updated():x2}";
             txt.Validating +=
                 (s, e) =>
                 {
@@ -160,7 +221,7 @@ namespace AssemblerGui
                                  {
                                      // ReSharper disable once PossibleInvalidOperationException
                                      validated(TryParse(txt.Text).Value);
-                                     m_Debugger.ForceUpdate();
+                                     m_RawDebugger.ForceUpdate();
                                  };
             table.Controls.Add(lbl, 0, row);
             table.Controls.Add(txt, 1, row);
@@ -175,12 +236,12 @@ namespace AssemblerGui
             if ((line.MarkerGet() & 1) != 0)
             {
                 line.MarkerDelete(0);
-                m_Debugger?.RemoveBreakPoint(m_FilePath, id);
+                m_RawDebugger?.RemoveBreakPoint(m_FilePath, id);
             }
             else
             {
                 line.MarkerAdd(0);
-                m_Debugger?.AddBreakPoint(m_FilePath, id);
+                m_RawDebugger?.AddBreakPoint(m_FilePath, id);
             }
         }
 
@@ -198,7 +259,7 @@ namespace AssemblerGui
             }
         }
 
-        private void RunDebugger(Action<AsmDebugger> f, bool force = false)
+        private void RunDebugger(Action<AsmAsyncDebugger> f, bool force = false)
         {
             if (m_Debugger == null)
             {
@@ -227,7 +288,8 @@ namespace AssemblerGui
         private void 开始执行SToolStripMenuItem_Click(object sender, EventArgs e) =>
             RunDebugger(d => d.Run(), true);
 
-        private void 停止执行XToolStripMenuItem_Click(object sender, EventArgs e) => StopDebugger();
+        private void 停止执行XToolStripMenuItem_Click(object sender, EventArgs e) =>
+            StopDebugger();
 
         private void 逐指令IToolStripMenuItem_Click(object sender, EventArgs e) =>
             RunDebugger(d => d.NextInstruction());
@@ -240,6 +302,9 @@ namespace AssemblerGui
 
         private void 跳出JToolStripMenuItem_Click(object sender, EventArgs e) =>
             RunDebugger(d => d.JumpOut());
+
+        private void 暂停PToolStripMenuItem_Click(object sender, EventArgs e) =>
+            m_Debugger.Pause();
 
         private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
@@ -258,7 +323,7 @@ namespace AssemblerGui
 
             var v = TryParse((string)dataGridView1.Rows[e.RowIndex].Cells[1].Value);
             // ReSharper disable once PossibleInvalidOperationException
-            m_Debugger.CPU.Ram[e.RowIndex] = (byte)v.Value;
+            m_RawDebugger.CPU.Ram[e.RowIndex] = (byte)v.Value;
         }
     }
 }

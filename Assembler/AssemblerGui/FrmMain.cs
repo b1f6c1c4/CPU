@@ -25,7 +25,9 @@ namespace AssemblerGui
 
         private void UpdateTitle() =>
             Text = (m_Debugger != null)
-                       ? $"MIPS调试器 - [{m_FileName}]"
+                       ? (!m_IsRunning
+                              ? $"MIPS调试器 - [{m_FileName}]"
+                              : $"MIPS调试器 - [{m_FileName}] - Running")
                        : $"MIPS编辑器 - [{m_FileName}]{(m_Edited ? "*" : "")}";
 
         private string PromptSaveDialog(string ext, string desc, string title)

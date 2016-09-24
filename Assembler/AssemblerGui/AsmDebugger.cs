@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using Assembler;
 
 namespace AssemblerGui
@@ -15,7 +16,7 @@ namespace AssemblerGui
     {
         public delegate void UpdatedEventHandler();
 
-        public event UpdatedEventHandler OnUpdated;
+        public event UpdatedEventHandler OnPause;
 
         public Context CPU { get; }
 
@@ -40,7 +41,7 @@ namespace AssemblerGui
 
         protected override bool ExpansionDebug => true;
 
-        public void ForceUpdate() => OnUpdated?.Invoke();
+        public void ForceUpdate() => OnPause?.Invoke();
 
         public void AddBreakPoint(string filename, int id) =>
             m_BreakPoints.Add(new SourcePosition(filename, id));
@@ -75,16 +76,16 @@ namespace AssemblerGui
         public void NextInstruction()
         {
             Advance();
-            OnUpdated?.Invoke();
+            OnPause?.Invoke();
         }
 
         public void NextStatement()
         {
             AdvanceStatement();
-            OnUpdated?.Invoke();
+            OnPause?.Invoke();
         }
 
-        public void NextProcedure()
+        public void NextProcedure(CancellationToken cancel)
         {
             var pos = Lines[CPU.PC];
             var lines = File.ReadAllLines(pos.FilePath);
@@ -99,28 +100,30 @@ namespace AssemblerGui
 
                 var pox = new SourcePosition(pos.FilePath, l);
 
-                while (pox != Source)
+                while (!cancel.IsCancellationRequested &&
+                       pox != Source)
                     if (AdvanceStatement())
                         break;
             }
-            OnUpdated?.Invoke();
+            OnPause?.Invoke();
         }
 
-        public void JumpOut()
+        public void JumpOut(CancellationToken cancel)
         {
             var bp = CPU.Ram[CPU.Ram[0xfe]];
-            while (bp != CPU.Ram[0xfe])
+            while (!cancel.IsCancellationRequested &&
+                   bp != CPU.Ram[0xfe])
                 if (AdvanceStatement())
                     break;
-            OnUpdated?.Invoke();
+            OnPause?.Invoke();
         }
 
-        public void Run()
+        public void Run(CancellationToken cancel)
         {
-            while (true)
+            while (!cancel.IsCancellationRequested)
                 if (AdvanceStatement())
                     break;
-            OnUpdated?.Invoke();
+            OnPause?.Invoke();
         }
     }
 }
