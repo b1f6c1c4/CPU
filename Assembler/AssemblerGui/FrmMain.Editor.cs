@@ -50,7 +50,7 @@ namespace AssemblerGui
             OnStateChanged?.Invoke();
         }
 
-        private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false)
+        private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false, bool force = false)
         {
             if (m_IsInitial &&
                 tabControl1.TabCount == 1 &&
@@ -64,7 +64,7 @@ namespace AssemblerGui
             the = the ?? MakeNewEditor();
             tabControl1.SelectedTab = the;
             the.Focus();
-            the.LoadDoc(str, line, charPos, debugging);
+            the.LoadDoc(str, line, charPos, debugging, force);
             if (isNew)
                 foreach (var s in m_BreakPoints.Where(s => s.FilePath == str))
                     the.ToggleBreakPoint(s.Line);

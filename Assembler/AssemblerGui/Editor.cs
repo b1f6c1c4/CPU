@@ -161,7 +161,7 @@ namespace AssemblerGui
             OnStateChanged?.Invoke();
         }
 
-        private void LoadDoc()
+        private void ReloadDoc()
         {
             var b = m_Scintilla.ReadOnly;
             m_Scintilla.ReadOnly = false;
@@ -172,7 +172,7 @@ namespace AssemblerGui
             OnStateChanged?.Invoke();
         }
 
-        public void LoadDoc(string filePath, int? line = null, int? charPos = null, bool debugging = false)
+        public void LoadDoc(string filePath, int? line = null, int? charPos = null, bool debugging = false, bool force = false)
         {
             if (filePath == null)
                 return;
@@ -182,9 +182,11 @@ namespace AssemblerGui
                 if (!PromptForSave())
                     return;
 
-                SetFile(filePath);                
+                SetFile(filePath);
+                ReloadDoc();
             }
-            LoadDoc();
+            else if (force)
+                ReloadDoc();
 
             if (!line.HasValue)
                 return;

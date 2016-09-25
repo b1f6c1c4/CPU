@@ -2,14 +2,14 @@
     ADDI R0, R0, 0x58   ; R0 = 0x58
     ANDI R1, R1, 0x00   ;
     ADDI R1, R1, 0x01   ; R1 = 0x01
-add:
+pre_add:
     ANDI R3, R3, 0x00   ;
     ADDI R2, R0, 0xC2   ; R2 + c = R0 + 0xC2
     SW   R2, R3, 0x20   ; MEM[0x20] = R2
     ANDI R2, R2, 0x00   ;
     ADDC R3, R1, R3     ; R3 = R1 + c
     SW   R3, R2, 0x21   ; MEM[0x21] = R3
-minus:
+pre_minus:
     ANDI R2, R2, 0x00   ;
     ADDI R2, R2, 0xC2   ; R2 = 0xC2
     ANDI R3, R3, 0x00   ;
@@ -42,7 +42,8 @@ disp_minus:
     JMP  delay          ; call delay
 disp_minus_ret:
     JMP  disp_add       ;
-delay:                  ; R2 is preserved
+delay:
+    ; R2 is preserved
     ; loop 694444 times to get 0.5s delay
     ANDI R1, R1, 0x00   ;
     ADDI R3, R1, 0xac   ;
@@ -68,7 +69,8 @@ delay:                  ; R2 is preserved
     SW   R0, R1, 0xa6   ;
     LW   R0, R1, 0xa3   ;
     SW   R0, R1, 0xa7   ;
-loop:                   ; 18 insts per loop
+loop:
+    ; 18 insts per loop
     ; R3 = |(--i)
     ANDI R3, R3, 0x00   ; R3 = 0
     LW   R0, R1, 0xa4   ;
@@ -89,6 +91,7 @@ loop:                   ; 18 insts per loop
     SW   R0, R1, 0xa7   ;
     ; if (R3) goto loop
     BNE  R3, R1, loop   ;
-ret:
-    BEQ  R2, R1, disp_add_ret ;
+to_ret:
+    BEQ  R2, R1, disp_add_ret;
     JMP  disp_minus_ret ;
+   JMP  disp_minus_ret ;

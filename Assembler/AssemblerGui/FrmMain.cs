@@ -163,7 +163,7 @@ namespace AssemblerGui
                     using (var ou = File.OpenWrite(TheEditor.FilePath))
                         mem.CopyTo(ou);
                 }
-                OpenFile(TheEditor.FilePath);
+                OpenFile(TheEditor.FilePath, force : true);
             }
             catch (Exception e)
             {

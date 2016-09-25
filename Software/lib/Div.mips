@@ -1,6 +1,6 @@
-    ; Div: Integer Divier
-    ; arg[0]: a -> a / b
+    ; Div: Integer Divider
     ; arg[1]: b -> a % b
+    ; arg[0]: a -> a / b
 Div:
     PUSH BP
     ; sh = sp+4
