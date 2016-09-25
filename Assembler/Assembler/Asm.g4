@@ -46,6 +46,7 @@ macro
 	Op=INIT
 	| Op=CALL obj
 	| Op=RET
+	| Op=ADDPC
 	| Op=HALT
 	| Op=PUSH Rx=(BP | Register)
 	| Op=POP  Rx=Register
@@ -117,6 +118,7 @@ POP : P O P;
 CALL: C A L L;
 RET : R E T;
 HALT: H A L T;
+ADDPC: A D D P C;
 
 BP  : B P;
 

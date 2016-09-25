@@ -86,6 +86,21 @@ LW   {0}, {0}, 0xff  ; {0} = MEM[sp-1]
 BEQ R1, R1, 0xff
 ";
 
+            private const string AddPc = @"
+LPCH R2
+LPCL R0
+ANDI R1, R1, 0x00   ; +0 R0 points here
+BNE  R0, R1, 0x01   ; +1
+ADDI R2, R2, 0x01   ; +2
+LW   R3, R1, 0xff   ; +3
+LW   R3, R3, 0x00   ; +4
+ADDI R3, R3, 9      ; +5
+ADD  R0, R0, R3     ; +6
+ADDC R2, R2, R1     ; +7
+SPC  R2, R0         ; +8
+;                   ;+9
+";
+
             public IReadOnlyList<IExecutableInstruction> Flatten(bool debug)
             {
                 if (Debug != null &&
@@ -100,6 +115,8 @@ BEQ R1, R1, 0xff
                         return Parse(string.Format(Call, obj().GetText()), debug);
                     case "RET":
                         return Parse(Ret, debug);
+                    case "ADDPC":
+                        return Parse(AddPc, debug);
                     case "HALT":
                         return Parse(Halt, debug);
                     case "PUSH":
@@ -122,6 +139,7 @@ BEQ R1, R1, 0xff
                 switch (Op.Text.ToUpper())
                 {
                     case "INIT":
+                    case "ADDPC":
                     case "RET":
                     case "HALT":
                         str = $"{Op.Text.ToUpper()}";

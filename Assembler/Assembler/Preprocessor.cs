@@ -43,8 +43,8 @@ namespace Assembler
         {
             string s;
             while ((s = fin.ReadLine()) != null)
-                if (s.StartsWith(";include", StringComparison.Ordinal))
-                    yield return s.Substring(8).Trim();
+                if (s.TrimStart().StartsWith(";include", StringComparison.Ordinal))
+                    yield return s.TrimStart().Substring(8).Trim();
         }
 
         public IEnumerator<string> GetEnumerator() => m_Files.GetEnumerator();

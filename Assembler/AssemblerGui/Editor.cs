@@ -89,7 +89,7 @@ namespace AssemblerGui
             m_Scintilla.SetKeywords(
                                     0,
                                     "AND ANDI OR ORI ADD ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC".ToLower());
-            m_Scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT".ToLower());
+            m_Scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT ADDPC".ToLower());
             m_Scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
 
             m_Scintilla.Margins[1].Type = MarginType.Number;
