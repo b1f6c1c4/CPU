@@ -182,9 +182,9 @@ namespace AssemblerGui
                 if (!PromptForSave())
                     return;
 
-                SetFile(filePath);
-                LoadDoc();
+                SetFile(filePath);                
             }
+            LoadDoc();
 
             if (!line.HasValue)
                 return;
