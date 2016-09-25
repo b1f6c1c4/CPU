@@ -23,6 +23,10 @@ namespace AssemblerGui
             SetProcessDPIAware();
             InitializeComponent();
 
+            this.AllowDrop = true;
+            this.DragEnter += new DragEventHandler(FrmMain_DragEnter);
+            this.DragDrop += new DragEventHandler(FrmMain_DragDrop);
+
             OnStateChanged += UpdateTitle;
             OnStateChanged += ToggleEditorMenus;
             OnStateChanged += ToggleAssemblerMenus;
@@ -293,5 +297,18 @@ namespace AssemblerGui
         }
 
         private void tabControl1_MouseClick(object sender, MouseEventArgs e) => TheEditor?.Focus();
+        private void FrmMain_DragDrop(object sender, DragEventArgs e)
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (var file in files)
+            {
+                OpenFile(file);
+            }
+        }
+
+        private void FrmMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
     }
 }

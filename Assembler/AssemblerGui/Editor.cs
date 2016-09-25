@@ -185,6 +185,8 @@ namespace AssemblerGui
                 SetFile(filePath);
                 LoadDoc();
             }
+            else if (!debugging)
+                LoadDoc();
 
             if (!line.HasValue)
                 return;
