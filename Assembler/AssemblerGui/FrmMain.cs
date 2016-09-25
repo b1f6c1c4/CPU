@@ -293,5 +293,20 @@ namespace AssemblerGui
         }
 
         private void tabControl1_MouseClick(object sender, MouseEventArgs e) => TheEditor?.Focus();
+
+        private void FrmMain_DragDrop(object sender, DragEventArgs e)
+        {
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (files == null)
+                return;
+            foreach (var file in files)
+                OpenFile(file);
+        }
+
+        private void FrmMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+        }
     }
 }
