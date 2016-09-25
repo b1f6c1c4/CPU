@@ -101,7 +101,7 @@ namespace AssemblerGui
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        OpenFile(e.FilePath, e.Line, e.CharPos);
+                        OpenFile(e.FilePath, e.Line, e.CharPos, false);
                         return false;
                     }
                     sw.Flush();
