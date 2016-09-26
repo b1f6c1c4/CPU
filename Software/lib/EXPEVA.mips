@@ -1,0 +1,164 @@
+    ; EXPEVA
+    ;
+    ; MEM[0x09] = n_sp (point to the next)
+    ; MEM[0x0a] = o_sp (point to the next)
+    ; MEM[0x0b] = is_number
+    ;
+    ; MEM[0x4f .. 0x10] : numbers (32)
+    ; MEM[0x7f .. 0x50] : operators (48)
+    ;
+    ; Operator List
+    ; =============
+    ; 0x00  Unary Plus
+    ; 0x01  Unary Minus
+    ; 0x02  Plus
+    ; 0x03  Minus
+    ; 0x04  Multiply
+    ; 0x05  Divide
+    ; 0x06  Reminder
+    ; 0x07  Bit-wise Not
+    ; 0x08  Bit-wise And
+    ; 0x09  Bit-wise Or
+    ; 0x0a  Bit-wise Xor
+    ; 0x0b  Left Parenthesis
+    ; 0x0c  Right Parenthesis
+    ; 0x0d  Less Than
+    ; 0x0e  OK
+    ;
+    ; Method Implementation
+    ; =====================
+get_precedence:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    PUSH R0
+    ADDPC
+    JMP  gpre_UnaryPlus
+    JMP  gpre_UnaryMinus
+    JMP  gpre_Plus
+    JMP  gpre_Minus
+    JMP  gpre_Multiply
+    JMP  gpre_Divide
+    JMP  gpre_Reminder
+    JMP  gpre_BitwiseNot
+    JMP  gpre_BitwiseAnd
+    JMP  gpre_BitwiseOr
+    JMP  gpre_BitwiseXor
+    JMP  gpre_LeftParenthesis
+    JMP  gpre_RightParenthesis
+    JMP  gpre_LessThan
+    JMP  gpre_OK
+    ; Init_EXPEVA: Stack initialize
+Init_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x10
+    SW   R0, R1, 0x09
+    ADDI R0, R1, 0x50
+    SW   R0, R1, 0x0a
+    RET
+    ; Digit_EXPEVA: Push one digit or create number
+    ; arg[0]: digit
+Digit_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R0, R1, 0x0b
+    BEQ  R0, R1, create_Digit_EXPEVA
+    ADDI R0, R1, 0
+    PUSH R0
+    ADDI R0, R1, 10
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R0
+    PUSH R3
+    CALL Mult16p
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 4
+    SW   R3, R1, 0xff
+    ADDI R0, R1, 0
+    PUSH R0
+    ADDI R0, R1, 10
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R0
+    PUSH R3
+    CALL Add16p
+    RET
+create_Digit_EXPEVA:
+    CALL allocate_number
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R2, R1, 0x09
+    SW   R1, R2, 0xff
+    SW   R0, R2, 0xfe
+    RET
+    ; Operator_EXPEVA: Push one operator
+Operator_EXPEVA:
+    PUSH BP
+    ; TODO
+    RET
+    ; Equal_EXPEVA: Force flush all
+Equal_EXPEVA:
+    PUSH BP
+    ; TODO
+    RET
+    ; Back_EXPEVA: Remove last digit
+    ; return: 0 is succeed
+Back_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R0, R1, 0x0b
+    BEQ  R0, R1, fail_Back_EXPEVA
+    ADDI R0, R1, 0
+    PUSH R0
+    ADDI R0, R1, 10
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R0
+    PUSH R3
+    CALL Div16p
+    ANDI R0, R0, 0x00
+    RET
+fail_Back_EXPEVA:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0x01
+    RET
+allocate_number:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0x09
+    ADDI R3, R3, 0x02
+    SW   R3, R1, 0x09
+    RET
+free_number:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0x09
+    ADDI R3, R3, 0xfe
+    SW   R3, R1, 0x09
+    RET
+push_operator:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0x0a
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x00
+    ADDI R3, R3, 0x01
+    SW   R3, R1, 0x0a
+    RET
+pop_operator:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0x0a
+    ADDI R3, R3, 0xff
+    LW   R0, R3, 0x00
+    RET

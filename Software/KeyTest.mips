@@ -1,0 +1,7 @@
+    ;include lib/ReadKey.mips
+    INIT
+loop:
+    CALL ReadKey
+    ANDI R1, R1, 0x00
+    SW   R0, R1, 0x00
+    JMP  loop
