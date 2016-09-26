@@ -376,6 +376,8 @@
             this.tabControl1.Size = new System.Drawing.Size(756, 470);
             this.tabControl1.TabIndex = 4;
             this.tabControl1.ActiveDocumentChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.DragDrop += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragDrop);
+            this.tabControl1.DragEnter += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragEnter);
             // 
             // FrmMain
             // 
