@@ -6,7 +6,7 @@ using ScintillaNET;
 
 namespace AssemblerGui
 {
-    public class Editor : TabPage
+    public class Editor : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         private static int m_ID = 1;
 

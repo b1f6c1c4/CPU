@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Assembler;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
 {
@@ -279,9 +280,7 @@ namespace AssemblerGui
             downloader.Start();
         }
 
-        private void tabControl1_Selected(object sender, TabControlEventArgs e) => OnStateChanged?.Invoke();
-
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e) => TheEditor?.Focus();
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e) => OnStateChanged?.Invoke();
 
         private void 全部关闭WToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -291,11 +290,9 @@ namespace AssemblerGui
                     if (!TheEditor.PromptForSave())
                         break;
 
-                tabControl1.TabPages.RemoveAt(0);
+                TheEditor.Close();
             }
         }
-
-        private void tabControl1_MouseClick(object sender, MouseEventArgs e) => TheEditor?.Focus();
 
         private void FrmMain_DragDrop(object sender, DragEventArgs e)
         {

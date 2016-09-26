@@ -52,13 +52,17 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.9.0.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <HintPath>..\packages\DockPanelSuite.2.10.0\lib\net40\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsmAsyncDebugger.cs" />
     <Compile Include="AsmDebugger.cs" />
     <Compile Include="Downloader.cs" />
     <Compile Include="Editor.cs">
-      <SubType>Component</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmHelp.cs">
       <SubType>Form</SubType>
@@ -121,7 +125,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll $(TargetDir)Markdown.dll</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll $(TargetDir)Markdown.dll $(TargetDir)WeifenLuo.WinFormsUI.Docking.dll</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

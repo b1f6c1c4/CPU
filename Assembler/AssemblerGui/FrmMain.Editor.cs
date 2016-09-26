@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
 {
@@ -9,9 +10,9 @@ namespace AssemblerGui
     {
         private bool m_IsInitial = true;
 
-        private Editor TheEditor => tabControl1.TabCount > 0 ? tabControl1.SelectedTab as Editor : null;
+        private Editor TheEditor => tabControl1.ActiveDocument as Editor;
 
-        private IEnumerable<Editor> Editors => tabControl1.TabPages.Cast<Editor>();
+        private IEnumerable<Editor> Editors => tabControl1.Documents.Cast<Editor>();
 
         private static string PromptOpen()
         {
@@ -38,31 +39,31 @@ namespace AssemblerGui
             var the = new Editor();
             the.OnStateChanged += () => OnStateChanged?.Invoke();
             the.OnToggleBreakPoint += ToggledBreakPoint;
-            tabControl1.TabPages.Add(the);
+            the.Show(tabControl1, DockState.Document);
             return the;
         }
 
         private void NewFile()
         {
             var the = MakeNewEditor();
-            tabControl1.SelectedTab = the;
             the.Focus();
             OnStateChanged?.Invoke();
         }
 
         private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false, bool force = false)
         {
+            Editor the;
             if (m_IsInitial &&
-                tabControl1.TabCount == 1 &&
+                tabControl1.DocumentsCount == 1 &&
                 !TheEditor.Edited)
-                tabControl1.TabPages.RemoveAt(0);
+                the = TheEditor;
+            else
+                the = Editors.FirstOrDefault(ed => ed.FilePath == str);
 
             m_IsInitial = false;
 
-            var the = Editors.FirstOrDefault(ed => ed.FilePath == str);
             var isNew = the == null;
             the = the ?? MakeNewEditor();
-            tabControl1.SelectedTab = the;
             the.Focus();
             the.LoadDoc(str, line, charPos, debugging, force);
             if (isNew)
@@ -145,9 +146,7 @@ namespace AssemblerGui
             if (!TheEditor.PromptForSave())
                 return;
 
-            var id = tabControl1.SelectedIndex;
-            tabControl1.TabPages.RemoveAt(id);
-            tabControl1.SelectedIndex = id >= tabControl1.TabCount ? tabControl1.TabCount - 1 : id;
+            TheEditor.Close();
             OnStateChanged?.Invoke();
         }
     }
