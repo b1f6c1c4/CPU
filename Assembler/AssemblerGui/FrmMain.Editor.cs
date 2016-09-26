@@ -46,11 +46,12 @@ namespace AssemblerGui
         private void NewFile()
         {
             var the = MakeNewEditor();
-            the.Focus();
+            the.Activate();
             OnStateChanged?.Invoke();
         }
 
-        private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false, bool force = false)
+        private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false,
+                              bool force = false)
         {
             Editor the;
             if (m_IsInitial &&
@@ -64,7 +65,7 @@ namespace AssemblerGui
 
             var isNew = the == null;
             the = the ?? MakeNewEditor();
-            the.Focus();
+            the.Activate();
             the.LoadDoc(str, line, charPos, debugging, force);
             if (isNew)
                 foreach (var s in m_BreakPoints.Where(s => s.FilePath == str))
@@ -73,7 +74,7 @@ namespace AssemblerGui
         }
 
         private bool SaveAll(bool forbidNo = false) =>
-            Editors.All(ed => ed.PromptForSave(forbidNo));
+            Editors.All(ed => ed.PromptForSave(forbidNo) == Editor.PromptForSaveResult.Saved);
 
         private void ToggleEditorMenus()
         {
@@ -140,14 +141,6 @@ namespace AssemblerGui
         private void 切换断点BToolStripMenuItem_Click(object sender, EventArgs e) =>
             TheEditor.ToggleBreakPoint();
 
-        private void 关闭CToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            m_IsInitial = false;
-            if (!TheEditor.PromptForSave())
-                return;
-
-            TheEditor.Close();
-            OnStateChanged?.Invoke();
-        }
+        private void 关闭CToolStripMenuItem_Click(object sender, EventArgs e) => TheEditor?.SaveClose();
     }
 }

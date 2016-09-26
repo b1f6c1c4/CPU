@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Assembler;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
 {
@@ -164,7 +162,7 @@ namespace AssemblerGui
                     using (var ou = File.OpenWrite(TheEditor.FilePath))
                         mem.CopyTo(ou);
                 }
-                OpenFile(TheEditor.FilePath, force : true);
+                OpenFile(TheEditor.FilePath, force: true);
             }
             catch (Exception e)
             {
@@ -238,10 +236,8 @@ namespace AssemblerGui
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!TheEditor.PromptForSave(true))
-                return;
-
-            Cycle(new AsmPrettifier());
+            if (TheEditor.PromptForSave(true) == Editor.PromptForSaveResult.Saved)
+                Cycle(new AsmPrettifier());
         }
 
         private void 查看帮助VToolStripMenuItem_Click(object sender, EventArgs e) => FrmHelp.ShowHelp(this);
@@ -285,13 +281,8 @@ namespace AssemblerGui
         private void 全部关闭WToolStripMenuItem_Click(object sender, EventArgs e)
         {
             while (TheEditor != null)
-            {
-                if (TheEditor.Edited)
-                    if (!TheEditor.PromptForSave())
-                        break;
-
-                TheEditor.Close();
-            }
+                if (!TheEditor.SaveClose())
+                    break;
         }
 
         private void FrmMain_DragDrop(object sender, DragEventArgs e)

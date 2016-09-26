@@ -60,6 +60,9 @@
   <ItemGroup>
     <Compile Include="AsmAsyncDebugger.cs" />
     <Compile Include="AsmDebugger.cs" />
+    <Compile Include="DebuggerPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Downloader.cs" />
     <Compile Include="Editor.cs">
       <SubType>Form</SubType>
@@ -84,9 +87,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Editor.resx">
-      <DependentUpon>Editor.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="FrmHelp.resx">
       <DependentUpon>FrmHelp.cs</DependentUpon>
     </EmbeddedResource>

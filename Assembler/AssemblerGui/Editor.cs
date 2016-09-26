@@ -3,10 +3,11 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using ScintillaNET;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
 {
-    public class Editor : WeifenLuo.WinFormsUI.Docking.DockContent
+    public class Editor : DockContent
     {
         private static int m_ID = 1;
 
@@ -32,7 +33,7 @@ namespace AssemblerGui
 
         public bool ReadOnly { set { m_Scintilla.ReadOnly = value; } }
 
-        public Control ActiveControl => m_Scintilla;
+        public new Control ActiveControl => m_Scintilla;
 
         private int m_LineNumberLength;
 
@@ -43,6 +44,8 @@ namespace AssemblerGui
 
         public Editor()
         {
+            DockAreas = DockAreas.Document;
+            FormClosing += (s, e) => e.Cancel = PromptForSave() == PromptForSaveResult.Cancel;
             OnStateChanged += () => Text = m_FileName + (Edited ? "*" : "");
 
             InitializeComponent();
@@ -172,14 +175,15 @@ namespace AssemblerGui
             OnStateChanged?.Invoke();
         }
 
-        public void LoadDoc(string filePath, int? line = null, int? charPos = null, bool debugging = false, bool force = false)
+        public void LoadDoc(string filePath, int? line = null, int? charPos = null, bool debugging = false,
+                            bool force = false)
         {
             if (filePath == null)
                 return;
 
             if (filePath != FilePath)
             {
-                if (!PromptForSave())
+                if (PromptForSave() == PromptForSaveResult.Cancel)
                     return;
 
                 SetFile(filePath);
@@ -200,11 +204,18 @@ namespace AssemblerGui
             m_Scintilla.Lines[line.Value - 1].MarkerAdd(1);
         }
 
-        public bool PromptForSave(bool forbidNo = false)
+        public enum PromptForSaveResult
+        {
+            Saved,
+            DontSave,
+            Cancel
+        }
+
+        public PromptForSaveResult PromptForSave(bool forbidNo = false)
         {
             if ((!forbidNo || FilePath != null) &&
                 !Edited)
-                return true;
+                return PromptForSaveResult.Saved;
 
             var res = MessageBox.Show(
                                       $"{FileName} 尚未保存，是否要保存？",
@@ -212,12 +223,14 @@ namespace AssemblerGui
                                       forbidNo ? MessageBoxButtons.OKCancel : MessageBoxButtons.YesNoCancel,
                                       MessageBoxIcon.Exclamation);
             if (res == DialogResult.Cancel)
-                return false;
+                return PromptForSaveResult.Cancel;
 
             if (res == DialogResult.No)
-                return true;
+                return PromptForSaveResult.DontSave;
 
-            return PerformSave();
+            return PerformSave()
+                       ? PromptForSaveResult.Saved
+                       : PromptForSaveResult.Cancel;
         }
 
         public bool PerformSave()
@@ -260,5 +273,16 @@ namespace AssemblerGui
         }
 
         public void ClearCurrentPositon() => m_Scintilla.MarkerDeleteAll(1);
+
+        public bool SaveClose()
+        {
+            var res = PromptForSave();
+            if (res == PromptForSaveResult.Cancel)
+                return false;
+            if (res == PromptForSaveResult.DontSave)
+                Edited = false; // workaround
+            Close();
+            return true;
+        }
     }
 }
