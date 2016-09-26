@@ -14,7 +14,7 @@ namespace AssemblerGui
 
         private IEnumerable<Editor> Editors => tabControl1.Documents.Cast<Editor>();
 
-        private static string PromptOpen()
+        private static IEnumerable<string> PromptOpen()
         {
             var dialog =
                 new OpenFileDialog
@@ -23,6 +23,7 @@ namespace AssemblerGui
                         AutoUpgradeEnabled = true,
                         CheckFileExists = true,
                         CheckPathExists = true,
+                        Multiselect = true,
                         DefaultExt = "mips",
                         Filter = "MIPS文件 (*.mips)|*.mips|所有文件 (*)|*",
                         Title = "打开"
@@ -31,7 +32,7 @@ namespace AssemblerGui
             if (res == DialogResult.Cancel)
                 return null;
 
-            return dialog.FileName;
+            return dialog.FileNames;
         }
 
         private Editor MakeNewEditor()
@@ -74,7 +75,7 @@ namespace AssemblerGui
         }
 
         private bool SaveAll(bool forbidNo = false) =>
-            Editors.All(ed => ed.PromptForSave(forbidNo) == Editor.PromptForSaveResult.Saved);
+            Editors.All(ed => ed.PromptForSave(forbidNo) != Editor.PromptForSaveResult.Cancel);
 
         private void ToggleEditorMenus()
         {
@@ -123,11 +124,12 @@ namespace AssemblerGui
 
         private void 打开OToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var str = PromptOpen();
-            if (str == null)
+            var strs = PromptOpen();
+            if (strs == null)
                 return;
 
-            OpenFile(str);
+            foreach (var str in strs)
+                OpenFile(str);
         }
 
         private void 退出QToolStripMenuItem_Click(object sender, EventArgs e)

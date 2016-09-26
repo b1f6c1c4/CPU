@@ -99,7 +99,8 @@ namespace AssemblerCli
                     fin.Add(ftmp);
                 }
 
-                var pre = new Preprocessor(fin);
+                var pre = new Preprocessor();
+                pre.AddRange(fin);
                 Action<AsmProgBase> action =
                     apb =>
                     {

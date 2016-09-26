@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -85,7 +87,7 @@ namespace AssemblerGui
         {
             try
             {
-                var pre = new Preprocessor(new[] { TheEditor.FilePath });
+                var pre = SaveDependency(TheEditor.FilePath);
                 string fn;
                 using (var mem = new MemoryStream())
                 using (var sw = new StreamWriter(mem))
@@ -133,6 +135,29 @@ namespace AssemblerGui
                 MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+
+        private Preprocessor SaveDependency(string initial)
+        {
+            var pre = new Preprocessor { initial };
+            var flag = true;
+            while (flag)
+            {
+                flag = false;
+                var lst = new List<string>();
+                foreach (var fn in pre)
+                {
+                    var e = Editors.FirstOrDefault(ed => ed.FilePath == fn);
+                    if (e == null ||
+                        !e.Edited)
+                        continue;
+                    e.PerformSave();
+                    lst.Add(fn);
+                    flag = true;
+                }
+                pre.AddRange(lst);
+            }
+            return pre;
         }
 
         private void Cycle<T>(T asm)
@@ -202,37 +227,17 @@ namespace AssemblerGui
                 e.Cancel = true;
         }
 
-        private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!SaveAll(true))
-                return;
-
+        private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出", TheEditor.FileName));
-        }
 
-        private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!SaveAll(true))
-                return;
-
+        private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
-        }
 
-        private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!SaveAll(true))
-                return;
-
+        private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
-        }
 
-        private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!SaveAll(true))
-                return;
-
+        private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
-        }
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -244,9 +249,6 @@ namespace AssemblerGui
 
         private void 下载DToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!SaveAll(true))
-                return;
-
             if (!Downloader.CheckStpExistance(this))
                 return;
 

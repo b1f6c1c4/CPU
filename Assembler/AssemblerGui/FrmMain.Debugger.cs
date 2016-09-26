@@ -22,7 +22,9 @@ namespace AssemblerGui
 
         private HashSet<SourcePosition> m_BreakPoints;
 
+        // ReSharper disable InconsistentNaming
         private DebuggerPanel panel1;
+        // ReSharper restore InconsistentNaming
 
         private void SetupDebugger()
         {
@@ -64,7 +66,7 @@ namespace AssemblerGui
         {
             m_RawDebugger = new AsmDebugger(m_BreakPoints);
 
-            var pre = new Preprocessor(new[] { TheEditor.FilePath });
+            var pre = SaveDependency(TheEditor.FilePath);
             try
             {
                 foreach (var p in pre)
@@ -162,8 +164,7 @@ namespace AssemblerGui
         {
             if (m_Debugger == null)
             {
-                if (!SaveAll(true))
-                    return;
+                SaveDependency(TheEditor.FilePath);
 
                 StartDebugger();
 
