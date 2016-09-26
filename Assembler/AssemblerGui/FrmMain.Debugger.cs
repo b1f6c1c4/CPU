@@ -221,14 +221,14 @@ namespace AssemblerGui
                     {
                         Text = name,
                         Dock = DockStyle.Fill,
-                        Font = new Font("Microsoft YaHei Mono", 10F, FontStyle.Regular, GraphicsUnit.Point, 134),
+                        Font = new Font("Consolas", 10F, FontStyle.Regular, GraphicsUnit.Point, 134),
                         TextAlign = ContentAlignment.MiddleCenter
                     };
             var txt =
                 new TextBox
                     {
                         Dock = DockStyle.Fill,
-                        Font = new Font("Microsoft YaHei Mono", 10F, FontStyle.Regular, GraphicsUnit.Point, 134)
+                        Font = new Font("Consolas", 10F, FontStyle.Regular, GraphicsUnit.Point, 134)
                     };
             OnStarted += () => txt.Enabled = false;
             OnPause += () => txt.Enabled = true;

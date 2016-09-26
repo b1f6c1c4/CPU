@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
+using AssemblerGui.Properties;
 
 namespace AssemblerGui
 {
@@ -35,6 +37,41 @@ end_memory_edit
 
         public Downloader(string hexPath) { m_HexPath = hexPath; }
 
+        public static bool CheckStpExistance(IWin32Window owner)
+        {
+            if (File.Exists(Settings.Default.QuartusStp))
+                return true;
+
+            var res =
+                MessageBox.Show(
+                                $"在位置{Settings.Default.QuartusStp}没有找到“quartus_stp.exe”。请确保Quartus已经正确安装；是否要手动查找“quartus_stp.exe”？",
+                                "MIPS下载器",
+                                MessageBoxButtons.OKCancel,
+                                MessageBoxIcon.Question);
+            if (res != DialogResult.OK)
+                return false;
+
+            var dialog =
+                new OpenFileDialog
+                    {
+                        AutoUpgradeEnabled = true,
+                        CheckFileExists = true,
+                        CheckPathExists = true,
+                        FileName = "quartus_stp.exe",
+                        Filter = "quartus_stp.exe|quartus_stp.exe",
+                        Title = "查找“quartus_stp.exe”",
+                        ValidateNames = true
+                    };
+
+            var dres = dialog.ShowDialog(owner);
+            if (dres == DialogResult.Cancel)
+                return false;
+
+            Settings.Default.QuartusStp = dialog.FileName;
+            Settings.Default.Save();
+            return true;
+        }
+
         public void Start()
         {
             m_Retry = 1;
@@ -52,7 +89,7 @@ end_memory_edit
                     {
                         StartInfo =
                             {
-                                FileName = @"C:\altera\13.0sp1\quartus\bin64\quartus_stp.exe",
+                                FileName = Settings.Default.QuartusStp,
                                 Arguments = $"-t {m_ScriptPath}",
                                 UseShellExecute = false,
                                 RedirectStandardError = true,

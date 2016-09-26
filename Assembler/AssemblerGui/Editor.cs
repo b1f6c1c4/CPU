@@ -74,7 +74,7 @@ namespace AssemblerGui
             Controls.Add(m_Scintilla);
 
             m_Scintilla.StyleResetDefault();
-            m_Scintilla.Styles[Style.Default].Font = "Microsoft YaHei Mono";
+            m_Scintilla.Styles[Style.Default].Font = "Consolas";
             m_Scintilla.Styles[Style.Default].SizeF = 10F;
             m_Scintilla.StyleClearAll();
 

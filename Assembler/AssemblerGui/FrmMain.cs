@@ -250,6 +250,9 @@ namespace AssemblerGui
             if (!SaveAll(true))
                 return;
 
+            if (!Downloader.CheckStpExistance(this))
+                return;
+
             var path = Path.GetTempFileName();
             File.Move(path, path + ".hex");
             var hexPath = path + ".hex";
