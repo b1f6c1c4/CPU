@@ -35,6 +35,8 @@ namespace AssemblerGui
 
         public new Control ActiveControl => m_Scintilla;
 
+        public string Value { get { return m_Scintilla.Text; } set { m_Scintilla.Text = value; } }
+
         private int m_LineNumberLength;
 
         private Scintilla m_Scintilla;

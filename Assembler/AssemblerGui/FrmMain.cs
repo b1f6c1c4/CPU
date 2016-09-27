@@ -163,35 +163,44 @@ namespace AssemblerGui
         private void Cycle<T>(T asm)
             where T : AsmProgBase, IWriter
         {
+            var tmp = Path.GetTempFileName();
             try
             {
+                File.WriteAllText(tmp, TheEditor.Value);
                 using (var mem = new MemoryStream())
                 using (var sw = new StreamWriter(mem))
                 {
                     asm.SetWriter(sw);
                     try
                     {
-                        asm.Feed(TheEditor.FilePath, false);
+                        asm.Feed(tmp, false);
                         asm.Done();
                     }
                     catch (AssemblyException e)
                     {
-                        MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        OpenFile(e.FilePath, e.Line, e.CharPos);
+                        MessageBox.Show(
+                                        e.ToString().Replace(tmp, TheEditor.FilePath),
+                                        "错误",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                        OpenFile(TheEditor.FilePath, e.Line, e.CharPos);
                         return;
                     }
                     sw.Flush();
 
                     mem.Position = 0;
 
-                    using (var ou = File.OpenWrite(TheEditor.FilePath))
-                        mem.CopyTo(ou);
+                    using (var sr = new StreamReader(mem))
+                        TheEditor.Value = sr.ReadToEnd();
                 }
-                OpenFile(TheEditor.FilePath, force: true);
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                File.Delete(tmp);
             }
         }
 
@@ -239,11 +248,7 @@ namespace AssemblerGui
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
 
-        private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (TheEditor.PromptForSave(true) == Editor.PromptForSaveResult.Saved)
-                Cycle(new AsmPrettifier());
-        }
+        private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e) => Cycle(new AsmPrettifier());
 
         private void 查看帮助VToolStripMenuItem_Click(object sender, EventArgs e) => FrmHelp.ShowHelp(this);
 
