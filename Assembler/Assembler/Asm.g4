@@ -123,7 +123,7 @@ ADDPC: A D D P C;
 BP  : B P;
 
 Decimal
-    : [0-9]+
+    : ('-' | '+')? [0-9]+
     ;
 
 Binary
