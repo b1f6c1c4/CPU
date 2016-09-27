@@ -1,7 +1,7 @@
     ; Mult16: 16bit signed multiplier
     ; arg[3..2] a -> (a*b)_H
     ; arg[1..0] b -> (a*b)_L
-;include Mult.mips
+    ;include Mult.mips
 Mult16:
     PUSH BP
     ; sp+7..4 = sum
@@ -21,7 +21,7 @@ Mult16:
     SW   R0, R3, 0x02
     LW   R0, R2, 0x04
     SW   R0, R3, 0x03
-    JMP done_a
+    JMP  done_a
 inv_a:
     LW   R0, R2, 0x03
     SUB  R0, R1, R0
@@ -37,7 +37,7 @@ done_a:
     SW   R0, R3, 0x00
     LW   R0, R2, 0x06
     SW   R0, R3, 0x01
-    JMP done_b
+    JMP  done_b
 inv_b:
     LW   R0, R2, 0x05
     SUB  R0, R1, R0

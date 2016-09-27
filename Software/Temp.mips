@@ -1,4 +1,4 @@
-;include lib/Mult16.mips
+    ;include lib/Mult16.mips
     INIT
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x5a

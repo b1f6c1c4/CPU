@@ -112,7 +112,7 @@ namespace AssemblerGui
                     if (fn == null)
                         return false;
 
-                    using (var ou = File.OpenWrite(fn))
+                    using (var ou = File.Open(fn, FileMode.Create, FileAccess.Write))
                         mem.CopyTo(ou);
                 }
                 if (!open)

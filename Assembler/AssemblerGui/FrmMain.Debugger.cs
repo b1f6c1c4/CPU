@@ -37,19 +37,23 @@ namespace AssemblerGui
             OnStarted +=
                 () =>
                 {
+                    if (m_Debugger == null)
+                        return;
                     m_IsRunning = true;
+                    panel1.Start(m_RawDebugger);
                     foreach (var ed in Editors)
                         ed.ClearCurrentPositon();
                     OnStateChanged?.Invoke();
                 };
-            OnStarted += () => panel1.Start(m_RawDebugger);
             OnPause +=
                 () =>
                 {
+                    if (m_Debugger == null)
+                        return;
                     m_IsRunning = false;
                     OpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line, null, true);
+                    panel1.Pause(m_RawDebugger);
                 };
-            OnPause += () => panel1.Pause(m_RawDebugger);
             OnExited += StopDebugger;
         }
 
@@ -99,6 +103,7 @@ namespace AssemblerGui
             m_Debugger?.Stop();
             m_Debugger?.Dispose();
             m_Debugger = null;
+            m_RawDebugger = null;
             panel1.Hide();
 
             foreach (var ed in Editors)

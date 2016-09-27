@@ -73,6 +73,8 @@ namespace AssemblerGui
             m_Scintilla.Size = new Size(450, 344);
             m_Scintilla.TabIndex = 0;
             m_Scintilla.WrapMode = WrapMode.Char;
+            m_Scintilla.HScrollBar = false;
+            m_Scintilla.WrapMode = WrapMode.None;
             // 
             // Editor
             // 
@@ -143,7 +145,7 @@ namespace AssemblerGui
         private void scintilla_MarginClick(object sender, MarginClickEventArgs e)
         {
             if (e.Margin == 0)
-                ToggleBreakPoint(m_Scintilla.LineFromPosition(e.Position));
+                ToggleBreakPoint(m_Scintilla.LineFromPosition(e.Position) + 1);
         }
 
         private void SetFile(string filePath)
