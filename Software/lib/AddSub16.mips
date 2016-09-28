@@ -1,35 +1,3 @@
-    ; Add16: 16bit Integer Adder
-    ; arg[3..2] b -> a + b
-    ; arg[1..0] a
-Add16:
-    PUSH BP
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xfe
-    LW   R0, R3, 0x05
-    LW   R2, R3, 0x03
-    ADD  R0, R0, R2
-    SW   R0, R3, 0x05
-    LW   R0, R3, 0x06
-    LW   R2, R3, 0x04
-    ADDC R0, R0, R2
-    SW   R0, R3, 0x06
-    RET
-    ; Sub16: 16bit Integer Subber
-    ; arg[3..2] b -> b - a
-    ; arg[1..0] a
-Sub16:
-    PUSH BP
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xfe
-    LW   R0, R3, 0x05
-    LW   R2, R3, 0x03
-    SUB  R0, R0, R2
-    SW   R0, R3, 0x05
-    LW   R0, R3, 0x06
-    LW   R2, R3, 0x04
-    SUBC R0, R0, R2
-    SW   R0, R3, 0x06
-    RET
     ; Add16p: 16bit Integer Adder
     ; arg[1] &b -> a + b
     ; arg[0] &a

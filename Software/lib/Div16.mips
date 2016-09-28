@@ -1,0 +1,243 @@
+    ;include AddSub16.mips
+    ;include Comp16.mips
+    ;include Shift.mips
+    ; Div16p: 16bit Integer Divider
+    ; arg[1]: &b -> a % b
+    ; arg[0]: &a -> a / b
+Div16p:
+    PUSH BP
+    ; sh = sp+10
+    ; dq = sp+9 .. 8
+    ; dr = sp+7 .. 6
+    ; dp = sp+5 .. 2
+    ; (temp) sp+1
+    ; (temp) sp
+    ;
+    ;     dp_H      dp_L   <<
+    ; ---------------------
+    ; {    dr   ,  0x0000 }
+    ANDI R1, R1, 0x00
+    ; sp -= 11
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -11
+    SW   R3, R1, 0xff
+    ; dr = *arg[1]
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x00
+    SW   R0, R3, 0x06
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01
+    SW   R0, R3, 0x07
+    ; dp = {0x0000, *arg[0]}
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x00
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01
+    SW   R0, R3, 0x03
+    SW   R1, R3, 0x04
+    SW   R1, R3, 0x05
+    ; dq = 0x0000
+    SW   R1, R3, 0x08
+    SW   R1, R3, 0x09
+    ; sh = 16
+    ADDI R0, R1, 16
+    SW   R0, R3, 0x0a
+loop:
+    ; *(sp+1) = &dp_H
+    ADDI R0, R3, 0x04
+    SW   R0, R3, 0x01
+    ; *(sp+0) = &dr
+    ADDI R0, R3, 0x06
+    SW   R0, R3, 0x00
+    ; if (dr >= dp_H) goto next
+    CALL Comp16p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ANDI R0, R0, 0x80
+    BEQ  R0, R1, next
+    ; dp_H -= dr
+    CALL Sub16p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ; dq |= 0x01
+    LW   R0, R3, 0x08   ; R0 = dq_L
+    ORI  R0, R0, 0x01   ; R0 |= 0x01
+    SW   R0, R3, 0x08   ; dq_L = R0
+next:
+    LW   R2, R3, 0x0a   ; R2 = sh
+    BEQ  R2, R1, done   ; if (!(R2)) goto done
+    ; *(sp+1) = &dp
+    ADDI R0, R3, 0x02
+    SW   R0, R3, 0x01
+    ; *(sp+0) = 1
+    ADDI R0, R1, 0x01
+    SW   R0, R3, 0x00
+    ; dp <<= 1
+    CALL Shift32p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ; *(sp+1) = &dq
+    ADDI R0, R3, 0x08
+    SW   R0, R3, 0x01
+    ; *(sp+0) = 1
+    ADDI R0, R1, 0x01
+    SW   R0, R3, 0x00
+    ; dq <<= 1
+    CALL Shift16p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R2, R3, 0x0a   ; R2 = sh
+    ADDI R2, R2, 0xff   ; R2--
+    SW   R2, R3, 0x0a   ; sh = R2
+    JMP  loop           ; goto loop
+done:
+    ; *arg[0] = dq
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
+    LW   R0, R3, 0x08
+    SW   R0, R2, 0x00
+    LW   R0, R3, 0x09
+    SW   R0, R2, 0x01
+    ; *arg[1] = dp_H
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
+    LW   R0, R3, 0x04
+    SW   R0, R2, 0x00
+    LW   R0, R3, 0x05
+    SW   R0, R2, 0x01
+    RET
+    ; Div16ps: 16bit Signed Integer Divider
+    ; arg[1]: &b -> a % b
+    ; arg[0]: &a -> a / b
+Div16ps:
+    PUSH BP
+    ; sign = sp+7
+    ; |b| = sp+5 .. 4
+    ; |a| = sp+3 .. 2
+    ; &|b| = sp+1
+    ; &|a| = sp
+    ANDI R1, R1, 0x00
+    ; sp -= 8
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -8
+    SW   R3, R1, 0xff
+    ; sign = 0
+    SW   R1, R3, 0x07
+    LW   R2, R1, 0xfe
+    ; |a| = a
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = a_H
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_a
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x00
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01
+    SW   R0, R3, 0x03
+    JMP  done_a
+inv_a:
+    LW   R0, R3, 0x07
+    ADDI R0, R0, 0x01
+    SW   R0, R3, 0x07
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x00
+    SUB  R0, R1, R0
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01
+    SUBC R0, R1, R0
+    SW   R0, R3, 0x03
+done_a:
+    ; |b| = b
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01   ; R0 = b_H
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_b
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x00
+    SW   R0, R3, 0x04
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01
+    SW   R0, R3, 0x05
+    JMP  done_b
+inv_b:
+    LW   R0, R3, 0x07
+    ADDI R0, R0, 0x01
+    SW   R0, R3, 0x07
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x00
+    SUB  R0, R1, R0
+    SW   R0, R3, 0x04
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01
+    SUBC R0, R1, R0
+    SW   R0, R3, 0x05
+done_b:
+    ; sign = sgn(a) XOR sgn(b)
+    LW   R0, R3, 0x07
+    ANDI R0, R0, 0x01
+    SW   R0, R3, 0x07
+    ; &|a|
+    ADDI R0, R3, 0x02
+    SW   R0, R3, 0x00
+    ; &|b|
+    ADDI R0, R3, 0x04
+    SW   R0, R3, 0x01
+    CALL Div16p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ; *arg[1] = sgn(*arg[0]) * |a| % |b|
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_rem
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
+    LW   R0, R3, 0x04
+    SW   R0, R2, 0x00
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
+    LW   R0, R3, 0x05
+    SW   R0, R2, 0x01
+    JMP  done_rem
+inv_rem:
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
+    LW   R0, R3, 0x04
+    SUB  R0, R1, R0
+    SW   R0, R2, 0x00
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
+    LW   R0, R3, 0x05
+    SUBC R0, R1, R0
+    SW   R0, R2, 0x01
+done_rem:
+    ; *arg[0] = sign * |a| / |b|
+    LW   R0, R3, 0x07
+    BNE  R0, R1, inv_quo
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
+    LW   R0, R3, 0x02
+    SW   R0, R2, 0x00
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
+    LW   R0, R3, 0x03
+    SW   R0, R2, 0x01
+    JMP  done_quo
+inv_quo:
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
+    LW   R0, R3, 0x02
+    SUB  R0, R1, R0
+    SW   R0, R2, 0x00
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
+    LW   R0, R3, 0x03
+    SUBC R0, R1, R0
+    SW   R0, R2, 0x01
+done_quo:
+    RET

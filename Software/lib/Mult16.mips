@@ -1,8 +1,8 @@
-    ; Mult16: 16bit signed multiplier
-    ; arg[3..2] a -> (a*b)_H
-    ; arg[1..0] b -> (a*b)_L
     ;include Mult.mips
-Mult16:
+    ; Mult16p: 16bit signed multiplier
+    ; arg[1] &b -> (a*b)_H
+    ; arg[0] &a -> (a*b)_L
+Mult16p:
     PUSH BP
     ; sp+7..4 = sum
     ; sp+3 = |a|_H
@@ -14,35 +14,45 @@ Mult16:
     ADDI R3, R3, 0xf8
     SW   R3, R1, 0xff
     LW   R2, R1, 0xfe
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
     ANDI R0, R0, 0x80
     BNE  R0, R1, inv_a
     LW   R0, R2, 0x03
+    LW   R0, R0, 0x00   ; R0 = *(&a)_L
     SW   R0, R3, 0x02
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
     SW   R0, R3, 0x03
     JMP  done_a
 inv_a:
     LW   R0, R2, 0x03
+    LW   R0, R0, 0x00   ; R0 = *(&a)_L
     SUB  R0, R1, R0
     SW   R0, R3, 0x02
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
     SUBC R0, R1, R0
     SW   R0, R3, 0x03
 done_a:
-    LW   R0, R2, 0x06
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01   ; R0 = *(&b)_H
     ANDI R0, R0, 0x80
     BNE  R0, R1, inv_b
-    LW   R0, R2, 0x05
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x00   ; R0 = *(&b)_L
     SW   R0, R3, 0x00
-    LW   R0, R2, 0x06
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01   ; R0 = *(&b)_H
     SW   R0, R3, 0x01
     JMP  done_b
 inv_b:
-    LW   R0, R2, 0x05
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x00   ; R0 = *(&b)_L
     SUB  R0, R1, R0
     SW   R0, R3, 0x00
-    LW   R0, R2, 0x06
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01   ; R0 = *(&b)_H
     SUBC R0, R1, R0
     SW   R0, R3, 0x01
 done_b:
@@ -148,26 +158,34 @@ done_b:
     ADD  R0, R0, R3
     LW   R3, R1, 0xff
     BNE  R0, R1, inv_sum
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
     LW   R0, R3, 0x04
-    SW   R0, R2, 0x03
+    SW   R0, R2, 0x00
     LW   R0, R3, 0x05
-    SW   R0, R2, 0x04
+    SW   R0, R2, 0x01
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
     LW   R0, R3, 0x06
-    SW   R0, R2, 0x05
+    SW   R0, R2, 0x00
     LW   R0, R3, 0x07
-    SW   R0, R2, 0x06
+    SW   R0, R2, 0x01
     RET
 inv_sum:
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x03
     LW   R0, R3, 0x04
     SUB  R0, R1, R0
-    SW   R0, R2, 0x03
+    SW   R0, R2, 0x00
     LW   R0, R3, 0x05
     SUBC R0, R1, R0
-    SW   R0, R2, 0x04
+    SW   R0, R2, 0x01
+    LW   R2, R1, 0xfe
+    LW   R2, R2, 0x04
     LW   R0, R3, 0x06
     SUBC R0, R1, R0
-    SW   R0, R2, 0x05
+    SW   R0, R2, 0x00
     LW   R0, R3, 0x07
     SUBC R0, R1, R0
-    SW   R0, R2, 0x06
+    SW   R0, R2, 0x01
     RET
