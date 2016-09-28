@@ -19,8 +19,8 @@ Add16p:
     SW   R0, R1, 1
     RET
     ; Sub16p: 16bit Integer Subber
-    ; arg[3..2] &b -> b - a
-    ; arg[1..0] &a
+    ; arg[1] &b -> b - a
+    ; arg[0] &a
 Sub16p:
     PUSH BP
     ANDI R1, R1, 0x00

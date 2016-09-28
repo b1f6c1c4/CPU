@@ -1,8 +1,8 @@
     ;include Mult.mips
-    ; Mult16p: 16bit signed multiplier
+    ; Mult16ps: 16bit signed multiplier
     ; arg[1] &b -> (a*b)_H
     ; arg[0] &a -> (a*b)_L
-Mult16p:
+Mult16ps:
     PUSH BP
     ; sp+7..4 = sum
     ; sp+3 = |a|_H
@@ -151,11 +151,14 @@ done_b:
     POP  R2
     ; return
     LW   R2, R1, 0xfe
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
     ANDI R3, R0, 0x80
-    LW   R0, R2, 0x06
+    LW   R0, R2, 0x04
+    LW   R0, R0, 0x01   ; R0 = *(&b)_H
     ANDI R0, R0, 0x80
     ADD  R0, R0, R3
+    ANDI R0, R0, 0x01
     LW   R3, R1, 0xff
     BNE  R0, R1, inv_sum
     LW   R2, R1, 0xfe

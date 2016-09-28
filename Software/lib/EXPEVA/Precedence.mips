@@ -1,0 +1,102 @@
+    ; Operator List
+    ; =============
+    ; 0x00  Unary Plus
+    ; 0x01  Unary Minus
+    ; 0x02  Plus
+    ; 0x03  Minus
+    ; 0x04  Multiply
+    ; 0x05  Divide
+    ; 0x06  Reminder
+    ; 0x07  Bit-wise Not
+    ; 0x08  Bit-wise And
+    ; 0x09  Bit-wise Or
+    ; 0x0a  Bit-wise Xor
+    ; 0x0b  Left Parenthesis
+    ; 0x0c  Right Parenthesis
+    ; 0x0d  Less Than
+    ; 0x0e  Equal To
+    ; 0x0f  OK
+    ;
+    ; Precedence_EXPEVA
+    ; arg[1]: B
+    ; arg[0]: A
+    ; return: lle-rlt, gpre(A) <= gpre(B)
+Precedence_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    PUSH R0
+    CALL gpre
+    POP  R3
+    PUSH R0
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    PUSH R0
+    CALL gpre           ; R0 = gpre(B)
+    POP  R3
+    POP  R3             ; R3 = gpre(A)
+    SLT  R0, R0, R3
+    ANDI R1, R1, 0x00
+    SUB  R0, R1, R0
+    RET
+gpre:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    PUSH R0
+    ADDPC
+    JMP  gpre_UnaryPlus
+    JMP  gpre_UnaryMinus
+    JMP  gpre_Plus
+    JMP  gpre_Minus
+    JMP  gpre_Multiply
+    JMP  gpre_Divide
+    JMP  gpre_Reminder
+    JMP  gpre_BitwiseNot
+    JMP  gpre_BitwiseAnd
+    JMP  gpre_BitwiseOr
+    JMP  gpre_BitwiseXor
+    JMP  gpre_LeftParenthesis
+    JMP  gpre_RightParenthesis
+    JMP  gpre_LessThan
+    JMP  gpre_EqualTo
+    JMP  gpre_OK
+gpre_OK:
+gpre_LeftParenthesis:
+gpre_RightParenthesis:
+    ADDI R0, R1, 0
+    RET
+gpre_BitwiseOr:
+    ADDI R0, R1, 30
+    JMP  gpre_done
+gpre_BitwiseXor:
+    ADDI R0, R1, 40
+    JMP  gpre_done
+gpre_BitwiseAnd:
+    ADDI R0, R1, 50
+    JMP  gpre_done
+gpre_EqualTo:
+    ADDI R0, R1, 60
+    JMP  gpre_done
+gpre_LessThan:
+    ADDI R0, R1, 70
+    JMP  gpre_done
+gpre_Plus:
+gpre_Minus:
+    ADDI R0, R1, 80
+    JMP  gpre_done
+gpre_Multiply:
+gpre_Divide:
+gpre_Reminder:
+    ADDI R0, R1, 90
+    JMP  gpre_done
+gpre_UnaryPlus:
+gpre_UnaryMinus:
+gpre_BitwiseNot:
+    ADDI R0, R1, 100
+    JMP  gpre_done
+gpre_done:
+    RET
