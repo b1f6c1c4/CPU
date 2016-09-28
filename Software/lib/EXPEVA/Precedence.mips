@@ -18,8 +18,8 @@
     ; 0x0f  OK
     ;
     ; Precedence_EXPEVA
-    ; arg[1]: B
-    ; arg[0]: A
+    ; arg[1]: A
+    ; arg[0]: B
     ; return: lle-rlt, gpre(A) <= gpre(B)
 Precedence_EXPEVA:
     PUSH BP
@@ -34,11 +34,12 @@ Precedence_EXPEVA:
     LW   R2, R1, 0xfe
     LW   R0, R2, 0x04
     PUSH R0
-    CALL gpre           ; R0 = gpre(B)
+    CALL gpre           ; R0 = gpre(A)
     POP  R3
-    POP  R3             ; R3 = gpre(A)
-    SLT  R0, R0, R3
+    POP  R3             ; R3 = gpre(B)
+    SLT  R0, R3, R0
     ANDI R1, R1, 0x00
+    ADDI R1, R1, 0x01
     SUB  R0, R1, R0
     RET
 gpre:

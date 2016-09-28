@@ -17,7 +17,12 @@
     CALL Digit_EXPEVA
     POP  R0
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x04   ; Multiply
+    ADDI R0, R1, 0x02   ; Plus
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x03   ; Minus
     PUSH R0
     CALL Operator_EXPEVA
     POP  R0
@@ -42,7 +47,22 @@
     CALL Digit_EXPEVA
     POP  R0
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x02   ; Plus
+    ADDI R0, R1, 0x04   ; Multiply
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 8
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 9
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0f   ; OK
     PUSH R0
     CALL Operator_EXPEVA
     POP  R0

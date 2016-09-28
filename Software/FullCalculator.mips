@@ -1,0 +1,227 @@
+    ;include lib/ReadKey.mips
+    ;include lib/EXPEVA.mips
+    ; Keys
+    ;|        |  V[3]  |  V[2]  |  V[1]  |  V[0]  |
+    ;|:------:|:------:|:------:|:------:|:------:|
+    ;|  H[3]  |   1    |   2    |   3    |   4    |
+    ;|  H[2]  |   5    |   6    |   7 == |   8 %  |
+    ;|  H[1]  |   9 no |   0 xo |  +  *  |  -  /  |
+    ;|  H[0]  |  AN (  |  OR )  |  < BK  |  = CL  |
+    INIT
+    CALL Init_EXPEVA
+    PUSH R0
+main:
+    PUSH R0
+    CALL Top_EXPEVA
+    ANDI R1, R1, 0x00
+    POP  R0
+    SW   R0, R1, 0x00
+    ANDI R1, R1, 0x00
+    POP  R0
+    SW   R0, R1, 0x01
+    CALL ReadKey
+    PUSH R0
+    ADDPC
+    JMP  op_OK          ; 0
+    JMP  op_Minus       ; 1
+    JMP  nm_8           ; 2
+    JMP  nm_4           ; 3
+    JMP  op_LessThan    ; 4
+    JMP  op_Plus        ; 5
+    JMP  nm_7           ; 6
+    JMP  nm_3           ; 7
+    JMP  op_BitwiseOr   ; 8
+    JMP  nm_0           ; 9
+    JMP  nm_6           ; 10
+    JMP  nm_2           ; 11
+    JMP  op_BitwiseAnd  ; 12
+    JMP  nm_9           ; 13
+    JMP  nm_5           ; 14
+    JMP  nm_1           ; 15
+    JMP  ct_Clear       ; 16
+    JMP  op_Divide      ; 17
+    JMP  op_Reminder    ; 18
+    JMP  main           ; 19
+    JMP  ct_Back        ; 20
+    JMP  op_Multiply    ; 21
+    JMP  op_EqualTo     ; 22
+    JMP  main           ; 23
+    JMP  op_RightParenthesis; 24
+    JMP  op_BitwiseXor  ; 25
+    JMP  main           ; 26
+    JMP  main           ; 27
+    JMP  op_LeftParenthesis; 28
+    JMP  op_BitwiseNot  ; 29
+    JMP  main           ; 30
+    JMP  main           ; 31
+nm_0:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_1:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 1
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_2:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 2
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_3:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 3
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_4:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 4
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_5:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 5
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_6:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 6
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_7:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 7
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_8:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 8
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+nm_9:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 9
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    JMP  main
+op_Plus:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x02
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_Minus:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x03
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_Multiply:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x04
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_Divide:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x05
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_Reminder:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x06
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_BitwiseNot:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x07
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_BitwiseAnd:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x08
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_BitwiseOr:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x09
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_BitwiseXor:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0a
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_LeftParenthesis:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0b
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_RightParenthesis:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0c
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_LessThan:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0d
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_EqualTo:
+    ANDI R1, R1, 0x00
+    ADDI R1, R1, 0x0e
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+op_OK:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0f
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    JMP  main
+ct_Back:
+ct_Clear:
+    CALL Back_EXPEVA

@@ -158,7 +158,6 @@ done_b:
     LW   R0, R0, 0x01   ; R0 = *(&b)_H
     ANDI R0, R0, 0x80
     ADD  R0, R0, R3
-    ANDI R0, R0, 0x01
     LW   R3, R1, 0xff
     BNE  R0, R1, inv_sum
     LW   R2, R1, 0xfe
