@@ -7,17 +7,6 @@
 main:
     PUSH R0
     CALL Top_EXPEVA
-    CALL SendNumber
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x0d   ; '\r'
-    PUSH R0
-    CALL WriteExternal
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x0a   ; '\n'
-    PUSH R0
-    CALL WriteExternal
-    POP  R0
     POP  R0
     SW   R0, R1, 0x00
     ANDI R1, R1, 0x00
@@ -252,6 +241,20 @@ op_OK:
     ADDI R0, R1, 0x0f
     PUSH R0
     CALL Operator_EXPEVA
+    POP  R0
+    PUSH R0
+    CALL Top_EXPEVA
+    CALL SendNumber
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0d   ; '\r'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0a   ; '\n'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
     POP  R0
     JMP  main
 ct_Back:
