@@ -1,0 +1,37 @@
+Allocate_number_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; n_sp += 2
+    LW   R3, R1, 0x09
+    ADDI R3, R3, 0x02
+    SW   R3, R1, 0x09
+    RET
+Free_number_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; n_sp -= 2
+    LW   R3, R1, 0x09
+    ADDI R3, R3, 0xfe
+    SW   R3, R1, 0x09
+    RET
+Push_operator_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R3, R1, 0x0a
+    ; *o_sp = arg[0]
+    SW   R0, R3, 0x00
+    ; o_sp += 1
+    ADDI R3, R3, 0x01
+    SW   R3, R1, 0x0a
+    RET
+Pop_operator_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; o_sp -= 1
+    LW   R3, R1, 0x0a
+    ADDI R3, R3, 0xff
+    SW   R3, R1, 0x0a
+    LW   R0, R3, 0x00
+    RET
