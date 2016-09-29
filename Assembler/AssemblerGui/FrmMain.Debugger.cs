@@ -66,6 +66,15 @@ namespace AssemblerGui
                     handler?.Invoke();
             };
 
+        private ExceptionEventHandler InvokeOnMainThread(ExceptionEventHandler handler) =>
+            e =>
+            {
+                if (InvokeRequired)
+                    Invoke(handler, e);
+                else
+                    handler?.Invoke(e);
+            };
+
         private void StartDebugger()
         {
             m_RawDebugger = new AsmDebugger(m_BreakPoints);
@@ -89,6 +98,17 @@ namespace AssemblerGui
             m_Debugger.OnPause += InvokeOnMainThread(OnPause);
             m_Debugger.OnStarted += InvokeOnMainThread(OnStarted);
             m_Debugger.OnExited += InvokeOnMainThread(OnExited);
+            m_Debugger.OnError +=
+                InvokeOnMainThread(
+                                   e =>
+                                   {
+                                       OnExited?.Invoke();
+                                       MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                       var ee = e as AssemblyException;
+                                       if (ee == null)
+                                           return;
+                                       OpenFile(ee.FilePath, ee.Line, ee.CharPos);
+                                   });
 
             panel1.Show();
             ToggleDebuggerMenus();

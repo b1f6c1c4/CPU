@@ -3,8 +3,18 @@ using System.Threading;
 
 namespace AssemblerGui
 {
+    public delegate void ExceptionEventHandler(Exception e);
+
     public class AsmAsyncDebugger : IDisposable
     {
+        public event SimpleEventHandler OnPause;
+
+        public event SimpleEventHandler OnExited;
+
+        public event SimpleEventHandler OnStarted;
+
+        public event ExceptionEventHandler OnError;
+
         private enum Executing
         {
             None,
@@ -15,12 +25,6 @@ namespace AssemblerGui
             All,
             Quit
         }
-
-        public event SimpleEventHandler OnPause;
-
-        public event SimpleEventHandler OnExited;
-
-        public event SimpleEventHandler OnStarted;
 
         private readonly AsmDebugger m_Debugger;
 
@@ -117,6 +121,11 @@ namespace AssemblerGui
                 catch (HaltException)
                 {
                     OnExited?.Invoke();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    OnError?.Invoke(e);
                     break;
                 }
             }
