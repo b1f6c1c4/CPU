@@ -141,7 +141,7 @@ eval_BitwiseXor:
     SW   R0, R2, -4
     LW   R0, R2, -1
     LW   R3, R2, -3
-    AND  R0, R0, R3
+    AND  R1, R0, R3
     OR   R0, R0, R3
     ORI  R3, R3, 0xff
     SUB  R3, R3, R1
@@ -156,9 +156,9 @@ eval_LessThan:
     PUSH R0
     ADDI R0, R2, -4
     PUSH R0
-    CALL Comp16p
+    CALL Comp16ps
     ANDI R1, R1, 0x00
-    ADDI R1, R1, 0x01
+    ADDI R0, R0, 0x01
     BEQ  R0, R1, eval_LTEQ_yes
     JMP  eval_LTEQ_no
 eval_EqualTo:

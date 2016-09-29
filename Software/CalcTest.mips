@@ -7,67 +7,12 @@
     CALL Digit_EXPEVA
     POP  R0
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 8
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 9
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x05   ; Divide
+    ADDI R0, R1, 0x0d   ; Less Than
     PUSH R0
     CALL Operator_EXPEVA
     POP  R0
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x0b   ; Left Parenthesis
-    PUSH R0
-    CALL Operator_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 5
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x04   ; Multiply
-    PUSH R0
-    CALL Operator_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 3
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x0c   ; Right Parenthesis
-    PUSH R0
-    CALL Operator_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x02   ; Plus
-    PUSH R0
-    CALL Operator_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 9
-    PUSH R0
-    CALL Digit_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 3
+    ADDI R0, R1, 7
     PUSH R0
     CALL Digit_EXPEVA
     POP  R0
@@ -76,13 +21,13 @@
     PUSH R0
     CALL Operator_EXPEVA
     POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x02 ; Plus
     PUSH R0
-    CALL Operator_EXPEVA
-    POP  R0
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 3
     PUSH R0
-    CALL Digit_EXPEVA
+    CALL Top_EXPEVA
+    ANDI R1, R1, 0x00
     POP  R0
+    SW   R0, R1, 0x00
+    ANDI R1, R1, 0x00
+    POP  R0
+    SW   R0, R1, 0x01
+halt
