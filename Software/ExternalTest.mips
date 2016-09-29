@@ -1,0 +1,11 @@
+    ;include lib/External.mips
+    INIT
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x5a
+    PUSH R0
+loop:
+    CALL WriteExternal
+    POP  R0
+    CALL ReadExternal
+    PUSH R0
+    JMP  loop
