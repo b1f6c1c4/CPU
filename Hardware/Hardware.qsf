@@ -107,3 +107,5 @@ set_global_assignment -name VERILOG_FILE lpm_rom_256_16.v
 set_global_assignment -name VERILOG_FILE Flag.v
 set_global_assignment -name VERILOG_FILE ctrlunit.v
 set_global_assignment -name VERILOG_FILE instrconunit.v
+set_global_assignment -name VERILOG_FILE opaque_buffer.v
+set_global_assignment -name VERILOG_FILE UART.v

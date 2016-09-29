@@ -144,7 +144,11 @@ namespace Assembler
         {
             int pos;
             if (!Symbols.TryGetValue(MakeUniqueSymbol(symbol, m_Filenames[now]), out pos))
-                throw new KeyNotFoundException($"Symbol {symbol} not found.");
+                throw new AssemblyException($"Symbol {symbol} not found.")
+                          {
+                              FilePath = Lines[now].FilePath,
+                              Line = Lines[now].Line
+                          };
             return pos;
         }
     }

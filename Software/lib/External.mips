@@ -1,0 +1,23 @@
+    ; ReadExternal: Read from buffered external device at IO3, Blocked
+ReadExternal:
+    PUSH BP
+    ANDI R1, R1, 0x00
+read_loop:
+    LW   R0, R1, 0x03
+    BEQ  R0, R1, read_loop
+    SW   R0, R1, 0x03
+    LW   R0, R1, 0x03
+    SW   R0, R1, 0x03
+    RET
+    ;WriteExternal: Write to buffered external device at IO4, Blocked
+    ; arg[0]: byte to write
+WriteExternal:
+    PUSH BP
+    ANDI R1, R1, 0x00
+write_loop:
+    LW   R0, R1, 0x04
+    BEQ  R0, R1, write_loop
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R1, 0x04
+    RET

@@ -8,6 +8,8 @@ module Hardware(
    output [7:0] SEG,
    output [7:0] LD,
    input [7:0] SB,
+   output TX,
+   input RX,
    output Buzz
 `ifdef SIMULATION
    ,
@@ -30,6 +32,13 @@ module Hardware(
 
    // links
    wire [7:0] ou_L, ou_H;
+
+   wire uw_ready, uw_send, uw_finish;
+   wire [7:0] uw_data;
+
+   wire ur_arrived;
+   wire [7:0] ur_data;
+
 `ifndef SIMULATION
    wire [7:0] io_ena;
    wire [7:0] io_0, io_1, io_2, io_3;
@@ -46,6 +55,15 @@ module Hardware(
    latch_buffer lat7(
       .Clock(Clock), .Reset(Reset),
       .en(io_ena[7]), .in(io_7), .out(LD));
+   opaque_read_buffer orb(
+      .Clock(Clock), .Reset(Reset),
+      .Din(ur_data), .Din_arrived(ur_arrived),
+      .io(io_3), .ena(io_ena[3]));
+   opaque_write_buffer owb(
+      .Clock(Clock), .Reset(Reset),
+      .Dout(uw_data), .Dout_send(uw_send),
+      .Dout_ready(uw_ready), .Dout_finish(uw_finish),
+      .io(io_4), .ena(io_ena[4]));
 
    assign Buzz = ~LD[0];
 
@@ -67,5 +85,16 @@ module Hardware(
       .CLK_seg(Clock),
       .data_inH(ou_H), .data_inL(ou_L),
       .seg_sel(SD), .data_out(SEG));
+
+   UART_WriteD uw(
+      .Clock(Clock), .Reset(Reset),
+      .ready(uw_ready), .send(uw_send),
+      .finish(uw_finish), .data(uw_data),
+      .TX(TX));
+
+   UART_ReadD ur(
+      .Clock(Clock), .Reset(Reset),
+      .arrived(ur_arrived), .data(ur_data),
+      .RX(RX));
 
 endmodule
