@@ -9,55 +9,83 @@ main:
     CALL Top_EXPEVA
     CALL SendNumber
     ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
     ADDI R0, R1, 0x0d   ; '\r'
-    SW   R0, R3, 0x00
+    PUSH R0
     CALL WriteExternal
+    POP  R0
     ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
     ADDI R0, R1, 0x0a   ; '\n'
-    SW   R0, R3, 0x00
+    PUSH R0
     CALL WriteExternal
+    POP  R0
     POP  R0
     SW   R0, R1, 0x00
     ANDI R1, R1, 0x00
     POP  R0
     SW   R0, R1, 0x01
-    CALL ReadKey
+    CALL ReadExternal
+    ANDI R1, R1, 0x00
+    ADDI R2, R1, 0x0a   ; LF
+    BNE  R0, R2, not_ok
+    PUSH R0
+    JMP  op_OK
+not_ok:
+    ADDI R2, R1, 0x5e   ; ^
+    BNE  R0, R2, not_xor
+    PUSH R0
+    JMP  op_BitwiseXor
+not_xor:
+    ADDI R2, R1, 0x7c   ; |
+    BNE  R0, R2, not_or
+    PUSH R0
+    JMP  op_BitwiseOr
+not_or:
+    ADDI R2, R1, 0x7e   ; ~
+    BNE  R0, R2, not_not
+    PUSH R0
+    JMP  op_BitwiseNot
+not_not:
+    ADDI R2, R1, 0x20
+    ADDI R0, R0, 0xe0
+    SLT  R2, R0, R2
+    BNE  R2, R1, valid
+    PUSH R0
+    JMP  main
+valid:
     PUSH R0
     ADDPC
-    JMP  op_OK          ; 0
-    JMP  op_Minus       ; 1
-    JMP  nm_8           ; 2
-    JMP  nm_4           ; 3
-    JMP  op_LessThan    ; 4
-    JMP  op_Plus        ; 5
-    JMP  nm_7           ; 6
-    JMP  nm_3           ; 7
-    JMP  op_BitwiseOr   ; 8
-    JMP  nm_0           ; 9
-    JMP  nm_6           ; 10
-    JMP  nm_2           ; 11
-    JMP  op_BitwiseAnd  ; 12
-    JMP  nm_9           ; 13
-    JMP  nm_5           ; 14
-    JMP  nm_1           ; 15
-    JMP  ct_Clear       ; 16
-    JMP  op_Divide      ; 17
-    JMP  op_Reminder    ; 18
-    JMP  main           ; 19
-    JMP  ct_Back        ; 20
-    JMP  op_Multiply    ; 21
-    JMP  op_EqualTo     ; 22
-    JMP  main           ; 23
-    JMP  op_RightParenthesis; 24
-    JMP  op_BitwiseXor  ; 25
-    JMP  main           ; 26
-    JMP  main           ; 27
-    JMP  op_LeftParenthesis; 28
-    JMP  op_BitwiseNot  ; 29
-    JMP  main           ; 30
-    JMP  main           ; 31
+    JMP  main           ; Space
+    JMP  main           ; !
+    JMP  main           ; "
+    JMP  main           ; #
+    JMP  main           ; $
+    JMP  op_Reminder    ; %
+    JMP  op_BitwiseAnd  ; &
+    JMP  main           ; '
+    JMP  op_LeftParenthesis; (
+    JMP  op_RightParenthesis; )
+    JMP  op_Multiply    ; *
+    JMP  op_Plus        ; +
+    JMP  main           ; ,
+    JMP  op_Minus       ; -
+    JMP  main           ; .
+    JMP  op_Divide      ; /
+    JMP  nm_0           ; 0
+    JMP  nm_1           ; 1
+    JMP  nm_2           ; 2
+    JMP  nm_3           ; 3
+    JMP  nm_4           ; 4
+    JMP  nm_5           ; 5
+    JMP  nm_6           ; 6
+    JMP  nm_7           ; 7
+    JMP  nm_8           ; 8
+    JMP  nm_9           ; 9
+    JMP  main           ; :
+    JMP  main           ; ;
+    JMP  op_LessThan    ; <
+    JMP  op_EqualTo     ; =
+    JMP  main           ; ;
+    JMP  main           ; ?
 nm_0:
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0

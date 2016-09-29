@@ -27,6 +27,7 @@ SendNumber:
     JMP  done_quo
 inv_quo:
     ADDI R0, R1, 0x2d   ; '-'
+    SW   R0, R3, 0x00
     CALL WriteExternal
     ANDI R1, R1, 0x00
     LW   R2, R1, 0xfe

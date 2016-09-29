@@ -79,9 +79,19 @@ eval_Multiply:
 eval_Divide:
     ANDI R1, R1, 0x00
     LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
     ADDI R0, R2, -4
     PUSH R0
+    CALL Div16ps
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_Reminder:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
     ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
     PUSH R0
     CALL Div16ps
     ANDI R1, R1, 0x00
@@ -90,16 +100,6 @@ eval_Divide:
     SW   R0, R2, -4
     LW   R0, R2, -1
     SW   R0, R2, -3
-    CALL Free_number_EXPEVA
-    JMP  eval_done
-eval_Reminder:
-    ANDI R1, R1, 0x00
-    LW   R2, R1, 0x09
-    ADDI R0, R2, -4
-    PUSH R0
-    ADDI R0, R2, -2
-    PUSH R0
-    CALL Div16ps
     CALL Free_number_EXPEVA
     JMP  eval_done
 eval_BitwiseAnd:
