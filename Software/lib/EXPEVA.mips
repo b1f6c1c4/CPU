@@ -9,6 +9,7 @@
     ; MEM[0x09] = n_sp (point to the next)
     ; MEM[0x0a] = o_sp (point to the next)
     ; MEM[0x0b] = is_number
+    ; MEM[0x0c] = is_after_OK
     ;
     ; MEM[0x4f .. 0x10] : numbers (32)
     ; MEM[0x7f .. 0x50] : operators (48)
@@ -19,11 +20,15 @@
 Init_EXPEVA:
     PUSH BP
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x10
+    ADDI R0, R1, 0x12
     SW   R0, R1, 0x09
+    SW   R1, R1, 0x10
+    SW   R1, R1, 0x11
     ADDI R0, R1, 0x50
     SW   R0, R1, 0x0a
     SW   R1, R1, 0x0b
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x0c
     RET
     ; Top_EXPEVA: Get top number
     ; arg[1..0] result
@@ -31,25 +36,23 @@ Top_EXPEVA:
     PUSH BP
     ANDI R1, R1, 0x00
     LW   R3, R1, 0x09
-    ADDI R2, R1, 0x10
-    BEQ  R3, R2, empty_Top_EXPEVA
     LW   R2, R1, 0xfe
     LW   R0, R3, -2
     SW   R0, R2, 0x03
     LW   R0, R3, -1
     SW   R0, R2, 0x04
-    JMP  done_Top_EXPEVA
-empty_Top_EXPEVA:
-    LW   R2, R1, 0xfe
-    SW   R1, R2, 0x03
-    SW   R1, R2, 0x04
-done_Top_EXPEVA:
     RET
     ; Digit_EXPEVA: Push one digit or create number
     ; arg[0]: digit
 Digit_EXPEVA:
     PUSH BP
     ANDI R1, R1, 0x00
+    LW   R0, R1, 0x0c
+    BEQ  R0, R1, after_clear_Digit_EXPEVA
+    CALL free_number
+    SW   R1, R1, 0x0b
+    SW   R1, R1, 0x0c
+after_clear_Digit_EXPEVA:
     LW   R0, R1, 0x0b
     BEQ  R0, R1, create_Digit_EXPEVA
     ADDI R0, R1, 0
@@ -103,6 +106,7 @@ Operator_EXPEVA:
     LW   R2, R1, 0xfe
     LW   R0, R2, 0x03
     SW   R0, R3, 0x00
+    SW   R1, R1, 0x0c
     LW   R0, R1, 0x0b
     BNE  R0, R1, parse_Operator_EXPEVA
     LW   R0, R3, 0x00
@@ -131,13 +135,20 @@ parse_Operator_EXPEVA:
     ADDI R2, R1, 0x0b   ; Left Parenthesis
     BEQ  R0, R2, push_op_Operator_EXPEVA
 flush_Operator_EXPEVA:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
     LW   R0, R1, 0x0a
     ADDI R2, R1, 0x50
     BNE  R0, R2, compare_Operator_EXPEVA
     LW   R0, R3, 0x00
     ADDI R2, R1, 0x0c   ; Right Parenthesis
     BEQ  R0, R2, fail_Operator_EXPEVA
-    JMP  push_op_Operator_EXPEVA
+    ADDI R2, R1, 0x0f   ; OK
+    BNE  R0, R2, push_op_Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x0c
+    JMP  done_Operator_EXPEVA
 compare_Operator_EXPEVA:
     LW   R0, R3, 0x00
     ADDI R2, R1, 0x0c   ; Right Parenthesis
@@ -147,7 +158,8 @@ compare_Operator_EXPEVA:
     LW   R0, R0, 0xff
     ADDI R2, R1, 0x0b   ; Left Parenthesis
     BNE  R0, R2, evaluate_Operator_EXPEVA
-    JMP  push_op_Operator_EXPEVA
+    CALL pop_operator
+    JMP  done_Operator_EXPEVA
 not_rp_at_compare_Operator_EXPEVA:
     ; R0 = *(o_sp-1)
     LW   R0, R1, 0x0a
@@ -169,10 +181,11 @@ push_op_Operator_EXPEVA:
     CALL push_operator
     ANDI R1, R1, 0x00
     SW   R1, R1, 0x0b
-    RET
+    JMP  done_Operator_EXPEVA
 fail_Operator_EXPEVA:
     ANDI R0, R0, 0x00
     ADDI R0, R0, 0x01
+done_Operator_EXPEVA:
     RET
     ; Back_EXPEVA: Remove last digit
     ; return: 0 is succeed

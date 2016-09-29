@@ -21,19 +21,19 @@ Div16p:
     LW   R3, R1, 0xff
     ADDI R3, R3, -11
     SW   R3, R1, 0xff
-    ; dr = *arg[1]
+    ; dr = *arg[0]
     LW   R2, R1, 0xfe
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
     LW   R0, R0, 0x00
     SW   R0, R3, 0x06
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
     LW   R0, R0, 0x01
     SW   R0, R3, 0x07
-    ; dp = {0x0000, *arg[0]}
-    LW   R0, R2, 0x03
+    ; dp = {0x0000, *arg[1]}
+    LW   R0, R2, 0x04
     LW   R0, R0, 0x00
     SW   R0, R3, 0x02
-    LW   R0, R2, 0x03
+    LW   R0, R2, 0x04
     LW   R0, R0, 0x01
     SW   R0, R3, 0x03
     SW   R1, R3, 0x04
