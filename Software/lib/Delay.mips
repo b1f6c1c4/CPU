@@ -1,0 +1,44 @@
+    ; Delay: Soft Delay
+    ; arg[3..0]: time
+    ; Delays are in MEM[0xa3] .. MEM[0xa0] = n
+    ; Use MEM[0xa7] .. MEM[0xa4] as the loop variable i
+Delay:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; sp+3..0 = i
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -4
+    SW   R3, R1, 0xff
+    ; i = n
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x00
+    LW   R0, R2, 0x04
+    SW   R0, R3, 0x01
+    LW   R0, R2, 0x05
+    SW   R0, R3, 0x02
+    LW   R0, R2, 0x06
+    SW   R0, R3, 0x03
+loop:
+    ; 18 insts per loop
+    ; R2 = |(--i)
+    ANDI R2, R2, 0x00
+    LW   R0, R3, 0x00
+    ADDI R0, R0, 0xff
+    OR   R2, R2, R0
+    SW   R0, R3, 0x00
+    LW   R0, R3, 0x01
+    SUBC R0, R0, R1
+    OR   R2, R2, R0
+    SW   R0, R3, 0x01
+    LW   R0, R3, 0x02
+    SUBC R0, R0, R1
+    OR   R2, R2, R0
+    SW   R0, R3, 0x02
+    LW   R0, R3, 0x03
+    SUBC R0, R0, R1
+    OR   R2, R2, R0
+    SW   R0, R3, 0x03
+    ; if (R3) goto loop
+    BNE  R2, R1, loop
+    RET

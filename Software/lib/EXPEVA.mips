@@ -1,4 +1,5 @@
     ; EXPEVA
+    ; REQUIRE: FATAL
     ;
     ;include EXPEVA/Precedence.mips
     ;include EXPEVA/Stack.mips
@@ -52,7 +53,9 @@ Back_EXPEVA:
     PUSH BP
     ANDI R1, R1, 0x00
     LW   R0, R1, 0x0b
-    BEQ  R0, R1, fail_Back_EXPEVA
+    BNE  R0, R1, not_fail_Back_EXPEVA
+    JMP  FATAL
+not_fail_Back_EXPEVA:
     ADDI R0, R1, 0
     PUSH R0
     ADDI R0, R1, 10
@@ -64,8 +67,4 @@ Back_EXPEVA:
     PUSH R3
     CALL Div16p
     ANDI R0, R0, 0x00
-    RET
-fail_Back_EXPEVA:
-    ANDI R0, R0, 0x00
-    ADDI R0, R0, 0x01
     RET
