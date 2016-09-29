@@ -225,3 +225,4 @@ op_OK:
 ct_Back:
 ct_Clear:
     CALL Back_EXPEVA
+    JMP  main

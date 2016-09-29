@@ -21,19 +21,19 @@ Div16p:
     LW   R3, R1, 0xff
     ADDI R3, R3, -11
     SW   R3, R1, 0xff
-    ; dr = *arg[0]
+    ; dr = *arg[1]
     LW   R2, R1, 0xfe
-    LW   R0, R2, 0x03
+    LW   R0, R2, 0x04
     LW   R0, R0, 0x00
     SW   R0, R3, 0x06
-    LW   R0, R2, 0x03
+    LW   R0, R2, 0x04
     LW   R0, R0, 0x01
     SW   R0, R3, 0x07
-    ; dp = {0x0000, *arg[1]}
-    LW   R0, R2, 0x04
+    ; dp = {0x0000, *arg[0]}
+    LW   R0, R2, 0x03
     LW   R0, R0, 0x00
     SW   R0, R3, 0x02
-    LW   R0, R2, 0x04
+    LW   R0, R2, 0x03
     LW   R0, R0, 0x01
     SW   R0, R3, 0x03
     SW   R1, R3, 0x04
@@ -51,10 +51,11 @@ loop:
     ; *(sp+0) = &dr
     ADDI R0, R3, 0x06
     SW   R0, R3, 0x00
-    ; if (dr >= dp_H) goto next
+    ; if (dr > dp_H) goto next
     CALL Comp16p
     ANDI R1, R1, 0x00
     LW   R3, R1, 0xff
+    ADDI R0, R0, 0xff
     ANDI R0, R0, 0x80
     BEQ  R0, R1, next
     ; dp_H -= dr
