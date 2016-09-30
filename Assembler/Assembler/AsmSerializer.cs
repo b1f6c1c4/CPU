@@ -1,4 +1,6 @@
-﻿namespace Assembler
+﻿using System;
+
+namespace Assembler
 {
     public abstract class AsmSerializer : AsmProgBase
     {
@@ -8,7 +10,22 @@
             {
                 var inst = Instructions[i];
                 var i1 = i;
-                Put(inst.Serialize((s, a) => GetSymbol(i1, s, a)));
+                try
+                {
+                    Put(inst.Serialize((s, a) => GetSymbol(i1, s, a)));
+                }
+                catch (AssemblyException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw new AssemblyException("Serializer error", e)
+                              {
+                                  FilePath = Lines[i].FilePath,
+                                  Line = Lines[i].Line
+                              };
+                }
             }
 
             PutFinal();

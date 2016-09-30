@@ -96,7 +96,7 @@ namespace Assembler
                     throw new InvalidOperationException();
                 if (obj() != null &&
                     (imm > 0x7f || imm < -0x80))
-                    throw new ApplicationException($"BEQ/BNE at line {Op.Line} jump too long ({imm}); use JMP");
+                    throw new ApplicationException($"BEQ/BNE jumps too long ({imm}); use JMP");
                 return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
