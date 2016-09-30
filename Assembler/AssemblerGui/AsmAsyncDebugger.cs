@@ -77,7 +77,15 @@ namespace AssemblerGui
 
         private void Next(int lease, PauseCriterion criterion)
         {
-            m_Debugger.Next(ref lease, criterion);
+            try
+            {
+                m_Debugger.Next(ref lease, criterion);
+            }
+            catch (Exception e)
+            {
+                OnError?.Invoke(e);
+                return;
+            }
             if (lease == 0)
                 RequestRunning(criterion);
         }

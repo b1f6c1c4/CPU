@@ -140,7 +140,7 @@ namespace Assembler
         {
             int pos;
             if (!Symbols.TryGetValue(MakeUniqueSymbol(symbol, m_Filenames[now]), out pos))
-                throw new AssemblyException($"Symbol {symbol} not found.")
+                throw new AssemblyException($"ÕÒ²»µ½·ûºÅ¡°{symbol}¡±")
                           {
                               FilePath = Lines[now].FilePath,
                               Line = Lines[now].Line

@@ -101,7 +101,7 @@ namespace AssemblerGui
                     }
                     catch (AssemblyException e)
                     {
-                        MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         OpenFile(e.FilePath, e.Line, e.CharPos);
                         return false;
                     }
@@ -132,7 +132,7 @@ namespace AssemblerGui
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -179,7 +179,7 @@ namespace AssemblerGui
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(
-                                        e.ToString().Replace(tmp, TheEditor.FilePath),
+                                        e.Message.Replace(tmp, TheEditor.FilePath),
                                         "错误",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
@@ -196,7 +196,7 @@ namespace AssemblerGui
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

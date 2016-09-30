@@ -117,7 +117,18 @@ end_memory_edit
                         StartDownload();
                         return;
                     }
-                OnExited?.Invoke(message);
+                using (var stream = new StringReader(m_ResultErr.ToString()))
+                    while (true)
+                    {
+                        var s = stream.ReadLine();
+                        if (s == null)
+                            OnExited?.Invoke(message);
+                        else if (s.StartsWith("ERROR", StringComparison.Ordinal))
+                        {
+                            OnExited?.Invoke(s);
+                            break;
+                        }
+                    }
             }
             else
                 OnExited?.Invoke(null);

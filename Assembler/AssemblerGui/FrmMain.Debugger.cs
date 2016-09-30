@@ -88,7 +88,7 @@ namespace AssemblerGui
             }
             catch (AssemblyException e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 OpenFile(e.FilePath, e.Line, e.CharPos);
                 return;
             }
@@ -103,7 +103,7 @@ namespace AssemblerGui
                                    e =>
                                    {
                                        OnExited?.Invoke();
-                                       MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                       MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                        var ee = e as AssemblyException;
                                        if (ee == null)
                                            return;

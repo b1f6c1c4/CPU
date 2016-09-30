@@ -16,23 +16,28 @@ namespace Assembler
 
         public AssemblyException(string message, Exception e) : base(message, e) { }
 
-        public override string ToString()
+        public override string Message => Description + base.Message;
+
+        private string Description
         {
-            var sb = new StringBuilder();
-            if (FilePath != null)
-                sb.Append($"在 {FilePath} ");
+            get
+            {
+                var sb = new StringBuilder();
+                if (FilePath != null)
+                    sb.Append($"在 {FilePath} ");
 
-            if (Line.HasValue)
-                sb.Append($"第 {Line} 行");
+                if (Line.HasValue)
+                    sb.Append($"第 {Line} 行");
 
-            if (CharPos.HasValue)
-                sb.Append($"第 {CharPos} 字符");
+                if (CharPos.HasValue)
+                    sb.Append($"第 {CharPos} 字符");
 
-            sb.Append("处发生错误：");
-            sb.Append(base.ToString());
-
-            return sb.ToString();
+                sb.Append("处发生错误：");
+                return sb.ToString();
+            }
         }
+
+        public override string ToString() => Description + base.ToString();
     }
 
     internal class AssemblyHandler : IAntlrErrorListener<IToken>
