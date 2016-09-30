@@ -53,6 +53,7 @@ input_loop:
 got_key:
     SW   R0, R1, 0x02
     SW   R0, R3, 0x00
+    SW   R1, R3, 0x02
     ADDI R0, R1, 0x01
     SW   R0, R3, 0x03
     ADDPC
@@ -90,6 +91,7 @@ got_key:
     JMP  main           ; 31
 got_uart:
     ANDI R1, R1, 0x00
+    SW   R1, R3, 0x02
     SW   R1, R3, 0x03
     ADDI R2, R1, 0x0a   ; LF
     BNE  R0, R2, not_ok
@@ -225,6 +227,14 @@ op_Plus:
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Plus
+    JMP  done
+ld_Plus:
+    ADDI R0, R1, 0b01000000
+    SW   R0, R3, 0x02
     JMP  done
 op_Minus:
     ANDI R1, R1, 0x00
@@ -232,6 +242,14 @@ op_Minus:
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Minus
+    JMP  done
+ld_Minus:
+    ADDI R0, R1, 0b00100000
+    SW   R0, R3, 0x02
     JMP  done
 op_Multiply:
     ANDI R1, R1, 0x00
@@ -267,6 +285,14 @@ op_BitwiseAnd:
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_And
+    JMP  done
+ld_And:
+    ADDI R0, R1, 0b00010000
+    SW   R0, R3, 0x02
     JMP  done
 op_BitwiseOr:
     ANDI R1, R1, 0x00
@@ -281,6 +307,14 @@ op_BitwiseXor:
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Or
+    JMP  done
+ld_Or:
+    ADDI R0, R1, 0b00001000
+    SW   R0, R3, 0x02
     JMP  done
 op_LeftParenthesis:
     ANDI R1, R1, 0x00
@@ -302,6 +336,14 @@ op_LessThan:
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_LT
+    JMP  done
+ld_LT:
+    ADDI R0, R1, 0b00000100
+    SW   R0, R3, 0x02
     JMP  done
 op_EqualTo:
     ANDI R1, R1, 0x00
