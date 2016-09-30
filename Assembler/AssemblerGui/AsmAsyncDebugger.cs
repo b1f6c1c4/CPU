@@ -15,17 +15,6 @@ namespace AssemblerGui
 
         public event ExceptionEventHandler OnError;
 
-        private enum Executing
-        {
-            None,
-            Instruction,
-            Statement,
-            Procedure,
-            Frame,
-            All,
-            Quit
-        }
-
         private readonly AsmDebugger m_Debugger;
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
@@ -35,7 +24,9 @@ namespace AssemblerGui
 
         private readonly object m_Lock = new object();
 
-        private Executing m_Request;
+        private PauseCriterion m_Request;
+
+        private bool m_RequestQuit;
 
         private CancellationTokenSource m_Source;
 
@@ -49,74 +40,72 @@ namespace AssemblerGui
             m_Worker.Start();
         }
 
-        private void RequestRunning(Executing request)
+        private void RequestQuit()
         {
             lock (m_Lock)
             {
                 m_Source = new CancellationTokenSource();
                 m_Token = m_Source.Token;
-                m_Request = request;
-                if (request != Executing.Quit)
-                    OnStarted?.Invoke();
+                m_Request = null;
+                m_RequestQuit = true;
                 Monitor.Pulse(m_Lock);
             }
         }
 
-        public void Run() => RequestRunning(Executing.All);
+        private void RequestRunning(PauseCriterion request)
+        {
+            lock (m_Lock)
+            {
+                m_Source = new CancellationTokenSource();
+                m_Token = m_Source.Token;
+                m_Request = new Cancellable(request, m_Token);
+                m_RequestQuit = false;
+                OnStarted?.Invoke();
+                Monitor.Pulse(m_Lock);
+            }
+        }
+
+        public void Run() => RequestRunning(null);
 
         public void Pause() => m_Source?.Cancel();
 
         public void Stop()
         {
             m_Source?.Cancel();
-            RequestRunning(Executing.Quit);
+            RequestQuit();
         }
 
-        public void NextInstruction() => RequestRunning(Executing.Instruction);
+        private void Next(int lease, PauseCriterion criterion)
+        {
+            m_Debugger.Next(ref lease, criterion);
+            if (lease == 0)
+                RequestRunning(criterion);
+        }
 
-        public void NextStatement() => RequestRunning(Executing.Statement);
+        public void NextInstruction(int lease = 0) => Next(lease, new NextInstruction());
 
-        public void NextProcedure() => RequestRunning(Executing.Procedure);
+        public void NextStatement(int lease = 0) => Next(lease, new NextStatement(m_Debugger.Source));
 
-        public void JumpOut() => RequestRunning(Executing.Frame);
+        public void NextProcedure(int lease = 0) => Next(lease, new NextProcedure(m_Debugger.Source));
+
+        public void JumpOut(int lease = 0) => Next(lease, new JumpOut(m_Debugger.CPU, m_Debugger.Source));
 
         private void WorkerThreadEntryPoint()
         {
             while (true)
             {
-                Executing request;
+                PauseCriterion request;
                 lock (m_Lock)
                 {
                     Monitor.Wait(m_Lock);
+                    if (m_RequestQuit)
+                        return;
                     request = m_Request;
                 }
 
                 try
                 {
-                    switch (request)
-                    {
-                        case Executing.None:
-                            continue;
-                        case Executing.Quit:
-                            return;
-                        case Executing.Instruction:
-                            m_Debugger.NextInstruction();
-                            break;
-                        case Executing.Statement:
-                            m_Debugger.NextStatement();
-                            break;
-                        case Executing.Procedure:
-                            m_Debugger.NextProcedure(m_Token);
-                            break;
-                        case Executing.Frame:
-                            m_Debugger.JumpOut(m_Token);
-                            break;
-                        case Executing.All:
-                            m_Debugger.Run(m_Token);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    m_Debugger.Next(request);
                 }
                 catch (HaltException)
                 {

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Threading;
 using Assembler;
 
 namespace AssemblerGui
@@ -40,8 +37,13 @@ namespace AssemblerGui
 
         protected override bool ExpansionDebug => true;
 
-        private void Advance()
+        private bool Advance(ref int lease)
         {
+            if (lease == 0)
+                return false;
+            if (lease > 0)
+                lease--;
+
             var old = CPU.PC;
             var res = Instructions[CPU.PC].Execute(CPU);
             if (res == null)
@@ -54,66 +56,31 @@ namespace AssemblerGui
                 CPU.PC += res.Position + 1;
             if (old == CPU.PC)
                 throw new HaltException();
+
+            return true;
         }
 
-        private bool AdvanceStatement()
+        public void Next(PauseCriterion criterion)
         {
-            var pos = Source;
-            while (pos == Source)
-                Advance();
-            return m_BreakPoints.Contains(Source);
+            var lease = -1;
+            Next(ref lease, criterion);
         }
 
-        public void NextInstruction()
+        public void Next(ref int lease, PauseCriterion criterion)
         {
-            Advance();
-            OnPause?.Invoke();
-        }
-
-        public void NextStatement()
-        {
-            AdvanceStatement();
-            OnPause?.Invoke();
-        }
-
-        public void NextProcedure(CancellationToken cancel)
-        {
-            var pos = Lines[CPU.PC];
-            var lines = File.ReadAllLines(pos.FilePath);
-            if (pos.Line > lines.Length ||
-                !lines[pos.Line - 1].TrimStart().StartsWith("CALL", true, CultureInfo.InvariantCulture))
-                AdvanceStatement();
-            else
+            while (true)
             {
-                var l = pos.Line + 1;
-                while (lines[pos.Line - 1].TrimStart().StartsWith(";", true, CultureInfo.InvariantCulture))
-                    l++;
-
-                var pox = new SourcePosition(pos.FilePath, l);
-
-                while (!cancel.IsCancellationRequested &&
-                       pox != Source)
-                    if (AdvanceStatement())
+                var old = Source;
+                if (Advance(ref lease))
+                    criterion.NotifyInstruction();
+                if (!Source.Equals(old))
+                    if (m_BreakPoints.Contains(Source))
                         break;
+                if (criterion.ShouldPause(CPU, Source))
+                    break;
+                if (lease == 0)
+                    return;
             }
-            OnPause?.Invoke();
-        }
-
-        public void JumpOut(CancellationToken cancel)
-        {
-            var bp = CPU.Ram[CPU.Ram[0xfe]];
-            while (!cancel.IsCancellationRequested &&
-                   bp != CPU.Ram[0xfe])
-                if (AdvanceStatement())
-                    break;
-            OnPause?.Invoke();
-        }
-
-        public void Run(CancellationToken cancel)
-        {
-            while (!cancel.IsCancellationRequested)
-                if (AdvanceStatement())
-                    break;
             OnPause?.Invoke();
         }
     }

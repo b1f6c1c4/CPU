@@ -28,10 +28,6 @@ namespace Assembler
         }
 
         public bool Equals(SourcePosition other) => FilePath == other.FilePath && Line == other.Line;
-
-        public static bool operator ==(SourcePosition x, SourcePosition y) => x.Equals(y);
-
-        public static bool operator !=(SourcePosition x, SourcePosition y) => !x.Equals(y);
     }
 
     public abstract class AsmProgBase
