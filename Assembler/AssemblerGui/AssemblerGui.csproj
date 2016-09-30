@@ -85,6 +85,7 @@
     <Compile Include="FrmMain.Debugger.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="PauseCriterion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FrmHelp.resx">

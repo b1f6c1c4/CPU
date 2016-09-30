@@ -35,7 +35,20 @@ namespace AssemblerGui
 
         public new Control ActiveControl => m_Scintilla;
 
-        public string Value { get { return m_Scintilla.Text; } set { m_Scintilla.Text = value; } }
+        public string Value
+        {
+            get
+            {
+                return m_Scintilla.Text;
+            }
+            set
+            {
+                var t = m_Scintilla.CurrentLine;
+                m_Scintilla.Text = value;
+                if (m_Scintilla.Lines.Count > t)
+                    m_Scintilla.GotoPosition(m_Scintilla.Lines[t].Position);
+            }
+        }
 
         private int m_LineNumberLength;
 
@@ -195,7 +208,12 @@ namespace AssemblerGui
                 ReloadDoc();
             }
             else if (force)
+            {
+                var t = m_Scintilla.CurrentLine;
                 ReloadDoc();
+                if (m_Scintilla.Lines.Count > t)
+                    m_Scintilla.GotoPosition(m_Scintilla.Lines[t].Position);
+            }
 
             if (!line.HasValue)
                 return;

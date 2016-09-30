@@ -101,7 +101,7 @@ namespace AssemblerGui
                     }
                     catch (AssemblyException e)
                     {
-                        MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         OpenFile(e.FilePath, e.Line, e.CharPos);
                         return false;
                     }
@@ -132,7 +132,7 @@ namespace AssemblerGui
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
@@ -179,7 +179,7 @@ namespace AssemblerGui
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(
-                                        e.ToString().Replace(tmp, TheEditor.FilePath),
+                                        e.Message.Replace(tmp, TheEditor.FilePath),
                                         "错误",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
@@ -196,7 +196,7 @@ namespace AssemblerGui
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -246,7 +246,7 @@ namespace AssemblerGui
             ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
 
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
+            ExportFile(new AsmFinalPrettifier(), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e) => Cycle(new AsmPrettifier());
 

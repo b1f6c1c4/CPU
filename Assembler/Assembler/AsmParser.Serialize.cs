@@ -38,7 +38,8 @@ namespace Assembler
             public int Serialize(SymbolResolver symbols) =>
                 Debug != null ? new int() : GetInst().Serialize(symbols);
 
-            public string Prettify() => (Debug != null ? "#   " : "    ") + GetInst().Prettify();
+            public string Prettify(SymbolResolver symbols) =>
+                (Debug != null && symbols == null ? "#   " : "    ") + GetInst().Prettify(symbols);
         }
 
         public sealed partial class TypeRContext : IInstruction
@@ -52,7 +53,7 @@ namespace Assembler
                 return (op << 12) | (rs << 10) | (rt << 8) | (rd << 6);
             }
 
-            public string Prettify() =>
+            public string Prettify(SymbolResolver symbols) =>
                 $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rd)}, R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}";
 
             private static int GetOpcode(string text)
@@ -95,13 +96,15 @@ namespace Assembler
                     throw new InvalidOperationException();
                 if (obj() != null &&
                     (imm > 0x7f || imm < -0x80))
-                    throw new ApplicationException($"BEQ/BNE at line {Op.Line} jump too long ({imm}); use JMP");
+                    throw new ApplicationException($"BEQ/BNE jumps too long ({imm}); use JMP");
                 return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
-            public string Prettify() =>
+            public string Prettify(SymbolResolver symbols) =>
                 obj() != null
-                    ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {obj().GetText()}"
+                    ? symbols == null
+                          ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {obj().GetText()}"
+                          : $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, 0x{(obj().Serialize(symbols, true) & 0xff):x2}"
                     : $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rt)}, R{RegisterNumber(Rs)}, {number().GetText()}";
 
             private static int GetOpcode(string text)
@@ -137,8 +140,10 @@ namespace Assembler
                 return (op << 12) | (imm & 0xfff);
             }
 
-            public string Prettify() =>
-                $"{Op.Text.ToUpper().PadRight(4)} {obj().GetText()}";
+            public string Prettify(SymbolResolver symbols) =>
+                symbols == null
+                    ? $"{Op.Text.ToUpper().PadRight(4)} {obj().GetText()}"
+                    : $"{Op.Text.ToUpper().PadRight(4)} 0x{(obj().Serialize(symbols, true) & 0xfff):x3}";
 
             private static int GetOpcode(string text)
             {
@@ -169,7 +174,7 @@ namespace Assembler
                 }
             }
 
-            public string Prettify()
+            public string Prettify(SymbolResolver symbols)
             {
                 switch (Op.Text.ToUpper())
                 {

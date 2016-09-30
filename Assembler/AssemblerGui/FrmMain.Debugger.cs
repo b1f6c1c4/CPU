@@ -88,7 +88,7 @@ namespace AssemblerGui
             }
             catch (AssemblyException e)
             {
-                MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 OpenFile(e.FilePath, e.Line, e.CharPos);
                 return;
             }
@@ -103,7 +103,7 @@ namespace AssemblerGui
                                    e =>
                                    {
                                        OnExited?.Invoke();
-                                       MessageBox.Show(e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                       MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                        var ee = e as AssemblyException;
                                        if (ee == null)
                                            return;
@@ -225,16 +225,16 @@ namespace AssemblerGui
             StopDebugger();
 
         private void 逐指令IToolStripMenuItem_Click(object sender, EventArgs e) =>
-            RunDebugger(d => d.NextInstruction());
+            RunDebugger(d => d.NextInstruction(20));
 
         private void 逐语句SToolStripMenuItem_Click(object sender, EventArgs e) =>
-            RunDebugger(d => d.NextStatement());
+            RunDebugger(d => d.NextStatement(20));
 
         private void 逐过程OToolStripMenuItem_Click(object sender, EventArgs e) =>
-            RunDebugger(d => d.NextProcedure());
+            RunDebugger(d => d.NextProcedure(20));
 
         private void 跳出JToolStripMenuItem_Click(object sender, EventArgs e) =>
-            RunDebugger(d => d.JumpOut());
+            RunDebugger(d => d.JumpOut(20));
 
         private void 暂停PToolStripMenuItem_Click(object sender, EventArgs e) =>
             m_Debugger.Pause();

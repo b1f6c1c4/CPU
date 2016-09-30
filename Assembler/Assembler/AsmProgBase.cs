@@ -28,10 +28,6 @@ namespace Assembler
         }
 
         public bool Equals(SourcePosition other) => FilePath == other.FilePath && Line == other.Line;
-
-        public static bool operator ==(SourcePosition x, SourcePosition y) => x.Equals(y);
-
-        public static bool operator !=(SourcePosition x, SourcePosition y) => !x.Equals(y);
     }
 
     public abstract class AsmProgBase
@@ -101,7 +97,7 @@ namespace Assembler
             }
         }
 
-        public abstract void Done();
+        public virtual void Done() { }
 
         protected virtual void Parse(AsmParser.LineContext context, string filename, int diff = 0)
         {
@@ -144,12 +140,21 @@ namespace Assembler
         {
             int pos;
             if (!Symbols.TryGetValue(MakeUniqueSymbol(symbol, m_Filenames[now]), out pos))
-                throw new AssemblyException($"Symbol {symbol} not found.")
+                throw new AssemblyException($"ÕÒ²»µ½·ûºÅ¡°{symbol}¡±")
                           {
                               FilePath = Lines[now].FilePath,
                               Line = Lines[now].Line
                           };
             return pos;
+        }
+
+        protected int GetSymbol(int now, string symbol, bool isAbs)
+        {
+            var pos = GetSymbolPos(now, symbol);
+
+            if (isAbs)
+                return pos;
+            return pos - (now + 1);
         }
     }
 }
