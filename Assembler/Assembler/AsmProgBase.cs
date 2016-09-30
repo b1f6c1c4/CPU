@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
@@ -140,7 +140,7 @@ namespace Assembler
         {
             int pos;
             if (!Symbols.TryGetValue(MakeUniqueSymbol(symbol, m_Filenames[now]), out pos))
-                throw new AssemblyException($"’“≤ªµΩ∑˚∫≈°∞{symbol}°±")
+                throw new AssemblyException($"Êâæ‰∏çÂà∞Á¨¶Âè∑‚Äú{symbol}‚Äù")
                           {
                               FilePath = Lines[now].FilePath,
                               Line = Lines[now].Line

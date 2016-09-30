@@ -254,6 +254,7 @@ namespace AssemblerGui
             var v = TryParse((string)dataGridView1.Rows[e.RowIndex].Cells[1].Value);
             // ReSharper disable once PossibleInvalidOperationException
             m_RawDebugger.CPU.Ram[e.RowIndex] = (byte)v.Value;
+            dataGridView1.Rows[e.RowIndex].Cells[1].Value = $"0x{(byte)v.Value:x2}";
         }
     }
 }

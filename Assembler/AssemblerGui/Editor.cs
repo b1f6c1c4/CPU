@@ -37,10 +37,7 @@ namespace AssemblerGui
 
         public string Value
         {
-            get
-            {
-                return m_Scintilla.Text;
-            }
+            get { return m_Scintilla.Text; }
             set
             {
                 var t = m_Scintilla.CurrentLine;
