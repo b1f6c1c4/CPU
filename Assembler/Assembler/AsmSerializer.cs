@@ -20,7 +20,7 @@ namespace Assembler
                 }
                 catch (Exception e)
                 {
-                    throw new AssemblyException("Serializer error", e)
+                    throw new AssemblyException(e.Message, e)
                               {
                                   FilePath = Lines[i].FilePath,
                                   Line = Lines[i].Line
