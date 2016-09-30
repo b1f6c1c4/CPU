@@ -7,7 +7,7 @@ using NDesk.Options;
 
 namespace AssemblerCli
 {
-    internal class Program
+    internal static class Program
     {
         private static void ShowHelp(OptionSet opt)
         {
@@ -24,7 +24,9 @@ namespace AssemblerCli
             string fout = null;
             var run = false;
             var prettify = false;
+            var final = false;
             var expand = false;
+            var noComment = false;
             var debug = false;
             var isHex = false;
             var help = false;
@@ -36,6 +38,11 @@ namespace AssemblerCli
                         { "r|run", "don't assembly, just run", v => run = v != null },
                         { "n|no-halt", "don't append HALT after each file", v => noHalt = v != null },
                         { "p|prettify", "don't assembly, prettify asm", v => prettify = v != null },
+                        { "no-comment", "when prettify, remove comments", v => noComment = v != null },
+                        {
+                            "f|final", "when prettify, remove labels, remove comments, expand macros",
+                            v => final = v != null
+                        },
                         { "e|expand", "when prettify, expand macros", v => expand = v != null },
                         { "d|debug", "pause at every symbol to debug", v => debug = v != null },
                         { "o|output=", "output {FILE}", v => fout = v },
@@ -67,6 +74,12 @@ namespace AssemblerCli
 
                 if (expand && !prettify)
                     throw new ApplicationException("cann't expand macros without --prettify");
+
+                if (noComment && !prettify)
+                    throw new ApplicationException("cann't remove comments without --prettify");
+
+                if (final && !prettify)
+                    throw new ApplicationException("cann't final prettify without --prettify");
 
                 if (run && !string.IsNullOrEmpty(fout))
                     throw new ApplicationException("cann't run with --output");
@@ -132,7 +145,10 @@ namespace AssemblerCli
                     {
                         AsmProgBase asm;
                         if (prettify)
-                            asm = new AsmPrettifier(expand);
+                            if (final)
+                                asm = new AsmFinalPrettifier();
+                            else
+                                asm = new AsmPrettifier(!noComment, expand);
                         else if (isHex)
                             asm = new HexAssembler();
                         else if (sout.Equals(Console.Out))

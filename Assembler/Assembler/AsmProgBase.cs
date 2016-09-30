@@ -101,7 +101,7 @@ namespace Assembler
             }
         }
 
-        public abstract void Done();
+        public virtual void Done() { }
 
         protected virtual void Parse(AsmParser.LineContext context, string filename, int diff = 0)
         {
@@ -150,6 +150,15 @@ namespace Assembler
                               Line = Lines[now].Line
                           };
             return pos;
+        }
+
+        protected int GetSymbol(int now, string symbol, bool isAbs)
+        {
+            var pos = GetSymbolPos(now, symbol);
+
+            if (isAbs)
+                return pos;
+            return pos - (now + 1);
         }
     }
 }

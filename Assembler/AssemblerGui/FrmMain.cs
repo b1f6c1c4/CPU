@@ -246,7 +246,7 @@ namespace AssemblerGui
             ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
 
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new AsmPrettifier(true), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
+            ExportFile(new AsmFinalPrettifier(), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e) => Cycle(new AsmPrettifier());
 

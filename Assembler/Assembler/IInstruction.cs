@@ -13,6 +13,6 @@ namespace Assembler
     {
         int Serialize(SymbolResolver resolver);
 
-        string Prettify();
+        string Prettify(SymbolResolver symbols);
     }
 }

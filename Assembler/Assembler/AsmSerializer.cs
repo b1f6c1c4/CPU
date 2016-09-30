@@ -17,14 +17,5 @@
         protected abstract void Put(int res);
 
         protected virtual void PutFinal() { }
-
-        private int GetSymbol(int now, string symbol, bool isAbs)
-        {
-            var pos = GetSymbolPos(now, symbol);
-
-            if (isAbs)
-                return pos;
-            return pos - (now + 1);
-        }
     }
 }

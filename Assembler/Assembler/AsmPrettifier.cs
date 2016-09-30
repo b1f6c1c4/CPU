@@ -6,8 +6,14 @@ namespace Assembler
     {
         private TextWriter m_Writer;
         private readonly bool m_ExpandMacro;
+        private readonly bool m_IncludeComment;
 
-        public AsmPrettifier(bool expandMacro = false) { m_ExpandMacro = expandMacro; }
+        public AsmPrettifier(bool includeComment = true, bool expandMacro = false)
+        {
+            m_IncludeComment = includeComment;
+            m_ExpandMacro = expandMacro;
+        }
+
         public void SetWriter(TextWriter writer) => m_Writer = writer;
 
         protected override void Parse(AsmParser.LineContext context, string filename, int diff = 0)
@@ -17,11 +23,12 @@ namespace Assembler
 
             string str = null;
             if (context.instruction() != null)
-                str = context.instruction().Prettify();
-            else if (context.macro() != null)
+                str = context.instruction().Prettify(null);
+            else if (context.macro() != null &&
+                     (!m_ExpandMacro || m_IncludeComment))
                 str = (m_ExpandMacro ? ";" : "") + context.macro().Prettify();
 
-            if (context.Comment() != null)
+            if (m_IncludeComment && context.Comment() != null)
                 m_Writer.WriteLine((str?.PadRight(24) ?? "    ") + context.Comment().Symbol.Text);
             else if (str != null)
                 m_Writer.WriteLine(str);
@@ -31,10 +38,27 @@ namespace Assembler
                 return;
 
             foreach (var inst in context.macro().Flatten(ExpansionDebug))
-                m_Writer.WriteLine(inst.Prettify());
+                m_Writer.WriteLine(inst.Prettify(null));
         }
 
-        public override void Done() { }
+        protected override bool ExpansionDebug => true;
+    }
+
+    public class AsmFinalPrettifier : AsmProgBase, IWriter
+    {
+        private TextWriter m_Writer;
+
+        public void SetWriter(TextWriter writer) => m_Writer = writer;
+
+        public override void Done()
+        {
+            for (var i = 0; i < Instructions.Count; i++)
+            {
+                var inst = Instructions[i];
+                var i1 = i;
+                m_Writer.WriteLine(inst.Prettify((s, a) => GetSymbol(i1, s, a)));
+            }
+        }
 
         protected override bool ExpansionDebug => true;
     }
