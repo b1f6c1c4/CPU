@@ -1,3 +1,5 @@
+    ; REQUIRE: FATAL
+    ;
     ; Operator List
     ; =============
     ; 0x00  Unary Plus
@@ -16,6 +18,7 @@
     ; 0x0d  Less Than
     ; 0x0e  Equal To
     ; 0x0f  OK
+    ; 0x10  Greater Than
     ;
     ; Precedence_EXPEVA
     ; arg[1]: A
@@ -47,6 +50,12 @@ gpre:
     ANDI R1, R1, 0x00
     LW   R2, R1, 0xfe
     LW   R0, R2, 0x03
+    ; if !(arg[0] <= 0x10) throw
+    ADDI R3, R1, 0x11
+    SLT  R3, R0, R3
+    BNE  R3, R1, ok
+    JMP  FATAL
+ok:
     PUSH R0
     ADDPC
     JMP  gpre_UnaryPlus
@@ -65,11 +74,12 @@ gpre:
     JMP  gpre_LessThan
     JMP  gpre_EqualTo
     JMP  gpre_OK
+    JMP  gpre_GreaterThan
 gpre_OK:
 gpre_LeftParenthesis:
 gpre_RightParenthesis:
     ADDI R0, R1, 0
-    RET
+    JMP  gpre_done
 gpre_BitwiseOr:
     ADDI R0, R1, 30
     JMP  gpre_done
@@ -83,6 +93,7 @@ gpre_EqualTo:
     ADDI R0, R1, 60
     JMP  gpre_done
 gpre_LessThan:
+gpre_GreaterThan:
     ADDI R0, R1, 70
     JMP  gpre_done
 gpre_Plus:

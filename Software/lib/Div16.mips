@@ -1,3 +1,4 @@
+    ; REQUIRE: FATAL
     ;include AddSub16.mips
     ;include Comp16.mips
     ;include Shift.mips
@@ -23,6 +24,14 @@ Div16p:
     SW   R3, R1, 0xff
     ; dr = *arg[1]
     LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    LW   R3, R0, 0x01
+    LW   R0, R0, 0x00
+    OR   R0, R3, R0
+    BNE  R3, R1, ok
+    JMP  FATAL
+ok:
+    LW   R3, R1, 0xff
     LW   R0, R2, 0x04
     LW   R0, R0, 0x00
     SW   R0, R3, 0x06

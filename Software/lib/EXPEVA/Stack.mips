@@ -1,9 +1,16 @@
+    ; REQUIRE: FATAL
 Allocate_number_EXPEVA:
     PUSH BP
     ANDI R1, R1, 0x00
     ; n_sp += 2
     LW   R3, R1, 0x09
     ADDI R3, R3, 0x02
+    ; if n_sp > 0x50 throw
+    ADDI R0, R1, 0x50
+    SLT  R0, R0, R3
+    BEQ  R0, R1, ok_Allocate_number_EXPEVA
+    JMP  FATAL
+ok_Allocate_number_EXPEVA:
     SW   R3, R1, 0x09
     RET
 Free_number_EXPEVA:
@@ -12,6 +19,12 @@ Free_number_EXPEVA:
     ; n_sp -= 2
     LW   R3, R1, 0x09
     ADDI R3, R3, 0xfe
+    ; if n_sp < 0x10 throw
+    ADDI R0, R1, 0x10
+    SLT  R0, R3, R0
+    BEQ  R0, R1, ok_Free_number_EXPEVA
+    JMP  FATAL
+ok_Free_number_EXPEVA:
     SW   R3, R1, 0x09
     RET
 Push_operator_EXPEVA:
@@ -24,6 +37,12 @@ Push_operator_EXPEVA:
     SW   R0, R3, 0x00
     ; o_sp += 1
     ADDI R3, R3, 0x01
+    ; if o_sp > 0x80 throw
+    ADDI R0, R1, 0x80
+    SLT  R0, R0, R3
+    BEQ  R0, R1, ok_Push_operator_EXPEVA
+    JMP  FATAL
+ok_Push_operator_EXPEVA:
     SW   R3, R1, 0x0a
     RET
 Pop_operator_EXPEVA:
@@ -32,6 +51,12 @@ Pop_operator_EXPEVA:
     ; o_sp -= 1
     LW   R3, R1, 0x0a
     ADDI R3, R3, 0xff
+    ; if o_sp < 0x50 throw
+    ADDI R0, R1, 0x50
+    SLT  R0, R3, R0
+    BEQ  R0, R1, ok_Pop_operator_EXPEVA
+    JMP  FATAL
+ok_Pop_operator_EXPEVA:
     SW   R3, R1, 0x0a
     LW   R0, R3, 0x00
     RET

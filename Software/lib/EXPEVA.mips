@@ -47,24 +47,3 @@ Top_EXPEVA:
     LW   R0, R3, -1
     SW   R0, R2, 0x04
     RET
-    ; Back_EXPEVA: Remove last digit
-    ; return: 0 is succeed
-Back_EXPEVA:
-    PUSH BP
-    ANDI R1, R1, 0x00
-    LW   R0, R1, 0x0b
-    BNE  R0, R1, not_fail_Back_EXPEVA
-    JMP  FATAL
-not_fail_Back_EXPEVA:
-    ADDI R0, R1, 0
-    PUSH R0
-    ADDI R0, R1, 10
-    PUSH R0
-    LW   R3, R1, 0xff
-    LW   R0, R1, 0x09
-    ADDI R0, R0, 0xfe
-    PUSH R0
-    PUSH R3
-    CALL Div16p
-    ANDI R0, R0, 0x00
-    RET
