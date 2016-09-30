@@ -1,0 +1,70 @@
+    ; Comp16p: 16bit Unsigned Comparer
+    ; arg[1]: &b
+    ; arg[0]: &a
+    ; return: a < b ? 0xff : a == b ? 0x00 : 0x01
+Comp16p:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
+    LW   R3, R2, 0x04
+    LW   R3, R3, 0x01   ; R3 = *(&b)_H
+    SLT  R2, R0, R3
+    BNE  R2, R1, u_lt
+    SLT  R2, R3, R0
+    BNE  R2, R1, u_gt
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x00   ; R0 = *(&a)_L
+    LW   R3, R2, 0x04
+    LW   R3, R3, 0x00   ; R3 = *(&b)_L
+    SLT  R2, R0, R3
+    BNE  R2, R1, u_lt
+    SLT  R2, R3, R0
+    BNE  R2, R1, u_gt
+u_eq:
+    ANDI R0, R0, 0x00
+    RET
+u_lt:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0xff
+    RET
+u_gt:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0x01
+    RET
+    ; Comp16ps: 16bit Signed Comparer
+    ; arg[1]: &b
+    ; arg[0]: &a
+    ; return: a < b ? 0xff : a == b ? 0x00 : 0x01
+Comp16ps:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R0, R0, 0x01   ; R0 = *(&a)_H
+    LW   R3, R2, 0x04
+    LW   R3, R3, 0x01   ; R3 = *(&b)_H
+    ANDI R0, R0, 0x80
+    ANDI R3, R3, 0x80
+    BEQ  R0, R1, pos_a
+    BEQ  R3, R1, s_lt
+    JMP  direct
+pos_a:
+    BNE  R3, R1, s_gt
+direct:
+    LW   R0, R2, 0x04
+    PUSH R0
+    LW   R0, R2, 0x03
+    PUSH R0
+    CALL Comp16p
+    RET
+s_lt:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0xff
+    RET
+s_gt:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0x01
+    RET

@@ -1,0 +1,52 @@
+    ; Shift16p: 16bit Left Shifter
+    ; arg[1]: &x -> x << a
+    ; arg[0]: a -> 0
+Shift16p:
+    PUSH BP
+    ANDI R1, R1, 0x00
+s16_loop:
+    LW   R2, R1, 0xfe
+    LW   R3, R2, 0x03
+    BEQ  R3, R1, s16_done
+    LW   R3, R2, 0x04
+    LW   R0, R3, 0x00
+    ADD  R0, R0, R0
+    SW   R0, R3, 0x00
+    LW   R0, R3, 0x01
+    ADDC R0, R0, R0
+    SW   R0, R3, 0x01
+    LW   R0, R2, 0x03
+    ADDI R0, R0, 0xff
+    SW   R0, R2, 0x03
+    JMP  s16_loop
+s16_done:
+    RET
+    ; Shift32p: 32bit Left Shifter
+    ; arg[1]: &x -> x << a
+    ; arg[0]: a -> 0
+Shift32p:
+    PUSH BP
+    ANDI R1, R1, 0x00
+s32_loop:
+    LW   R2, R1, 0xfe
+    LW   R3, R2, 0x03
+    BEQ  R3, R1, s32_done
+    LW   R3, R2, 0x04
+    LW   R0, R3, 0x00
+    ADD  R0, R0, R0
+    SW   R0, R3, 0x00
+    LW   R0, R3, 0x01
+    ADDC R0, R0, R0
+    SW   R0, R3, 0x01
+    LW   R0, R3, 0x02
+    ADDC R0, R0, R0
+    SW   R0, R3, 0x02
+    LW   R0, R3, 0x03
+    ADDC R0, R0, R0
+    SW   R0, R3, 0x03
+    LW   R0, R2, 0x03
+    ADDI R0, R0, 0xff
+    SW   R0, R2, 0x03
+    JMP  s16_loop
+s32_done:
+    RET

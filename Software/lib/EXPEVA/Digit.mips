@@ -1,0 +1,73 @@
+; REQUIRE: FATAL
+    ;include Stack.mips
+    ; Digit_EXPEVA: Push one digit or create number
+    ; arg[0]: digit
+Digit_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R0, R1, 0x0c
+    BEQ  R0, R1, after_clear_Digit_EXPEVA
+    CALL Free_number_EXPEVA
+    SW   R1, R1, 0x0b
+    SW   R1, R1, 0x0c
+after_clear_Digit_EXPEVA:
+    LW   R0, R1, 0x0b
+    BEQ  R0, R1, create_Digit_EXPEVA
+    ADDI R0, R1, 0
+    PUSH R0
+    ADDI R0, R1, 10
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R3
+    PUSH R0
+    CALL Mult16ps
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 4
+    SW   R3, R1, 0xff
+    ADDI R0, R1, 0
+    PUSH R0
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R0
+    PUSH R3
+    CALL Add16p
+    JMP  done_Digit_EXPEVA
+create_Digit_EXPEVA:
+    CALL Allocate_number_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    LW   R2, R1, 0x09
+    SW   R1, R2, -1
+    SW   R0, R2, -2
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x0b
+done_Digit_EXPEVA:
+    RET
+    ; Back_EXPEVA: Remove last digit
+Back_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R0, R1, 0x0b
+    BNE  R0, R1, ok_Back_EXPEVA
+    JMP  FATAL
+ok_Back_EXPEVA:
+    ADDI R0, R1, 0
+    PUSH R0
+    ADDI R0, R1, 10
+    PUSH R0
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x09
+    ADDI R0, R0, 0xfe
+    PUSH R0
+    PUSH R3
+    CALL Div16p
+    ANDI R0, R0, 0x00
+    RET

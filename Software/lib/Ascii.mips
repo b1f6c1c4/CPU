@@ -1,0 +1,110 @@
+    ;include External.mips
+    ;include Div16.mips
+    ; SendNumber: Send signed arg[1..0] in ascii decimal
+SendNumber:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; sp+11 = 5 --> 0
+    ; sp+10..9 = |quo|
+    ; sp+8..7 = 0x000a / rem
+    ; sp+6..2 = result
+    ; sp+1 = sp+7
+    ; sp   = sp+9
+    ;
+    ; sp -= 12
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -12
+    SW   R3, R1, 0xff
+    ; sp+10..9 = |quo|
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x04
+    ANDI R0, R0, 0x80
+    BNE  R0, R1, inv_quo
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x09
+    LW   R0, R2, 0x04
+    SW   R0, R3, 0x0a
+    JMP  done_quo
+inv_quo:
+    ADDI R0, R1, 0x2d   ; '-'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R3, R1, 0xff
+    LW   R0, R2, 0x03
+    SUB  R0, R1, R0
+    SW   R0, R3, 0x09
+    LW   R0, R2, 0x04
+    SUBC R0, R1, R0
+    SW   R0, R3, 0x0a
+done_quo:
+    ; sp+1 = sp+7
+    ADDI R0, R3, 0x07
+    SW   R0, R3, 0x01
+    ; sp   = sp+9
+    ADDI R0, R3, 0x09
+    SW   R0, R3, 0x00
+    ; sp+11 = 5
+    ADDI R0, R1, 0x05
+    SW   R0, R3, 0x0b
+loop_div_send_number:
+    LW   R0, R3, 0x0b
+    BEQ  R0, R1, done_div_send_number
+    ; sp+8..7 = 0x000a
+    ADDI R0, R1, 0x0a
+    SW   R0, R3, 0x07
+    SW   R1, R3, 0x08
+    ; divide
+    CALL Div16p
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ; sp+*(sp+11)+1 = *(sp+7)_L
+    LW   R2, R3, 0x0b
+    ADD  R2, R2, R3
+    LW   R0, R3, 0x07
+    SW   R0, R2, 0x01
+    ; sp+11 -= 1
+    LW   R0, R3, 0x0b
+    ADDI R0, R0, 0xff
+    SW   R0, R3, 0x0b
+    JMP  loop_div_send_number
+done_div_send_number:
+    ; sp+1 = 1
+    ADDI R0, R1, 0x01
+    SW   R0, R3, 0x01
+    ; sp+11 = 5
+    ADDI R0, R1, 0x05
+    SW   R0, R3, 0x0b
+loop_send_send_number:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x0b
+    BEQ  R0, R1, done_send_number
+    ; R0 = *(sp+7-*(sp+11))
+    LW   R0, R3, 0x0b
+    SUB  R0, R3, R0
+    LW   R0, R0, 0x07
+    ; print if not zero
+    BNE  R0, R1, not_zero_send_number
+    ; print if sp+11 == 1
+    LW   R2, R3, 0x0b
+    ADDI R2, R2, 0xff
+    BEQ  R2, R1, not_zero_send_number
+    ; continue if sp+1 == 1
+    LW   R2, R3, 0x01
+    BNE  R2, R1, after_send_send_number
+not_zero_send_number:
+    SW   R1, R1, 0x01
+    ADDI R0, R0, 0x30   ; '0'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+after_send_send_number:
+    LW   R0, R3, 0x0b
+    ADDI R0, R0, 0xff
+    SW   R0, R3, 0x0b
+    JMP  loop_send_send_number
+done_send_number:
+    RET

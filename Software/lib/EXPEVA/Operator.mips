@@ -1,0 +1,103 @@
+    ; REQUIRE FATAL
+    ;include Stack.mips
+    ; Operator_EXPEVA: Push one operator
+    ; may use binary op for unary op
+Operator_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ; sp -= 1
+    LW   R3, R1, 0xff
+    ADDI R3, R3, 0xff
+    SW   R3, R1, 0xff
+    ; *sp = arg[0]
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R3, 0x00
+    SW   R1, R1, 0x0c
+    LW   R0, R1, 0x0b
+    BNE  R0, R1, parse_Operator_EXPEVA
+    LW   R0, R3, 0x00
+    ADDI R2, R1, 0x02   ; Plus
+    BNE  R0, R2, not_plus_Operator_EXPEVA
+    ADDI R0, R1, 0x00   ; Unary Plus
+    SW   R0, R3, 0x00
+    JMP  push_op_Operator_EXPEVA
+not_plus_Operator_EXPEVA:
+    ADDI R2, R1, 0x03   ; Minus
+    BNE  R0, R2, not_minus_Operator_EXPEVA
+    ADDI R0, R1, 0x01   ; Unary Minus
+    SW   R0, R3, 0x00
+    JMP  push_op_Operator_EXPEVA
+not_minus_Operator_EXPEVA:
+    ADDI R2, R1, 0x00   ; Unary Plus
+    BEQ  R0, R2, push_op_Operator_EXPEVA
+    ADDI R2, R1, 0x01   ; Unary Minus
+    BEQ  R0, R2, push_op_Operator_EXPEVA
+    ADDI R2, R1, 0x07   ; Bit-wise Not
+    BEQ  R0, R2, push_op_Operator_EXPEVA
+    ADDI R2, R1, 0x0b   ; Left Parenthesis
+    BEQ  R0, R2, push_op_Operator_EXPEVA
+    RET
+parse_Operator_EXPEVA:
+    ADDI R2, R1, 0x0b   ; Left Parenthesis
+    BEQ  R0, R2, push_op_Operator_EXPEVA
+flush_Operator_EXPEVA:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R1, 0x0a
+    ADDI R2, R1, 0x50
+    BNE  R0, R2, compare_Operator_EXPEVA
+    LW   R0, R3, 0x00
+    ADDI R2, R1, 0x0c   ; Right Parenthesis
+    BEQ  R0, R2, fail_Operator_EXPEVA
+    ADDI R2, R1, 0x0f   ; OK
+    BNE  R0, R2, push_op_Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    ; if o_sp > 0x50 throw
+    LW   R0, R1, 0x0a
+    ADDI R3, R1, 0x50
+    SLT  R0, R3, R0
+    BEQ  R0, R1, ok_OK_Operator_EXPEVA
+    JMP  FATAL
+ok_OK_Operator_EXPEVA:
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x0c
+    JMP  done_Operator_EXPEVA
+compare_Operator_EXPEVA:
+    LW   R0, R3, 0x00
+    ADDI R2, R1, 0x0c   ; Right Parenthesis
+    BNE  R0, R2, not_rp_at_compare_Operator_EXPEVA
+    ; R0 = *(o_sp-1)
+    LW   R0, R1, 0x0a
+    LW   R0, R0, 0xff
+    ADDI R2, R1, 0x0b   ; Left Parenthesis
+    BNE  R0, R2, evaluate_Operator_EXPEVA
+    CALL Pop_operator_EXPEVA
+    JMP  done_Operator_EXPEVA
+not_rp_at_compare_Operator_EXPEVA:
+    ; R0 = *(o_sp-1)
+    LW   R0, R1, 0x0a
+    LW   R0, R0, 0xff
+    PUSH R0
+    CALL Precedence_EXPEVA
+    POP  R2
+    BEQ  R0, R1, push_op_Operator_EXPEVA
+evaluate_Operator_EXPEVA:
+    ; R0 = *(o_sp-1)
+    LW   R0, R1, 0x0a
+    LW   R0, R0, 0xff
+    PUSH R0
+    CALL Evaluate_EXPEVA
+    POP  R0
+    CALL Pop_operator_EXPEVA
+    JMP  flush_Operator_EXPEVA
+push_op_Operator_EXPEVA:
+    CALL Push_operator_EXPEVA
+    ANDI R1, R1, 0x00
+    SW   R1, R1, 0x0b
+    JMP  done_Operator_EXPEVA
+fail_Operator_EXPEVA:
+    ANDI R0, R0, 0x00
+    ADDI R0, R0, 0x01
+done_Operator_EXPEVA:
+    RET

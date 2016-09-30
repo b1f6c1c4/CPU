@@ -1,0 +1,242 @@
+    ; REQUIRE: FATAL
+    ;include Stack.mips
+    ; Evaluate_EXPEVA
+    ; evaluate operator arg[0] on the stack
+fatal:
+    JMP  FATAL
+Evaluate_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    ; if !(arg[0] <= 0x10) throw
+    ADDI R3, R1, 0x11
+    SLT  R3, R0, R3
+    BEQ  R3, R1, fatal
+    ADDI R3, R1, 0x00   ; Unary Plus
+    BEQ  R0, R3, chk_one
+    ADDI R3, R1, 0x01   ; Unary Minus
+    BEQ  R0, R3, chk_one
+    ADDI R3, R1, 0x07   ; Bit-wise Not
+    BEQ  R0, R3, chk_one
+    ADDI R3, R1, 0x0b   ; Left Parenthesis
+    BEQ  R0, R3, ok
+    ADDI R3, R1, 0x0c   ; Right Parenthesis
+    BEQ  R0, R3, ok
+    ADDI R3, R1, 0x0f   ; OK
+    BEQ  R0, R3, ok
+    ; if n_sp < 0x14 throw
+    LW   R0, R1, 0x09
+    ADDI R3, R1, 0x14
+    SLT  R0, R0, R3
+    BNE  R0, R1, fatal
+    JMP  ok
+chk_one:
+    ; if n_sp < 0x12 throw
+    LW   R0, R1, 0x09
+    ADDI R3, R1, 0x12
+    SLT  R0, R0, R3
+    BNE  R0, R1, fatal
+ok:
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    PUSH R0
+    ADDPC
+    JMP  eval_UnaryPlus
+    JMP  eval_UnaryMinus
+    JMP  eval_Plus
+    JMP  eval_Minus
+    JMP  eval_Multiply
+    JMP  eval_Divide
+    JMP  eval_Reminder
+    JMP  eval_BitwiseNot
+    JMP  eval_BitwiseAnd
+    JMP  eval_BitwiseOr
+    JMP  eval_BitwiseXor
+    JMP  eval_LeftParenthesis
+    JMP  eval_RightParenthesis
+    JMP  eval_LessThan
+    JMP  eval_EqualTo
+    JMP  eval_OK
+    JMP  eval_GreaterThan
+eval_UnaryPlus:
+    JMP  eval_done
+eval_UnaryMinus:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    LW   R0, R2, -2
+    SUB  R0, R1, R0
+    SW   R0, R2, -2
+    LW   R0, R2, -1
+    SUBC R0, R1, R0
+    SW   R0, R2, -1
+    JMP  eval_done
+eval_BitwiseNot:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ORI  R1, R1, 0xff
+    LW   R0, R2, -2
+    SUB  R0, R1, R0
+    SW   R0, R2, -2
+    LW   R0, R2, -1
+    SUB  R0, R1, R0
+    SW   R0, R2, -1
+    JMP  eval_done
+eval_Plus:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -4
+    PUSH R0
+    ADDI R0, R2, -2
+    PUSH R0
+    CALL Add16p
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_Minus:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -4
+    PUSH R0
+    ADDI R0, R2, -2
+    PUSH R0
+    CALL Sub16p
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_Multiply:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
+    PUSH R0
+    CALL Mult16ps
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_Divide:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
+    PUSH R0
+    CALL Div16ps
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_Reminder:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
+    PUSH R0
+    CALL Div16ps
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    LW   R0, R2, -2
+    SW   R0, R2, -4
+    LW   R0, R2, -1
+    SW   R0, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_BitwiseAnd:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    LW   R0, R2, -2
+    LW   R3, R2, -4
+    AND  R0, R0, R3
+    SW   R0, R2, -4
+    LW   R0, R2, -1
+    LW   R3, R2, -3
+    AND  R0, R0, R3
+    SW   R0, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_BitwiseOr:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    LW   R0, R2, -2
+    LW   R3, R2, -4
+    OR   R0, R0, R3
+    SW   R0, R2, -4
+    LW   R0, R2, -1
+    LW   R3, R2, -3
+    OR   R0, R0, R3
+    SW   R0, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_BitwiseXor:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    LW   R0, R2, -2
+    LW   R3, R2, -4
+    AND  R1, R0, R3
+    OR   R0, R0, R3
+    ORI  R3, R3, 0xff
+    SUB  R3, R3, R1
+    AND  R0, R0, R3
+    SW   R0, R2, -4
+    LW   R0, R2, -1
+    LW   R3, R2, -3
+    AND  R1, R0, R3
+    OR   R0, R0, R3
+    ORI  R3, R3, 0xff
+    SUB  R3, R3, R1
+    AND  R0, R0, R3
+    SW   R0, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_LessThan:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
+    PUSH R0
+    CALL Comp16ps
+    ANDI R1, R1, 0x00
+    ADDI R0, R0, 0x01
+    BEQ  R0, R1, eval_LTEQ_yes
+    JMP  eval_LTEQ_no
+eval_EqualTo:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -2
+    PUSH R0
+    ADDI R0, R2, -4
+    PUSH R0
+    CALL Comp16p
+    ANDI R1, R1, 0x00
+    BEQ  R0, R1, eval_LTEQ_yes
+    JMP  eval_LTEQ_no
+eval_GreaterThan:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R2, -4
+    PUSH R0
+    ADDI R0, R2, -2
+    PUSH R0
+    CALL Comp16ps
+    ANDI R1, R1, 0x00
+    ADDI R0, R0, 0x01
+    BEQ  R0, R1, eval_LTEQ_yes
+    JMP  eval_LTEQ_no
+eval_LTEQ_yes:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    ADDI R0, R1, 0x01
+    SW   R0, R2, -4
+    SW   R1, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_LTEQ_no:
+    ANDI R1, R1, 0x00
+    LW   R2, R1, 0x09
+    SW   R1, R2, -4
+    SW   R1, R2, -3
+    CALL Free_number_EXPEVA
+    JMP  eval_done
+eval_LeftParenthesis:
+eval_RightParenthesis:
+eval_OK:
+eval_done:
+    RET

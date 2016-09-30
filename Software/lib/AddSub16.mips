@@ -1,0 +1,40 @@
+    ; Add16p: 16bit Integer Adder
+    ; arg[1] &b -> a + b
+    ; arg[0] &a
+Add16p:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xfe
+    LW   R1, R3, 0x03
+    LW   R2, R1, 0
+    LW   R1, R3, 0x04
+    LW   R0, R1, 0
+    ADD  R0, R0, R2
+    SW   R0, R1, 0
+    LW   R1, R3, 0x03
+    LW   R2, R1, 1
+    LW   R1, R3, 0x04
+    LW   R0, R1, 1
+    ADDC R0, R0, R2
+    SW   R0, R1, 1
+    RET
+    ; Sub16p: 16bit Integer Subber
+    ; arg[1] &b -> b - a
+    ; arg[0] &a
+Sub16p:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xfe
+    LW   R1, R3, 0x03
+    LW   R2, R1, 0
+    LW   R1, R3, 0x04
+    LW   R0, R1, 0
+    SUB  R0, R0, R2
+    SW   R0, R1, 0
+    LW   R1, R3, 0x03
+    LW   R2, R1, 1
+    LW   R1, R3, 0x04
+    LW   R0, R1, 1
+    SUBC R0, R0, R2
+    SW   R0, R1, 1
+    RET

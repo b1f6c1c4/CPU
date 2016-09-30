@@ -1,0 +1,433 @@
+    ;include lib/ReadKey.mips
+    ;include lib/Ascii.mips
+    ;include lib/EXPEVA.mips
+    ;include lib/Delay.mips
+    ; Keys
+    ;|        |  V[3]  |  V[2]  |  V[1]  |  V[0]  |
+    ;|:------:|:------:|:------:|:------:|:------:|
+    ;|  H[3]  |   1    |   2    |   3    |  4 CL  |
+    ;|  H[2]  |   5    |   6    |  7  == |  8  %  |
+    ;|  H[1]  |  9  no |  0  xo |  +  *  |  -  /  |
+    ;|  H[0]  |  AN (  |  OR )  |  <  >  |  = BK  |
+RESET:
+    INIT
+    CALL Init_EXPEVA
+    ; sp+3 is_key
+    ; sp+2 LD (LD[0] is buzz)
+    ; sp+1 (tmp)
+    ; sp+0 (tmp)
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -4
+    SW   R3, R1, 0xff
+    SW   R1, R3, 0x02
+    SW   R1, R1, 0x07   ; set LD
+main:
+    CALL Top_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x00
+    SW   R0, R1, 0x00
+    LW   R0, R3, 0x01
+    SW   R0, R1, 0x01
+    ANDI R0, R0, 0x80
+    BEQ  R0, R1, not_neg
+    LW   R0, R3, 0x02
+    ORI  R0, R0, 0x80
+    SW   R0, R1, 0x07
+    JMP  input_loop
+not_neg:
+    LW   R0, R3, 0x02
+    ANDI R0, R0, 0x7f
+    SW   R0, R1, 0x07
+input_loop:
+    LW   R0, R1, 0x02
+    ADDI R2, R0, 0x01
+    BNE  R2, R1, got_key
+    LW   R0, R1, 0x03
+    BEQ  R0, R1, input_loop
+    SW   R0, R1, 0x03
+    LW   R0, R1, 0x03
+    SW   R0, R1, 0x03
+    JMP  got_uart
+got_key:
+    SW   R0, R1, 0x02
+    SW   R0, R3, 0x00
+    SW   R1, R3, 0x02
+    ADDI R0, R1, 0x01
+    SW   R0, R3, 0x03
+    ADDPC
+    JMP  op_OK          ; 0
+    JMP  op_Minus       ; 1
+    JMP  nm_8           ; 2
+    JMP  nm_4           ; 3
+    JMP  op_LessThan    ; 4
+    JMP  op_Plus        ; 5
+    JMP  nm_7           ; 6
+    JMP  nm_3           ; 7
+    JMP  op_BitwiseOr   ; 8
+    JMP  nm_0           ; 9
+    JMP  nm_6           ; 10
+    JMP  nm_2           ; 11
+    JMP  op_BitwiseAnd  ; 12
+    JMP  nm_9           ; 13
+    JMP  nm_5           ; 14
+    JMP  nm_1           ; 15
+    JMP  ct_Back        ; 16
+    JMP  op_Divide      ; 17
+    JMP  op_Reminder    ; 18
+    JMP  RESET          ; 19
+    JMP  op_GreaterThan ; 20
+    JMP  op_Multiply    ; 21
+    JMP  op_EqualTo     ; 22
+    JMP  main           ; 23
+    JMP  op_RightParenthesis; 24
+    JMP  op_BitwiseXor  ; 25
+    JMP  main           ; 26
+    JMP  main           ; 27
+    JMP  op_LeftParenthesis; 28
+    JMP  op_BitwiseNot  ; 29
+    JMP  main           ; 30
+    JMP  main           ; 31
+got_uart:
+    ANDI R1, R1, 0x00
+    SW   R1, R3, 0x02
+    SW   R1, R3, 0x03
+    ADDI R2, R1, 0x0a   ; LF
+    BNE  R0, R2, not_ok
+    JMP  op_OK
+not_ok:
+    ADDI R2, R1, 0x5e   ; ^
+    BNE  R0, R2, not_xor
+    JMP  op_BitwiseXor
+not_xor:
+    ADDI R2, R1, 0x7c   ; |
+    BNE  R0, R2, not_or
+    JMP  op_BitwiseOr
+not_or:
+    ADDI R2, R1, 0x7e   ; ~
+    BNE  R0, R2, not_not
+    JMP  op_BitwiseNot
+not_not:
+    ADDI R2, R1, 0x20
+    ADDI R0, R0, 0xe0
+    SLT  R2, R0, R2
+    BNE  R2, R1, valid
+    JMP  main
+valid:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    ADDPC
+    JMP  main           ; Space
+    JMP  FATAL          ; !
+    JMP  FATAL          ; "
+    JMP  FATAL          ; #
+    JMP  FATAL          ; $
+    JMP  op_Reminder    ; %
+    JMP  op_BitwiseAnd  ; &
+    JMP  FATAL          ; '
+    JMP  op_LeftParenthesis; (
+    JMP  op_RightParenthesis; )
+    JMP  op_Multiply    ; *
+    JMP  op_Plus        ; +
+    JMP  FATAL          ; ,
+    JMP  op_Minus       ; -
+    JMP  FATAL          ; .
+    JMP  op_Divide      ; /
+    JMP  nm_0           ; 0
+    JMP  nm_1           ; 1
+    JMP  nm_2           ; 2
+    JMP  nm_3           ; 3
+    JMP  nm_4           ; 4
+    JMP  nm_5           ; 5
+    JMP  nm_6           ; 6
+    JMP  nm_7           ; 7
+    JMP  nm_8           ; 8
+    JMP  nm_9           ; 9
+    JMP  FATAL          ; :
+    JMP  FATAL          ; ;
+    JMP  op_LessThan    ; <
+    JMP  op_EqualTo     ; =
+    JMP  op_GreaterThan ; >
+    JMP  FATAL          ; ?
+nm_0:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_1:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 1
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_2:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 2
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_3:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 3
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_4:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 4
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_5:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 5
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_6:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 6
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_7:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 7
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_8:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 8
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+nm_9:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 9
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Digit_EXPEVA
+    JMP  done
+op_Plus:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x02
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Plus
+    JMP  done
+ld_Plus:
+    ADDI R0, R1, 0b01000000
+    SW   R0, R3, 0x02
+    JMP  done
+op_Minus:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x03
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Minus
+    JMP  done
+ld_Minus:
+    ADDI R0, R1, 0b00100000
+    SW   R0, R3, 0x02
+    JMP  done
+op_Multiply:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x04
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_Divide:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x05
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_Reminder:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x06
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_BitwiseNot:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x07
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_BitwiseAnd:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x08
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_And
+    JMP  done
+ld_And:
+    ADDI R0, R1, 0b00010000
+    SW   R0, R3, 0x02
+    JMP  done
+op_BitwiseOr:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x09
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_BitwiseXor:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0a
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_Or
+    JMP  done
+ld_Or:
+    ADDI R0, R1, 0b00001000
+    SW   R0, R3, 0x02
+    JMP  done
+op_LeftParenthesis:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0b
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_RightParenthesis:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0c
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_LessThan:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0d
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x03
+    BNE  R0, R1, ld_LT
+    JMP  done
+ld_LT:
+    ADDI R0, R1, 0b00000100
+    SW   R0, R3, 0x02
+    JMP  done
+op_EqualTo:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0e
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+op_OK:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0f
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    CALL Top_EXPEVA
+    CALL SendNumber
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x0d   ; '\r'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0a   ; '\n'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R0, R3, 0x02
+    SW   R0, R3, 0x00
+    CALL short_beep
+    JMP  done
+op_GreaterThan:
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x10
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
+ct_Back:
+    CALL Back_EXPEVA
+    JMP  done
+done:
+    JMP  main
+short_beep:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R3, R3, -4
+    SW   R3, R1, 0xff
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    ORI  R0, R0, 0x01
+    SW   R0, R1, 0x07
+    ADDI R0, R1, 0x00
+    SW   R0, R3, 0x03
+    ADDI R0, R1, 0x00
+    SW   R0, R3, 0x02
+    ADDI R0, R1, 0x36
+    SW   R0, R3, 0x01
+    ADDI R0, R1, 0x41
+    SW   R0, R3, 0x00
+    CALL Delay
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    LW   R2, R1, 0xfe
+    LW   R0, R2, 0x03
+    SW   R0, R1, 0x07
+    RET
+FATAL:
+    INIT
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x07
+    ADDI R0, R1, 0xb8
+    SW   R0, R1, 0x00
+    ADDI R0, R1, 0x22
+    SW   R0, R1, 0x01
+    ADDI R0, R1, 0x00
+    PUSH R0
+    ADDI R0, R1, 0x15
+    PUSH R0
+    ADDI R0, R1, 0x31
+    PUSH R0
+    ADDI R0, R1, 0x59
+    PUSH R0
+    CALL Delay
+    JMP  RESET

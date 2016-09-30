@@ -1,0 +1,49 @@
+    ; EXPEVA
+    ; REQUIRE: FATAL
+    ;
+    ;include EXPEVA/Precedence.mips
+    ;include EXPEVA/Stack.mips
+    ;include EXPEVA/Evaluate.mips
+    ;include EXPEVA/Operator.mips
+    ;include EXPEVA/Digit.mips
+    ;include AddSub16.mips
+    ;include Mult16.mips
+    ;include Div16.mips
+    ;include Comp16.mips
+    ;
+    ; MEM[0x09] = n_sp (point to the next)
+    ; MEM[0x0a] = o_sp (point to the next)
+    ; MEM[0x0b] = is_number
+    ; MEM[0x0c] = is_after_OK
+    ;
+    ; MEM[0x4f .. 0x10] : numbers (32)
+    ; MEM[0x7f .. 0x50] : operators (48)
+    ;
+    ; Method Implementation
+    ; =====================
+    ; Init_EXPEVA: Stack initialize
+Init_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x12
+    SW   R0, R1, 0x09
+    SW   R1, R1, 0x10
+    SW   R1, R1, 0x11
+    ADDI R0, R1, 0x50
+    SW   R0, R1, 0x0a
+    SW   R1, R1, 0x0b
+    ADDI R0, R1, 0x01
+    SW   R0, R1, 0x0c
+    RET
+    ; Top_EXPEVA: Get top number
+    ; arg[1..0] result
+Top_EXPEVA:
+    PUSH BP
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0x09
+    LW   R2, R1, 0xfe
+    LW   R0, R3, -2
+    SW   R0, R2, 0x03
+    LW   R0, R3, -1
+    SW   R0, R2, 0x04
+    RET

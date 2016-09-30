@@ -1,0 +1,33 @@
+    ;include lib/EXPEVA.mips
+    INIT
+    CALL Init_EXPEVA
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 5
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0d   ; Less Than
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 7
+    PUSH R0
+    CALL Digit_EXPEVA
+    POP  R0
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0f   ; OK
+    PUSH R0
+    CALL Operator_EXPEVA
+    POP  R0
+    PUSH R0
+    PUSH R0
+    CALL Top_EXPEVA
+    ANDI R1, R1, 0x00
+    POP  R0
+    SW   R0, R1, 0x00
+    ANDI R1, R1, 0x00
+    POP  R0
+    SW   R0, R1, 0x01
+halt
