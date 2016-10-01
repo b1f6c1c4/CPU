@@ -16,6 +16,7 @@ Operator_EXPEVA:
     SW   R1, R1, 0x0c
     LW   R0, R1, 0x0b
     BNE  R0, R1, parse_Operator_EXPEVA
+    ; after operator
     LW   R0, R3, 0x00
     ADDI R2, R1, 0x02   ; Plus
     BNE  R0, R2, not_plus_Operator_EXPEVA
@@ -37,8 +38,10 @@ not_minus_Operator_EXPEVA:
     BEQ  R0, R2, push_op_Operator_EXPEVA
     ADDI R2, R1, 0x0b   ; Left Parenthesis
     BEQ  R0, R2, push_op_Operator_EXPEVA
+    JMP  FATAL
     RET
 parse_Operator_EXPEVA:
+    ; after number
     ADDI R2, R1, 0x0b   ; Left Parenthesis
     BEQ  R0, R2, push_op_Operator_EXPEVA
 flush_Operator_EXPEVA:

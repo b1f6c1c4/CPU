@@ -5,10 +5,10 @@
     ; Keys
     ;|        |  V[3]  |  V[2]  |  V[1]  |  V[0]  |
     ;|:------:|:------:|:------:|:------:|:------:|
-    ;|  H[3]  |   1    |   2    |   3    |  4 CL  |
+    ;|  H[3]  |   1    |   2    |  3  BK |  4 CL  |
     ;|  H[2]  |   5    |   6    |  7  == |  8  %  |
     ;|  H[1]  |  9  no |  0  xo |  +  *  |  -  /  |
-    ;|  H[0]  |  AN (  |  OR )  |  <  >  |  = BK  |
+    ;|  H[0]  |  AN (  |  OR )  |  <  >  |    =   |
 RESET:
     INIT
     CALL Init_EXPEVA
@@ -73,14 +73,14 @@ got_key:
     JMP  nm_9           ; 13
     JMP  nm_5           ; 14
     JMP  nm_1           ; 15
-    JMP  ct_Back        ; 16
+    JMP  main           ; 16
     JMP  op_Divide      ; 17
     JMP  op_Reminder    ; 18
     JMP  RESET          ; 19
     JMP  op_GreaterThan ; 20
     JMP  op_Multiply    ; 21
     JMP  op_EqualTo     ; 22
-    JMP  main           ; 23
+    JMP  ct_Back        ; 23
     JMP  op_RightParenthesis; 24
     JMP  op_BitwiseXor  ; 25
     JMP  main           ; 26
@@ -567,6 +567,34 @@ FATAL:
     SW   R0, R1, 0x00
     ADDI R0, R1, 0x22
     SW   R0, R1, 0x01
+    ADDI R0, R1, 0x45   ; 'E'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x52   ; 'R'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x52   ; 'R'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x4f   ; 'O'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x52   ; 'R'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x0d   ; '\r'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
+    ADDI R0, R1, 0x0a   ; 'n'
+    PUSH R0
+    CALL WriteExternal
+    POP  R0
     ADDI R0, R1, 0x00
     PUSH R0
     ADDI R0, R1, 0x15
