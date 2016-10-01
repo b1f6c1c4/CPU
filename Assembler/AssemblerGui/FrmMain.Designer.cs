@@ -45,7 +45,10 @@
             this.格式化代码FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.启用长跳转LToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.启用扩展指令EToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.生成BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.文件末尾自动停机HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
             this.intelHex文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.二进制机器码BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.十六进制机器码HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,7 +70,6 @@
             this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.查看帮助VToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-            this.启用扩展指令EToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -216,9 +218,19 @@
             this.启用长跳转LToolStripMenuItem.Text = "启用长跳转(&L)";
             this.启用长跳转LToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用长跳转LToolStripMenuItem_CheckedChanged);
             // 
+            // 启用扩展指令EToolStripMenuItem
+            // 
+            this.启用扩展指令EToolStripMenuItem.CheckOnClick = true;
+            this.启用扩展指令EToolStripMenuItem.Name = "启用扩展指令EToolStripMenuItem";
+            this.启用扩展指令EToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
+            this.启用扩展指令EToolStripMenuItem.Text = "启用扩展指令(&E)";
+            this.启用扩展指令EToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_CheckedChanged);
+            // 
             // 生成BToolStripMenuItem
             // 
             this.生成BToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.文件末尾自动停机HToolStripMenuItem,
+            this.toolStripMenuItem9,
             this.intelHex文件ToolStripMenuItem,
             this.二进制机器码BToolStripMenuItem,
             this.十六进制机器码HToolStripMenuItem,
@@ -229,6 +241,19 @@
             this.生成BToolStripMenuItem.Name = "生成BToolStripMenuItem";
             this.生成BToolStripMenuItem.Size = new System.Drawing.Size(70, 24);
             this.生成BToolStripMenuItem.Text = "生成(&B)";
+            // 
+            // 文件末尾自动停机HToolStripMenuItem
+            // 
+            this.文件末尾自动停机HToolStripMenuItem.CheckOnClick = true;
+            this.文件末尾自动停机HToolStripMenuItem.Name = "文件末尾自动停机HToolStripMenuItem";
+            this.文件末尾自动停机HToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
+            this.文件末尾自动停机HToolStripMenuItem.Text = "文件末尾自动停机(&H)";
+            this.文件末尾自动停机HToolStripMenuItem.Click += new System.EventHandler(this.文件末尾自动停机HToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem9
+            // 
+            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(242, 6);
             // 
             // intelHex文件ToolStripMenuItem
             // 
@@ -398,14 +423,6 @@
             this.tabControl1.DragDrop += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragDrop);
             this.tabControl1.DragEnter += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragEnter);
             // 
-            // 启用扩展指令EToolStripMenuItem
-            // 
-            this.启用扩展指令EToolStripMenuItem.CheckOnClick = true;
-            this.启用扩展指令EToolStripMenuItem.Name = "启用扩展指令EToolStripMenuItem";
-            this.启用扩展指令EToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
-            this.启用扩展指令EToolStripMenuItem.Text = "启用扩展指令(&E)";
-            this.启用扩展指令EToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_CheckedChanged);
-            // 
             // FrmMain
             // 
             this.AllowDrop = true;
@@ -469,6 +486,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
         private System.Windows.Forms.ToolStripMenuItem 启用长跳转LToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 启用扩展指令EToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 文件末尾自动停机HToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
     }
 }
 

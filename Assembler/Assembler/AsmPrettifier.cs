@@ -29,8 +29,8 @@ namespace Assembler
                      (!m_ExpandMacro || m_IncludeComment))
                 str = (m_ExpandMacro ? ";" : "") + context.Macro.Prettify(null, EnableLongJump);
 
-            if (m_IncludeComment && context.comment != null)
-                m_Writer.WriteLine((str?.PadRight(24) ?? "    ") + context.comment);
+            if (m_IncludeComment && context.TheComment != null)
+                m_Writer.WriteLine((str?.PadRight(24) ?? "    ") + context.TheComment);
             else if (str != null)
                 m_Writer.WriteLine(str);
 

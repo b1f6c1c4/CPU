@@ -19,7 +19,7 @@ namespace Assembler.Frontend
 
         public static string Prettify(this ITypeJContext inst, SymbolResolver symbols, bool enableLongJump) =>
             symbols == null
-                ? $"{inst.Operator.ToUpper().PadRight(4)} {inst.Target}"
+                ? $"{inst.Operator.ToUpper().PadRight(4)} {inst.Target.Prettify()}"
                 : enableLongJump
                       ? $"{inst.Operator.ToUpper().PadRight(4)} 0x{(inst.Target.Serialize(symbols, true) & 0xfff):x3}"
                       : $"{inst.Operator.ToUpper().PadRight(4)} 0x{(inst.Target.Serialize(symbols, true) & 0xff):x2}";

@@ -36,9 +36,9 @@ namespace Assembler.Frontend
         public static string Prettify(this ITypeIContext inst, SymbolResolver symbols, bool enableLongJump) =>
             inst.Target != null
                 ? symbols == null
-                      ? $"{inst.Operator.ToUpper().PadRight(4)} R{inst.RegisterS}, R{inst.RegisterT}, {inst.Target}"
+                      ? $"{inst.Operator.ToUpper().PadRight(4)} R{inst.RegisterS}, R{inst.RegisterT}, {inst.Target.Prettify()}"
                       : $"{inst.Operator.ToUpper().PadRight(4)} R{inst.RegisterS}, R{inst.RegisterT}, 0x{(inst.Target.Serialize(symbols, true) & 0xff):x2}"
-                : $"{inst.Operator.ToUpper().PadRight(4)} R{inst.RegisterT}, R{inst.RegisterS}, {inst.ImmediateNumber}";
+                : $"{inst.Operator.ToUpper().PadRight(4)} R{inst.RegisterT}, R{inst.RegisterS}, {inst.ImmediateNumber.Prettify()}";
 
         private static int GetOpcode(string text)
         {

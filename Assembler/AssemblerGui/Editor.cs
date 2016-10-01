@@ -51,9 +51,6 @@ namespace AssemblerGui
         {
             set
             {
-                if (m_EnableExtension == value)
-                    return;
-
                 m_EnableExtension = value;
                 if (m_EnableExtension)
                 {

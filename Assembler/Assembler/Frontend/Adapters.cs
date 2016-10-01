@@ -19,10 +19,7 @@ namespace Assembler.Frontend
         string Label { get; }
     }
 
-    public interface IInstructionContext : IExecutableInstruction
-    {
-        IExecutableInstruction Inst { get; }
-    }
+    public interface IInstructionContext : IExecutableInstruction { }
 
     public interface ILineContext
     {
@@ -34,7 +31,7 @@ namespace Assembler.Frontend
 
         IMacro Macro { get; }
 
-        string comment { get; }
+        string TheComment { get; }
     }
 
     public static class SemanticHelper
@@ -60,5 +57,11 @@ namespace Assembler.Frontend
                 return symbols(obj.Label, absolute);
             throw new InvalidOperationException();
         }
+
+        public static string Prettify(this INumberContext num) =>
+            num.DecimalForm ?? num.BinaryForm ?? num.HexadecimalForm;
+
+        public static string Prettify(this IObjContext obj) =>
+            obj.Label ?? obj.ImmediateNumber.Prettify();
     }
 }

@@ -58,5 +58,17 @@ namespace AssemblerGui.Properties {
                 this["EnableExtension"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppendHalt {
+            get {
+                return ((bool)(this["AppendHalt"]));
+            }
+            set {
+                this["AppendHalt"] = value;
+            }
+        }
     }
 }

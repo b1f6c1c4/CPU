@@ -28,6 +28,7 @@ namespace AssemblerGui
 
             启用长跳转LToolStripMenuItem.Checked = Settings.Default.EnableLongJump;
             启用扩展指令EToolStripMenuItem.Checked = Settings.Default.EnableExtension;
+            文件末尾自动停机HToolStripMenuItem.Checked = Settings.Default.AppendHalt;
 
             OnStateChanged += UpdateTitle;
             OnStateChanged += ToggleEditorMenus;
@@ -111,7 +112,7 @@ namespace AssemblerGui
                     try
                     {
                         foreach (var p in pre)
-                            asm.Feed(p, true);
+                            asm.Feed(p, Settings.Default.AppendHalt);
                         asm.Done();
                     }
                     catch (AssemblyException e)
@@ -187,6 +188,10 @@ namespace AssemblerGui
                 using (var sw = new StreamWriter(mem))
                 {
                     asm.SetWriter(sw);
+                    if (Settings.Default.EnableExtension)
+                        asm.Frontend = new AntlrExtendedFrontend();
+                    else
+                        asm.Frontend = new AntlrStandardFrontend();
                     try
                     {
                         asm.Feed(tmp, false);
@@ -338,6 +343,12 @@ namespace AssemblerGui
             Settings.Default.EnableExtension = 启用扩展指令EToolStripMenuItem.Checked;
             Settings.Default.Save();
             OnStateChanged?.Invoke();
+        }
+
+        private void 文件末尾自动停机HToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings.Default.AppendHalt = 文件末尾自动停机HToolStripMenuItem.Checked;
+            Settings.Default.Save();
         }
     }
 }

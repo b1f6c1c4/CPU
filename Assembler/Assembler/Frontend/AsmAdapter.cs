@@ -10,20 +10,20 @@ namespace Assembler.Frontend
             string ILineContext.Label => label()?.Name()?.Symbol?.Text;
             IInstructionContext ILineContext.Instruction => instruction();
             IMacro ILineContext.Macro => null;
-            string ILineContext.comment => Comment()?.GetText();
+            string ILineContext.TheComment => Comment()?.GetText();
         }
 
         public sealed partial class NumberContext : INumberContext
         {
-            string INumberContext.DecimalForm => Decimal().Symbol.Text;
-            string INumberContext.BinaryForm => Binary().Symbol.Text;
-            string INumberContext.HexadecimalForm => Hexadecimal().Symbol.Text;
+            string INumberContext.DecimalForm => Decimal()?.Symbol?.Text;
+            string INumberContext.BinaryForm => Binary()?.Symbol?.Text;
+            string INumberContext.HexadecimalForm => Hexadecimal()?.Symbol?.Text;
         }
 
         public sealed partial class ObjContext : IObjContext
         {
             INumberContext IObjContext.ImmediateNumber => number();
-            public string Label => Name().Symbol.Text;
+            public string Label => Name()?.Symbol?.Text;
         }
 
         public sealed partial class InstructionContext : IInstructionContext, IExecutableInstruction

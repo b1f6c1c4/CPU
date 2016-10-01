@@ -23,12 +23,12 @@ instruction
     ;
 
 typeR
-    : Op=(AND | OR | ADD | SUB | SLT | SUBC | ADDC) Rd=Register ',' Rs=Register ',' Rt=Register
+    : Op=(AND | OR | ADD | SUB | SLT | SUBC | ADDC) Rd=Register ','? Rs=Register ','? Rt=Register
     ;
 
 typeI
-    : Op=(ANDI | ORI | ADDI | LW | SW) Rt=Register ',' Rs=Register ',' number
-    | Op=(BEQ | BNE) Rs=Register ',' Rt=Register ',' obj
+    : Op=(ANDI | ORI | ADDI | LW | SW) Rt=Register ','? Rs=Register ','? number
+    | Op=(BEQ | BNE) Rs=Register ','? Rt=Register ','? obj
     ;
 
 typeJ

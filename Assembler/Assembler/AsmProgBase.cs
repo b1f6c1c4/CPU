@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Antlr4.Runtime;
+using System.Linq;
 using Assembler.Frontend;
 
 namespace Assembler
@@ -72,11 +72,23 @@ namespace Assembler
             }
 
             if (halt)
-            {
-                var lexer = new AsmELexer(new AntlrInputStream("HALT" + Environment.NewLine));
-                var parser = new AsmEParser(new CommonTokenStream(lexer));
-                Parse(parser.line(), filename, last);
-            }
+                try
+                {
+                    var str = new StringReader("BEQ R1, R1, 0xff" + Environment.NewLine);
+                    Parse(Frontend.Parse(filename, str).Single(), filename, last);
+                }
+                catch (AssemblyException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw new AssemblyException(e.Message, e)
+                              {
+                                  FilePath = filename,
+                                  Line = File.ReadAllLines(filename).Length + 1
+                              };
+                }
         }
 
         public virtual void Done()
