@@ -28,7 +28,7 @@ Div16p:
     LW   R3, R0, 0x01
     LW   R0, R0, 0x00
     OR   R0, R3, R0
-    BNE  R3, R1, ok
+    BNE  R0, R1, ok
     JMP  FATAL
 ok:
     LW   R3, R1, 0xff

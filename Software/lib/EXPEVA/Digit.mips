@@ -66,8 +66,8 @@ ok_Back_EXPEVA:
     LW   R3, R1, 0xff
     LW   R0, R1, 0x09
     ADDI R0, R0, 0xfe
-    PUSH R0
     PUSH R3
+    PUSH R0
     CALL Div16p
     ANDI R0, R0, 0x00
     RET

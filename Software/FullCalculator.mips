@@ -153,12 +153,22 @@ valid:
     JMP  FATAL          ; ?
 nm_0:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x30   ; '0'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
 nm_1:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x31   ; '1'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 1
     LW   R3, R1, 0xff
@@ -167,12 +177,22 @@ nm_1:
     JMP  done
 nm_2:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x32   ; '2'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 2
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
 nm_3:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x33   ; '3'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 3
     LW   R3, R1, 0xff
@@ -181,12 +201,22 @@ nm_3:
     JMP  done
 nm_4:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x34   ; '4'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 4
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
 nm_5:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x35   ; '5'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 5
     LW   R3, R1, 0xff
@@ -195,12 +225,22 @@ nm_5:
     JMP  done
 nm_6:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x36   ; '6'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 6
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
 nm_7:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x37   ; '7'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 7
     LW   R3, R1, 0xff
@@ -209,6 +249,11 @@ nm_7:
     JMP  done
 nm_8:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x38   ; '8'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 8
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
@@ -216,12 +261,22 @@ nm_8:
     JMP  done
 nm_9:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x39   ; '9'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 9
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
 op_Plus:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x2b   ; '+'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x02
     LW   R3, R1, 0xff
@@ -238,6 +293,11 @@ ld_Plus:
     JMP  done
 op_Minus:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x2d   ; '-'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x03
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
@@ -253,12 +313,22 @@ ld_Minus:
     JMP  done
 op_Multiply:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x2a   ; '*'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x04
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
     JMP  done
 op_Divide:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x2f   ; '/'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x05
     LW   R3, R1, 0xff
@@ -267,6 +337,11 @@ op_Divide:
     JMP  done
 op_Reminder:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x25   ; '%'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x06
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
@@ -274,12 +349,22 @@ op_Reminder:
     JMP  done
 op_BitwiseNot:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x7e   ; '~'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x07
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
     JMP  done
 op_BitwiseAnd:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x26   ; '&'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x08
     LW   R3, R1, 0xff
@@ -296,14 +381,12 @@ ld_And:
     JMP  done
 op_BitwiseOr:
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x09
     LW   R3, R1, 0xff
+    ADDI R0, R1, 0x7c   ; '|'
     SW   R0, R3, 0x00
-    CALL Operator_EXPEVA
-    JMP  done
-op_BitwiseXor:
+    CALL WriteExternal
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 0x0a
+    ADDI R0, R1, 0x09
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
@@ -316,7 +399,24 @@ ld_Or:
     ADDI R0, R1, 0b00001000
     SW   R0, R3, 0x02
     JMP  done
+op_BitwiseXor:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x5e   ; '^'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    ADDI R0, R1, 0x0a
+    LW   R3, R1, 0xff
+    SW   R0, R3, 0x00
+    CALL Operator_EXPEVA
+    JMP  done
 op_LeftParenthesis:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x28   ; '('
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x0b
     LW   R3, R1, 0xff
@@ -325,12 +425,22 @@ op_LeftParenthesis:
     JMP  done
 op_RightParenthesis:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x29   ; ')'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x0c
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
     JMP  done
 op_LessThan:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x3c   ; '<'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x0d
     LW   R3, R1, 0xff
@@ -347,12 +457,37 @@ ld_LT:
     JMP  done
 op_EqualTo:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x3d   ; '='
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x3d   ; '='
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x0e
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
     JMP  done
 op_OK:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x20   ; ' '
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x3d   ; '='
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x20   ; ' '
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     ANDI R1, R1, 0x00
     ADDI R0, R1, 0x0f
     LW   R3, R1, 0xff
@@ -366,6 +501,7 @@ op_OK:
     SW   R0, R3, 0x00
     CALL WriteExternal
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
     ADDI R0, R1, 0x0a   ; '\n'
     SW   R0, R3, 0x00
     CALL WriteExternal
@@ -377,12 +513,22 @@ op_OK:
     JMP  done
 op_GreaterThan:
     ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x3e   ; '>'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
+    ANDI R1, R1, 0x00
     ADDI R0, R1, 0x10
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
     CALL Operator_EXPEVA
     JMP  done
 ct_Back:
+    ANDI R1, R1, 0x00
+    LW   R3, R1, 0xff
+    ADDI R0, R1, 0x08   ; '\b'
+    SW   R0, R3, 0x00
+    CALL WriteExternal
     CALL Back_EXPEVA
     JMP  done
 done:
