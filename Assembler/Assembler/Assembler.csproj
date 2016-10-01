@@ -53,31 +53,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Frontend\AssemblyHandler.cs" />
+    <Compile Include="Frontend\AsmAdapter.cs" />
     <Compile Include="AsmExecuter.cs" />
-    <Compile Include="AsmParser.Serialize.cs" />
+    <Compile Include="Frontend\AsmEAdapter.cs" />
     <Compile Include="AsmPrettifier.cs" />
     <Compile Include="AsmProgBase.cs" />
     <Compile Include="AsmSerializer.cs" />
     <Compile Include="AssemblyException.cs" />
     <Compile Include="BinAssembler.cs" />
-    <Compile Include="AsmMacro.cs" />
+    <Compile Include="Frontend\AsmMacro.cs" />
+    <Compile Include="Frontend\IFrontend.cs" />
     <Compile Include="HexAssembler.cs" />
     <Compile Include="IExecutableInstruction.cs" />
     <Compile Include="IInstruction.cs" />
-    <Compile Include="AsmParser.Execute.cs" />
+    <Compile Include="Frontend\Adapters.cs" />
     <Compile Include="IntelAssembler.cs" />
     <Compile Include="Preprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Frontend\SourcePosition.cs" />
     <Compile Include="TextAssembler.cs" />
+    <Compile Include="Frontend\TypeIHelper.cs" />
+    <Compile Include="Frontend\TypeJHelper.cs" />
+    <Compile Include="Frontend\TypeRHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Antlr4 Include="Asm.g4">
+    <Antlr4 Include="Frontend\Asm.g4">
       <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>Assembler.Frontend</CustomToolNamespace>
     </Antlr4>
-    <Antlr4 Include="AsmE.g4">
+    <Antlr4 Include="Frontend\AsmE.g4">
       <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>Assembler</CustomToolNamespace>
+      <CustomToolNamespace>Assembler.Frontend</CustomToolNamespace>
     </Antlr4>
     <None Include="packages.config" />
   </ItemGroup>

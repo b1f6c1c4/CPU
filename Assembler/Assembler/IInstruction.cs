@@ -9,10 +9,15 @@ namespace Assembler
         IReadOnlyList<TOut> Flatten(bool debug);
     }
 
-    public interface IInstruction
+    public interface IPrettifyable
     {
-        int Serialize(SymbolResolver resolver, bool enableLongJump);
-
         string Prettify(SymbolResolver symbols, bool enableLongJump);
     }
+
+    public interface IInstruction : IPrettifyable
+    {
+        int Serialize(SymbolResolver resolver, bool enableLongJump);
+    }
+
+    public interface IMacro : IFlattenable<IExecutableInstruction>, IPrettifyable { }
 }

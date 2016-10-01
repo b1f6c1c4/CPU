@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 
-namespace Assembler
+namespace Assembler.Frontend
 {
     partial class AsmEParser
     {
-        public sealed partial class MacroContext : IFlattenable<IExecutableInstruction>
+        public sealed partial class MacroContext : IMacro
         {
             /* MEM[0xff] = sp
              * MEM[0xfe] = bp
@@ -133,7 +133,7 @@ SPC  R2, R0         ; +8
                 }
             }
 
-            public string Prettify()
+            public string Prettify(SymbolResolver symbols, bool enableLongJump)
             {
                 string str;
                 switch (Op.Text.ToUpper())

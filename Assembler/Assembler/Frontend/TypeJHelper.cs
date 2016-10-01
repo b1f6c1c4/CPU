@@ -1,22 +1,28 @@
 ﻿using System;
 
-namespace Assembler
+namespace Assembler.Frontend
 {
+    internal interface ITypeJContext
+    {
+        string Operator { get; }
+        IObjContext Target { get; }
+    }
+
     internal static class TypeJHelper
     {
         public static int Serialize(this ITypeJContext inst, SymbolResolver symbols, bool enableLongJump)
         {
-            var op = GetOpcode(inst._Op);
-            var imm = inst.obj().Serialize(symbols, true);
+            var op = GetOpcode(inst.Operator);
+            var imm = inst.Target.Serialize(symbols, true);
             return (op << 12) | (imm & 0xfff);
         }
 
         public static string Prettify(this ITypeJContext inst, SymbolResolver symbols, bool enableLongJump) =>
             symbols == null
-                ? $"{inst._Op.ToUpper().PadRight(4)} {inst.obj()}"
+                ? $"{inst.Operator.ToUpper().PadRight(4)} {inst.Target}"
                 : enableLongJump
-                      ? $"{inst._Op.ToUpper().PadRight(4)} 0x{(inst.obj().Serialize(symbols, true) & 0xfff):x3}"
-                      : $"{inst._Op.ToUpper().PadRight(4)} 0x{(inst.obj().Serialize(symbols, true) & 0xff):x2}";
+                      ? $"{inst.Operator.ToUpper().PadRight(4)} 0x{(inst.Target.Serialize(symbols, true) & 0xfff):x3}"
+                      : $"{inst.Operator.ToUpper().PadRight(4)} 0x{(inst.Target.Serialize(symbols, true) & 0xff):x2}";
 
         private static int GetOpcode(string text)
         {
@@ -29,12 +35,12 @@ namespace Assembler
             }
         }
 
-        public static PCTarget Execute(this ITypeJContext inst,Context context)
+        public static PCTarget Execute(this ITypeJContext inst, Context context)
         {
-            switch (inst._Op.ToUpper())
+            switch (inst.Operator.ToUpper())
             {
                 case "JMP":
-                    return inst.obj().Name() == null ? new PCTarget(inst.obj().number().GetValue(), true) : inst.obj().Name().Symbol.Text;
+                    return inst.Target.Label ?? new PCTarget(inst.Target.ImmediateNumber.GetValue(), true);
                 default:
                     throw new InvalidOperationException();
             }

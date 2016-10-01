@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assembler;
+using Assembler.Frontend;
 
 namespace AssemblerGui
 {

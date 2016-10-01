@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Assembler;
+using Assembler.Frontend;
 
 namespace AssemblerGui
 {

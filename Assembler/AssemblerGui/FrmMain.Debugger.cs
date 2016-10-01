@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Assembler;
+using Assembler.Frontend;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
