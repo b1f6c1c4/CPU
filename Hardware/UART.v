@@ -2,6 +2,7 @@
 module UART_WriteD(
    input Clock,
    input Reset,
+   input [2:0] Baud, // 3'h4 = 9600, 3'h2 = 4800, 3'h1 = 2400
    output ready,
    input send,
    output reg finish,
@@ -9,9 +10,9 @@ module UART_WriteD(
    output TX
    );
 `ifdef SIMULATION
-   parameter div = 24;
+   parameter div = 96;
 `else
-   parameter div = 2604; // 9600
+   parameter div = 10417; // 2400
 `endif
 
    localparam S_IDLE = 1'h0;
@@ -20,6 +21,8 @@ module UART_WriteD(
    reg [9:0] shift_reg;
    reg [31:0] cnt_freq;
    reg [3:0] cnt_bit;
+
+   wire done_freq = cnt_freq[31];
 
    reg state;
    reg send_tr, pre_send;
@@ -46,7 +49,7 @@ module UART_WriteD(
          state <= S_IDLE;
       else if (state == S_IDLE && send_tr)
          state <= S_SEND;
-      else if (state == S_SEND && ~|cnt_bit && ~|cnt_freq)
+      else if (state == S_SEND && ~|cnt_bit && done_freq)
          state <= S_IDLE;
 
    always @(posedge Clock, negedge Reset)
@@ -54,7 +57,7 @@ module UART_WriteD(
          shift_reg <= 10'b0;
       else if (state == S_IDLE && send_tr)
          shift_reg <= {1'b1,data,1'b0};
-      else if (state == S_SEND && ~|cnt_freq)
+      else if (state == S_SEND && done_freq)
          shift_reg <= shift_reg >> 1;
 
    always @(posedge Clock, negedge Reset)
@@ -62,21 +65,21 @@ module UART_WriteD(
          cnt_bit <= 4'd9;
       else if (state == S_IDLE)
          cnt_bit <= 4'd9;
-      else if (state == S_SEND && ~|cnt_freq)
+      else if (state == S_SEND && done_freq)
          cnt_bit <= cnt_bit - 4'd1;
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
-         cnt_freq <= div - 1;
+         cnt_freq <= 0;
       else if (state == S_SEND)
-         cnt_freq <= ~|cnt_freq ? div - 1 : cnt_freq - 1;
+         cnt_freq <= done_freq ? div - Baud : cnt_freq - Baud;
       else
-         cnt_freq <= div - 1;
+         cnt_freq <= div - Baud;
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
          finish <= 1'b0;
-      else if (state == S_SEND && ~|cnt_bit && ~|cnt_freq)
+      else if (state == S_SEND && ~|cnt_bit && done_freq)
          finish <= 1'b1;
       else
          finish <= 1'b0;
@@ -86,14 +89,15 @@ endmodule
 module UART_ReadD(
    input Clock,
    input Reset,
+   input [2:0] Baud, // 3'h4 = 9600, 3'h2 = 4800, 3'h1 = 2400
    output arrived,
    output reg [7:0] data,
    input RX
    );
 `ifdef SIMULATION
-   parameter div = 2;
+   parameter div = 8;
 `else
-   parameter div = 217; // 12x 9600
+   parameter div = 868; // 12x 2400
 `endif
 
    localparam S_IDLE = 4'h0;
@@ -113,15 +117,17 @@ module UART_ReadD(
    reg [3:0] cnt_wait;
    reg [7:0] shift_reg;
 
+   wire done_freq = cnt_freq[31];
+
    assign arrived = (state == S_BITX) && waitx;
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
          data <= 8'b0;
-      else if (state == S_BITX && ~|cnt_freq)
+      else if (state == S_BITX && done_freq)
          data <= shift_reg;
 
-   wire waitx = ~(|cnt_freq || |cnt_wait);
+   wire waitx = done_freq && ~|cnt_wait;
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
@@ -164,19 +170,19 @@ module UART_ReadD(
             S_BITS, S_BIT0, S_BIT1, S_BIT2, S_BIT3, S_BIT4, S_BIT5, S_BIT6, S_BIT7:
                if (waitx)
                   cnt_wait <= 4'd11;
-               else if (~|cnt_freq)
+               else if (done_freq)
                   cnt_wait <= cnt_wait - 4'd1;
             S_BITX:
-               if (~waitx && ~|cnt_freq)
+               if (~waitx && done_freq)
                   cnt_wait <= cnt_wait - 4'd1;
          endcase
 
    always @(posedge Clock, negedge Reset)
       if (~Reset)
-         cnt_freq <= div - 1;
+         cnt_freq <= 0;
       else if (state == S_IDLE)
-         cnt_freq <= div - 1;
+         cnt_freq <= div - Baud - 1;
       else
-         cnt_freq <= ~|cnt_freq ? div - 1 : cnt_freq - 1;
+         cnt_freq <= done_freq ? div - Baud - 1 : cnt_freq - Baud;
 
 endmodule

@@ -39,6 +39,8 @@ module Hardware(
    wire ur_arrived;
    wire [7:0] ur_data;
 
+   wire [2:0] baud;
+
 `ifndef SIMULATION
    wire [7:0] io_ena;
    wire [7:0] io_0, io_1, io_2, io_3;
@@ -67,6 +69,9 @@ module Hardware(
 
    assign Buzz = ~LD[0];
 
+   assign baud = SB == 8'h0 ? 3'h4 : SB == 8'h1 ? 3'h2 : SB == 8'h2 ? 3'h1 : 3'h4;
+   assign io_6 = io_ena[6] ? 8'hz : SB;
+
    // main modules
    CPU u(
       .Clock(Clock), .Reset(Reset),
@@ -88,12 +93,14 @@ module Hardware(
 
    UART_WriteD uw(
       .Clock(Clock), .Reset(Reset),
+      .Baud(baud),
       .ready(uw_ready), .send(uw_send),
       .finish(uw_finish), .data(uw_data),
       .TX(TX));
 
    UART_ReadD ur(
       .Clock(Clock), .Reset(Reset),
+      .Baud(baud),
       .arrived(ur_arrived), .data(ur_data),
       .RX(RX));
 

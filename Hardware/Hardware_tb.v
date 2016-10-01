@@ -18,7 +18,7 @@ module Hardware_tb;
       // .H(H), .V(V),
       // .SD(SD), .SEG(SEG),
       // .LD(LD),
-      // .SB(SB),
+      .SB(8'h0),
       // .Buzz(Buzz),
       .TX(TX),
       .RX(RX),
