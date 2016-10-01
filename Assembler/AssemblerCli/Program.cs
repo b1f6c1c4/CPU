@@ -29,13 +29,16 @@ namespace AssemblerCli
             var noComment = false;
             var debug = false;
             var isHex = false;
+            var isBin = false;
             var help = false;
             var noHalt = false;
+            var shortCode = false;
 
             var opt =
                 new OptionSet
                     {
                         { "r|run", "don't assembly, just run", v => run = v != null },
+                        { "s|short-code", "don't expand code space from 256 to 4096", v => shortCode = v != null },
                         { "n|no-halt", "don't append HALT after each file", v => noHalt = v != null },
                         { "p|prettify", "don't assembly, prettify asm", v => prettify = v != null },
                         { "no-comment", "when prettify, remove comments", v => noComment = v != null },
@@ -46,7 +49,8 @@ namespace AssemblerCli
                         { "e|expand", "when prettify, expand macros", v => expand = v != null },
                         { "d|debug", "pause at every symbol to debug", v => debug = v != null },
                         { "o|output=", "output {FILE}", v => fout = v },
-                        { "H|hex", "output hex instead of binary", v => isHex = v != null },
+                        { "H|hex", "output pure hex", v => isHex = v != null },
+                        { "B|binary", "output pure binary", v => isBin = v != null },
                         { "h|?|help", "show this message and exit", v => help = v != null }
                     };
 
@@ -71,6 +75,12 @@ namespace AssemblerCli
 
                 if (prettify && isHex)
                     throw new ApplicationException("cann't prettify with --hex");
+
+                if (prettify && isBin)
+                    throw new ApplicationException("cann't prettify with --bin");
+
+                if (isBin && isHex)
+                    throw new ApplicationException("cann't --bin and --hex together");
 
                 if (expand && !prettify)
                     throw new ApplicationException("cann't expand macros without --prettify");
@@ -151,10 +161,12 @@ namespace AssemblerCli
                                 asm = new AsmPrettifier(!noComment, expand);
                         else if (isHex)
                             asm = new HexAssembler();
-                        else if (sout.Equals(Console.Out))
+                        else if (isBin)
                             asm = new BinAssembler();
                         else
                             asm = new IntelAssembler();
+
+                        asm.EnableLongJump = !shortCode;
 
                         ((IWriter)asm).SetWriter(sout);
 
@@ -170,7 +182,7 @@ namespace AssemblerCli
             catch (Exception e)
             {
                 Console.Error.Write("Assembler: ");
-                Console.Error.WriteLine(e.ToString());
+                Console.Error.WriteLine(e.Message);
                 Environment.Exit(1);
             }
             finally

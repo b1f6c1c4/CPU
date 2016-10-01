@@ -40,8 +40,15 @@ namespace Assembler
 
         protected readonly Dictionary<string, int> Symbols;
 
+        public bool EnableLongJump { get; set; }
+
+        private int MaxLength => EnableLongJump ? 4096 : 256;
+
+        protected int PCMask => MaxLength - 1;
+
         protected AsmProgBase()
         {
+            EnableLongJump = true;
             Instructions = new List<IExecutableInstruction>();
             m_Filenames = new List<string>();
             Lines = new Dictionary<int, SourcePosition>();
@@ -97,7 +104,11 @@ namespace Assembler
             }
         }
 
-        public virtual void Done() { }
+        public virtual void Done()
+        {
+            if (Instructions.Count > MaxLength)
+                throw new ApplicationException($"程序过长（{Instructions.Count} / {MaxLength}）");
+        }
 
         protected virtual void Parse(AsmParser.LineContext context, string filename, int diff = 0)
         {

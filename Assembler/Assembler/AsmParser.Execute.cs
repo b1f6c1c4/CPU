@@ -178,7 +178,7 @@ namespace Assembler
                     case "SPC":
                         return new PCTarget(
                             ((context.Registers[RegisterNumber(Rd)] << 8) |
-                             context.Registers[RegisterNumber(Rt)]) & 0x0fff,
+                             context.Registers[RegisterNumber(Rt)]),
                             true
                             );
                     default:

@@ -34,5 +34,17 @@ namespace AssemblerGui.Properties {
                 this["QuartusStp"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableLongJump {
+            get {
+                return ((bool)(this["EnableLongJump"]));
+            }
+            set {
+                this["EnableLongJump"] = value;
+            }
+        }
     }
 }

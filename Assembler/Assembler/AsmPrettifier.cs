@@ -23,7 +23,7 @@ namespace Assembler
 
             string str = null;
             if (context.instruction() != null)
-                str = context.instruction().Prettify(null);
+                str = context.instruction().Prettify(null, EnableLongJump);
             else if (context.macro() != null &&
                      (!m_ExpandMacro || m_IncludeComment))
                 str = (m_ExpandMacro ? ";" : "") + context.macro().Prettify();
@@ -38,7 +38,7 @@ namespace Assembler
                 return;
 
             foreach (var inst in context.macro().Flatten(ExpansionDebug))
-                m_Writer.WriteLine(inst.Prettify(null));
+                m_Writer.WriteLine(inst.Prettify(null, EnableLongJump));
         }
 
         protected override bool ExpansionDebug => true;
@@ -52,11 +52,13 @@ namespace Assembler
 
         public override void Done()
         {
+            base.Done();
+
             for (var i = 0; i < Instructions.Count; i++)
             {
                 var inst = Instructions[i];
                 var i1 = i;
-                m_Writer.WriteLine(inst.Prettify((s, a) => GetSymbol(i1, s, a)));
+                m_Writer.WriteLine(inst.Prettify((s, a) => GetSymbol(i1, s, a), EnableLongJump));
             }
         }
 

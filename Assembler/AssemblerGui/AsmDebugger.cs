@@ -33,8 +33,6 @@ namespace AssemblerGui
                     };
         }
 
-        public override void Done() { }
-
         protected override bool ExpansionDebug => true;
 
         private bool Advance(ref int lease)
@@ -54,6 +52,9 @@ namespace AssemblerGui
                 CPU.PC = res.Position;
             else
                 CPU.PC += res.Position + 1;
+
+            CPU.PC &= Properties.Settings.Default.EnableLongJump ? 0xfff : 0xff;
+
             if (old == CPU.PC)
                 throw new HaltException();
 

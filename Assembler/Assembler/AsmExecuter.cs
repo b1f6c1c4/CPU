@@ -20,6 +20,8 @@
 
         public override void Done()
         {
+            base.Done();
+
             while (CPU.PC < Instructions.Count)
             {
                 if (Symbols.ContainsValue(CPU.PC))
@@ -35,6 +37,9 @@
                     CPU.PC = res.Position;
                 else
                     CPU.PC += res.Position + 1;
+
+                CPU.PC &= PCMask;
+
                 if (oldPC == CPU.PC)
                     break;
             }

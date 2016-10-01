@@ -35,16 +35,16 @@ namespace Assembler
 
         public sealed partial class InstructionContext : IInstruction
         {
-            public int Serialize(SymbolResolver symbols) =>
-                Debug != null ? new int() : GetInst().Serialize(symbols);
+            public int Serialize(SymbolResolver symbols, bool enableLongJump) =>
+                Debug != null ? new int() : GetInst().Serialize(symbols, enableLongJump);
 
-            public string Prettify(SymbolResolver symbols) =>
-                (Debug != null && symbols == null ? "#   " : "    ") + GetInst().Prettify(symbols);
+            public string Prettify(SymbolResolver symbols, bool enableLongJump) =>
+                (Debug != null && symbols == null ? "#   " : "    ") + GetInst().Prettify(symbols, enableLongJump);
         }
 
         public sealed partial class TypeRContext : IInstruction
         {
-            public int Serialize(SymbolResolver symbols)
+            public int Serialize(SymbolResolver symbols, bool enableLongJump)
             {
                 var op = GetOpcode(Op.Text);
                 var rd = RegisterNumber(Rd);
@@ -53,7 +53,7 @@ namespace Assembler
                 return (op << 12) | (rs << 10) | (rt << 8) | (rd << 6);
             }
 
-            public string Prettify(SymbolResolver symbols) =>
+            public string Prettify(SymbolResolver symbols, bool enableLongJump) =>
                 $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rd)}, R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}";
 
             private static int GetOpcode(string text)
@@ -82,7 +82,7 @@ namespace Assembler
 
         public sealed partial class TypeIContext : IInstruction
         {
-            public int Serialize(SymbolResolver symbols)
+            public int Serialize(SymbolResolver symbols, bool enableLongJump)
             {
                 var op = GetOpcode(Op.Text);
                 var rs = RegisterNumber(Rs);
@@ -95,12 +95,14 @@ namespace Assembler
                 else
                     throw new InvalidOperationException();
                 if (obj() != null &&
-                    (imm > 0x7f || imm < -0x80))
-                    throw new ApplicationException($"BEQ/BNE jumps too long ({imm}); use JMP");
+                    enableLongJump &&
+                    (imm > 0x7f ||
+                     imm < -0x80))
+                    throw new ApplicationException($"BEQ/BNE 指令无法跳转到相对偏移 {imm} 处；请使用 JMP 进行跳转");
                 return (op << 12) | (rs << 10) | (rt << 8) | (imm & 0xff);
             }
 
-            public string Prettify(SymbolResolver symbols) =>
+            public string Prettify(SymbolResolver symbols, bool enableLongJump) =>
                 obj() != null
                     ? symbols == null
                           ? $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rs)}, R{RegisterNumber(Rt)}, {obj().GetText()}"
@@ -133,17 +135,19 @@ namespace Assembler
 
         public sealed partial class TypeJContext : IInstruction
         {
-            public int Serialize(SymbolResolver symbols)
+            public int Serialize(SymbolResolver symbols, bool enableLongJump)
             {
                 var op = GetOpcode(Op.Text);
                 var imm = obj().Serialize(symbols, true);
                 return (op << 12) | (imm & 0xfff);
             }
 
-            public string Prettify(SymbolResolver symbols) =>
+            public string Prettify(SymbolResolver symbols, bool enableLongJump) =>
                 symbols == null
                     ? $"{Op.Text.ToUpper().PadRight(4)} {obj().GetText()}"
-                    : $"{Op.Text.ToUpper().PadRight(4)} 0x{(obj().Serialize(symbols, true) & 0xfff):x3}";
+                    : enableLongJump
+                          ? $"{Op.Text.ToUpper().PadRight(4)} 0x{(obj().Serialize(symbols, true) & 0xfff):x3}"
+                          : $"{Op.Text.ToUpper().PadRight(4)} 0x{(obj().Serialize(symbols, true) & 0xff):x2}";
 
             private static int GetOpcode(string text)
             {
@@ -159,7 +163,7 @@ namespace Assembler
 
         public sealed partial class TypePContext : IInstruction
         {
-            public int Serialize(SymbolResolver symbols)
+            public int Serialize(SymbolResolver symbols, bool enableLongJump)
             {
                 switch (Op.Text.ToUpper())
                 {
@@ -174,7 +178,7 @@ namespace Assembler
                 }
             }
 
-            public string Prettify(SymbolResolver symbols)
+            public string Prettify(SymbolResolver symbols, bool enableLongJump)
             {
                 switch (Op.Text.ToUpper())
                 {

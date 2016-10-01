@@ -6,13 +6,15 @@ namespace Assembler
     {
         public override void Done()
         {
+            base.Done();
+
             for (var i = 0; i < Instructions.Count; i++)
             {
                 var inst = Instructions[i];
                 var i1 = i;
                 try
                 {
-                    Put(inst.Serialize((s, a) => GetSymbol(i1, s, a)));
+                    Put(inst.Serialize((s, a) => GetSymbol(i1, s, a), EnableLongJump));
                 }
                 catch (AssemblyException)
                 {

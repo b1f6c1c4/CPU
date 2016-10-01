@@ -11,8 +11,8 @@ namespace Assembler
 
     public interface IInstruction
     {
-        int Serialize(SymbolResolver resolver);
+        int Serialize(SymbolResolver resolver, bool enableLongJump);
 
-        string Prettify(SymbolResolver symbols);
+        string Prettify(SymbolResolver symbols, bool enableLongJump);
     }
 }

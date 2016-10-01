@@ -24,6 +24,8 @@ namespace AssemblerGui
             SetProcessDPIAware();
             InitializeComponent();
 
+            启用长跳转LToolStripMenuItem.Checked = Properties.Settings.Default.EnableLongJump;
+
             OnStateChanged += UpdateTitle;
             OnStateChanged += ToggleEditorMenus;
             OnStateChanged += ToggleAssemblerMenus;
@@ -85,6 +87,7 @@ namespace AssemblerGui
         private bool ExportFile<T>(T asm, Func<string> prompt, bool open = true)
             where T : AsmProgBase, IWriter
         {
+            asm.EnableLongJump = Properties.Settings.Default.EnableLongJump;
             try
             {
                 var pre = SaveDependency(TheEditor.FilePath);
@@ -163,6 +166,7 @@ namespace AssemblerGui
         private void Cycle<T>(T asm)
             where T : AsmProgBase, IWriter
         {
+            asm.EnableLongJump = Properties.Settings.Default.EnableLongJump;
             var tmp = Path.GetTempFileName();
             try
             {
@@ -216,6 +220,7 @@ namespace AssemblerGui
                 下载DToolStripMenuItem.Enabled = false;
 
                 格式化代码FToolStripMenuItem.Enabled = false;
+                启用长跳转LToolStripMenuItem.Enabled = false;
             }
             else
             {
@@ -227,6 +232,7 @@ namespace AssemblerGui
                 下载DToolStripMenuItem.Enabled = TheEditor != null;
 
                 格式化代码FToolStripMenuItem.Enabled = TheEditor != null;
+                启用长跳转LToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -305,6 +311,12 @@ namespace AssemblerGui
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
+        }
+
+        private void 启用长跳转LToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.EnableLongJump = 启用长跳转LToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
         }
     }
 }

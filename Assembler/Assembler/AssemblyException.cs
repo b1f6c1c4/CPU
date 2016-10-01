@@ -16,23 +16,23 @@ namespace Assembler
 
         public AssemblyException(string message, Exception e) : base(message, e) { }
 
-        public override string Message => Description + base.Message;
+        public override string Message => base.Message + Description;
 
         private string Description
         {
             get
             {
                 var sb = new StringBuilder();
+                sb.AppendLine();
+
                 if (FilePath != null)
-                    sb.Append($"在 {FilePath} ");
+                    sb.AppendLine(FilePath);
 
                 if (Line.HasValue)
                     sb.Append($"第 {Line} 行");
 
                 if (CharPos.HasValue)
-                    sb.Append($"第 {CharPos} 字符");
-
-                sb.Append("处发生错误：");
+                    sb.Append($" 第 {CharPos} 字符");
                 return sb.ToString();
             }
         }

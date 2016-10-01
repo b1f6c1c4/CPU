@@ -84,7 +84,6 @@ namespace AssemblerGui
             {
                 foreach (var p in pre)
                     m_RawDebugger.Feed(p, true);
-                m_RawDebugger.Done();
             }
             catch (AssemblyException e)
             {
