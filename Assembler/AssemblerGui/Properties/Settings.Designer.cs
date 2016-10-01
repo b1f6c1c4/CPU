@@ -46,5 +46,17 @@ namespace AssemblerGui.Properties {
                 this["EnableLongJump"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableExtension {
+            get {
+                return ((bool)(this["EnableExtension"]));
+            }
+            set {
+                this["EnableExtension"] = value;
+            }
+        }
     }
 }

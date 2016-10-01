@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Assembler;
+using Assembler.Frontend;
 using AssemblerGui.Properties;
 
 namespace AssemblerGui
@@ -26,6 +27,7 @@ namespace AssemblerGui
             InitializeComponent();
 
             启用长跳转LToolStripMenuItem.Checked = Settings.Default.EnableLongJump;
+            启用扩展指令EToolStripMenuItem.Checked = Settings.Default.EnableExtension;
 
             OnStateChanged += UpdateTitle;
             OnStateChanged += ToggleEditorMenus;
@@ -35,6 +37,11 @@ namespace AssemblerGui
                               {
                                   foreach (var ed in Editors)
                                       ed.ReadOnly = m_Downloading || m_Debugger != null;
+                              };
+            OnStateChanged += () =>
+                              {
+                                  foreach (var ed in Editors)
+                                      ed.EnableExtension = Settings.Default.EnableExtension;
                               };
 
             SetupDebugger();
@@ -97,6 +104,10 @@ namespace AssemblerGui
                 using (var sw = new StreamWriter(mem))
                 {
                     asm.SetWriter(sw);
+                    if (Settings.Default.EnableExtension)
+                        asm.Frontend = new AntlrExtendedFrontend();
+                    else
+                        asm.Frontend = new AntlrStandardFrontend();
                     try
                     {
                         foreach (var p in pre)
@@ -222,6 +233,7 @@ namespace AssemblerGui
 
                 格式化代码FToolStripMenuItem.Enabled = false;
                 启用长跳转LToolStripMenuItem.Enabled = false;
+                启用扩展指令EToolStripMenuItem.Enabled = false;
             }
             else
             {
@@ -234,6 +246,7 @@ namespace AssemblerGui
 
                 格式化代码FToolStripMenuItem.Enabled = TheEditor != null;
                 启用长跳转LToolStripMenuItem.Enabled = true;
+                启用扩展指令EToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -318,6 +331,13 @@ namespace AssemblerGui
         {
             Settings.Default.EnableLongJump = 启用长跳转LToolStripMenuItem.Checked;
             Settings.Default.Save();
+        }
+
+        private void 启用扩展指令EToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.EnableExtension = 启用扩展指令EToolStripMenuItem.Checked;
+            Settings.Default.Save();
+            OnStateChanged?.Invoke();
         }
     }
 }

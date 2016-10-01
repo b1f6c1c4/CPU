@@ -67,6 +67,7 @@
             this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.查看帮助VToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            this.启用扩展指令EToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -187,7 +188,8 @@
             this.编辑EToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.格式化代码FToolStripMenuItem,
             this.toolStripMenuItem8,
-            this.启用长跳转LToolStripMenuItem});
+            this.启用长跳转LToolStripMenuItem,
+            this.启用扩展指令EToolStripMenuItem});
             this.编辑EToolStripMenuItem.Name = "编辑EToolStripMenuItem";
             this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             this.编辑EToolStripMenuItem.Text = "编辑(&E)";
@@ -396,6 +398,14 @@
             this.tabControl1.DragDrop += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragDrop);
             this.tabControl1.DragEnter += new System.Windows.Forms.DragEventHandler(this.FrmMain_DragEnter);
             // 
+            // 启用扩展指令EToolStripMenuItem
+            // 
+            this.启用扩展指令EToolStripMenuItem.CheckOnClick = true;
+            this.启用扩展指令EToolStripMenuItem.Name = "启用扩展指令EToolStripMenuItem";
+            this.启用扩展指令EToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
+            this.启用扩展指令EToolStripMenuItem.Text = "启用扩展指令(&E)";
+            this.启用扩展指令EToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_CheckedChanged);
+            // 
             // FrmMain
             // 
             this.AllowDrop = true;
@@ -458,6 +468,7 @@
         private WeifenLuo.WinFormsUI.Docking.DockPanel tabControl1;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
         private System.Windows.Forms.ToolStripMenuItem 启用长跳转LToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 启用扩展指令EToolStripMenuItem;
     }
 }
 

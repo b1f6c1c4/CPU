@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using AssemblerGui.Properties;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace AssemblerGui
@@ -37,7 +38,7 @@ namespace AssemblerGui
 
         private Editor MakeNewEditor()
         {
-            var the = new Editor();
+            var the = new Editor { EnableExtension = Settings.Default.EnableExtension };
             the.OnStateChanged += () => OnStateChanged?.Invoke();
             the.OnToggleBreakPoint += ToggledBreakPoint;
             the.Show(tabControl1, DockState.Document);

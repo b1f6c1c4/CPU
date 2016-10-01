@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using Assembler;
+using Assembler.Frontend;
 using NDesk.Options;
 
 namespace AssemblerCli
@@ -27,6 +28,7 @@ namespace AssemblerCli
             var final = false;
             var expand = false;
             var noComment = false;
+            var noExtension = false;
             var isHex = false;
             var isBin = false;
             var help = false;
@@ -37,6 +39,7 @@ namespace AssemblerCli
                 new OptionSet
                     {
                         { "r|run", "don't assembly, just run", v => run = v != null },
+                        { "d|disable-extension", "disable extended instructoins", v => noExtension = v != null },
                         { "s|short-code", "don't expand code space from 256 to 4096", v => shortCode = v != null },
                         { "n|no-halt", "don't append HALT after each file", v => noHalt = v != null },
                         { "p|prettify", "don't assembly, prettify asm", v => prettify = v != null },
@@ -122,6 +125,10 @@ namespace AssemblerCli
                 Action<AsmProgBase> action =
                     apb =>
                     {
+                        if (noExtension)
+                            apb.Frontend = new AntlrStandardFrontend();
+                        else
+                            apb.Frontend = new AntlrExtendedFrontend();
                         foreach (var f in pre)
                             apb.Feed(f, !noHalt);
                         apb.Done();

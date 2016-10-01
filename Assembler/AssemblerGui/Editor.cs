@@ -47,10 +47,42 @@ namespace AssemblerGui
             }
         }
 
+        public bool EnableExtension
+        {
+            set
+            {
+                if (m_EnableExtension == value)
+                    return;
+
+                m_EnableExtension = value;
+                if (m_EnableExtension)
+                {
+                    m_Scintilla.SetKeywords(
+                                            0,
+                                            "AND ANDI OR ORI ADD SLT ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC"
+                                                .ToLower());
+                    m_Scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT ADDPC".ToLower());
+                    m_Scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
+                }
+                else
+                {
+                    m_Scintilla.SetKeywords(
+                                            0,
+                                            "AND ANDI OR ORI ADD SLT ADDI ADDC SUB SUBC LW SW JMP BEQ BNE"
+                                                .ToLower());
+                    m_Scintilla.SetKeywords(1, "".ToLower());
+                    m_Scintilla.SetKeywords(2, "R0 R1 R2 R3".ToLower());
+                }
+
+                m_Scintilla.Invalidate();
+            }
+        }
+
         private int m_LineNumberLength;
 
         private Scintilla m_Scintilla;
         private string m_FileName;
+        private bool m_EnableExtension;
 
         public new void Focus() => m_Scintilla.Focus();
 
@@ -102,13 +134,6 @@ namespace AssemblerGui
             m_Scintilla.Styles[Style.Asm.Register].ForeColor = Color.Magenta;
             m_Scintilla.Styles[Style.Asm.Number].ForeColor = Color.Black;
             m_Scintilla.Styles[Style.Asm.Identifier].ForeColor = Color.FromArgb(128, 0, 128);
-
-            m_Scintilla.SetKeywords(
-                                    0,
-                                    "AND ANDI OR ORI ADD SLT ADDI ADDC SUB SUBC LW SW JMP BEQ BNE LPCL LPCH SPC".ToLower
-                                        ());
-            m_Scintilla.SetKeywords(1, "INIT PUSH POP CALL RET HALT ADDPC".ToLower());
-            m_Scintilla.SetKeywords(2, "R0 R1 R2 R3 BP".ToLower());
 
             m_Scintilla.Margins[1].Type = MarginType.Number;
             m_Scintilla.Margins[1].Width = 16;
