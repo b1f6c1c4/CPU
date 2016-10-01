@@ -56,7 +56,7 @@ got_key:
     SW   R1, R3, 0x02
     ADDI R0, R1, 0x01
     SW   R0, R3, 0x03
-    ADDPC
+    ADDPC               ; R1 should be 0x00 before jmp
     JMP  op_OK          ; 0
     JMP  op_Minus       ; 1
     JMP  nm_8           ; 2
@@ -118,7 +118,7 @@ valid:
     ANDI R1, R1, 0x00
     LW   R3, R1, 0xff
     SW   R0, R3, 0x00
-    ADDPC
+    ADDPC               ; R1 should be 0x00 before jmp
     JMP  main           ; Space
     JMP  FATAL          ; !
     JMP  FATAL          ; "
@@ -151,123 +151,35 @@ valid:
     JMP  op_EqualTo     ; =
     JMP  op_GreaterThan ; >
     JMP  FATAL          ; ?
-nm_0:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x30   ; '0'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 0
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_1:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x31   ; '1'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 1
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_2:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x32   ; '2'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 2
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_3:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x33   ; '3'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 3
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_4:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x34   ; '4'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 4
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_5:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x35   ; '5'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 5
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_6:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x36   ; '6'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 6
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_7:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x37   ; '7'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 7
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
-nm_8:
-    ANDI R1, R1, 0x00
-    LW   R3, R1, 0xff
-    ADDI R0, R1, 0x38   ; '8'
-    SW   R0, R3, 0x00
-    CALL WriteExternal
-    ANDI R1, R1, 0x00
-    ADDI R0, R1, 8
-    LW   R3, R1, 0xff
-    SW   R0, R3, 0x00
-    CALL Digit_EXPEVA
-    JMP  done
 nm_9:
+    ADDI R1, R1, 0x01
+nm_8:
+    ADDI R1, R1, 0x01
+nm_7:
+    ADDI R1, R1, 0x01
+nm_6:
+    ADDI R1, R1, 0x01
+nm_5:
+    ADDI R1, R1, 0x01
+nm_4:
+    ADDI R1, R1, 0x01
+nm_3:
+    ADDI R1, R1, 0x01
+nm_2:
+    ADDI R1, R1, 0x01
+nm_1:
+    ADDI R1, R1, 0x01
+nm_0:
+    ADDI R2, R1, 0x00   ; R2 = nm
     ANDI R1, R1, 0x00
     LW   R3, R1, 0xff
-    ADDI R0, R1, 0x39   ; '9'
+    ADDI R0, R2, 0x30   ; '0' ~ '9'
     SW   R0, R3, 0x00
     CALL WriteExternal
     ANDI R1, R1, 0x00
-    ADDI R0, R1, 9
     LW   R3, R1, 0xff
+    LW   R0, R3, 0x00
+    ADDI R0, R0, 0xd0
     SW   R0, R3, 0x00
     CALL Digit_EXPEVA
     JMP  done
