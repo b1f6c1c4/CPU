@@ -11,29 +11,15 @@ namespace AssemblerGui
         public HaltException() : base("HALT") { }
     }
 
-    public class AsmDebugger : AsmProgBase
+    public class AsmDebugger : AsmExecuterBase
     {
         public event SimpleEventHandler OnPause;
-
-        public Context CPU { get; }
 
         public SourcePosition Source => Lines[CPU.PC];
 
         private readonly HashSet<SourcePosition> m_BreakPoints;
 
-        public AsmDebugger(HashSet<SourcePosition> breakPoints)
-        {
-            m_BreakPoints = breakPoints;
-            CPU =
-                new Context
-                    {
-                        PC = 0,
-                        Registers = new byte[4],
-                        Ram = new byte[256]
-                    };
-        }
-
-        protected override bool ExpansionDebug => true;
+        public AsmDebugger(HashSet<SourcePosition> breakPoints) { m_BreakPoints = breakPoints; }
 
         private bool Advance(ref int lease)
         {
@@ -42,20 +28,7 @@ namespace AssemblerGui
             if (lease > 0)
                 lease--;
 
-            var old = CPU.PC;
-            var res = Instructions[CPU.PC].Execute(CPU);
-            if (res == null)
-                CPU.PC++;
-            else if (res.IsSymbol)
-                CPU.PC = GetSymbolPos(CPU.PC, res.Symbol);
-            else if (res.IsAbs)
-                CPU.PC = res.Position;
-            else
-                CPU.PC += res.Position + 1;
-
-            CPU.PC &= Properties.Settings.Default.EnableLongJump ? 0xfff : 0xff;
-
-            if (old == CPU.PC)
+            if (Advance())
                 throw new HaltException();
 
             return true;

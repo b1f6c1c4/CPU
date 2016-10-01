@@ -27,7 +27,6 @@ namespace AssemblerCli
             var final = false;
             var expand = false;
             var noComment = false;
-            var debug = false;
             var isHex = false;
             var isBin = false;
             var help = false;
@@ -47,7 +46,6 @@ namespace AssemblerCli
                             v => final = v != null
                         },
                         { "e|expand", "when prettify, expand macros", v => expand = v != null },
-                        { "d|debug", "pause at every symbol to debug", v => debug = v != null },
                         { "o|output=", "output {FILE}", v => fout = v },
                         { "H|hex", "output pure hex", v => isHex = v != null },
                         { "B|binary", "output pure binary", v => isBin = v != null },
@@ -63,9 +61,6 @@ namespace AssemblerCli
                     ShowHelp(opt);
                     return;
                 }
-
-                if (!run && debug)
-                    throw new ApplicationException("cann't assembly with --debug");
 
                 if (run && isHex)
                     throw new ApplicationException("cann't run with --hex");
@@ -135,15 +130,6 @@ namespace AssemblerCli
                 if (run)
                 {
                     var asm = new AsmExecuter();
-                    if (debug)
-                        asm.OnBreakPoint +=
-                            s =>
-                            {
-                                Console.WriteLine($"BreakPoint: {s}");
-                                PrintContext(asm.CPU);
-                                Console.Read();
-                                Console.Read();
-                            };
 
                     action(asm);
                     PrintContext(asm.CPU);
@@ -209,19 +195,21 @@ namespace AssemblerCli
 
     public static class ConsoleEx
     {
+        // ReSharper disable UnusedMember.Global
         public static bool IsOutputRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdout));
 
         public static bool IsInputRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stdin));
 
         public static bool IsErrorRedirected => FileType.Char != GetFileType(GetStdHandle(StdHandle.Stderr));
 
-        // P/Invoke:
         private enum FileType
         {
+            // ReSharper disable UnusedMember.Local
             Unknown,
             Disk,
             Char,
             Pipe
+            // ReSharper restore UnusedMember.Local
         };
 
         private enum StdHandle
@@ -236,5 +224,7 @@ namespace AssemblerCli
 
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetStdHandle(StdHandle std);
+
+        // ReSharper restore UnusedMember.Global
     }
 }

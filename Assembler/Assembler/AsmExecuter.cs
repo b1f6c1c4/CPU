@@ -1,14 +1,8 @@
 ﻿namespace Assembler
 {
-    public class AsmExecuter : AsmProgBase
+    public abstract class AsmExecuterBase : AsmProgBase
     {
-        public delegate void OnBreakPointEventHandler(SourcePosition pos);
-
-        public event OnBreakPointEventHandler OnBreakPoint;
-
-        public Context CPU { get; }
-
-        public AsmExecuter()
+        protected AsmExecuterBase()
         {
             CPU = new Context
                       {
@@ -18,33 +12,38 @@
                       };
         }
 
+        public Context CPU { get; }
+
+        protected override bool ExpansionDebug => true;
+
+        protected bool Advance()
+        {
+            var oldPC = CPU.PC;
+            var res = Instructions[CPU.PC].Execute(CPU);
+            if (res == null)
+                CPU.PC++;
+            else if (res.IsSymbol)
+                CPU.PC = GetSymbolPos(CPU.PC, res.Symbol);
+            else if (res.IsAbs)
+                CPU.PC = res.Position;
+            else
+                CPU.PC += res.Position + 1;
+
+            CPU.PC &= PCMask;
+
+            return oldPC == CPU.PC;
+        }
+    }
+
+    public class AsmExecuter : AsmExecuterBase
+    {
         public override void Done()
         {
             base.Done();
 
             while (CPU.PC < Instructions.Count)
-            {
-                if (Symbols.ContainsValue(CPU.PC))
-                    OnBreakPoint?.Invoke(Lines[CPU.PC]);
-
-                var oldPC = CPU.PC;
-                var res = Instructions[CPU.PC].Execute(CPU);
-                if (res == null)
-                    CPU.PC++;
-                else if (res.IsSymbol)
-                    CPU.PC = GetSymbolPos(CPU.PC, res.Symbol);
-                else if (res.IsAbs)
-                    CPU.PC = res.Position;
-                else
-                    CPU.PC += res.Position + 1;
-
-                CPU.PC &= PCMask;
-
-                if (oldPC == CPU.PC)
+                if (Advance())
                     break;
-            }
         }
-
-        protected override bool ExpansionDebug => true;
     }
 }
