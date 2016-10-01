@@ -350,5 +350,8 @@ namespace AssemblerGui
             Settings.Default.AppendHalt = 文件末尾自动停机HToolStripMenuItem.Checked;
             Settings.Default.Save();
         }
+
+        private void 关于AToolStripMenuItem_Click(object sender, EventArgs e) =>
+            Process.Start("https://github.com/b1f6c1c4/CPU");
     }
 }

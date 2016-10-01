@@ -69,6 +69,7 @@
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.查看帮助VToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.关于AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -106,6 +107,7 @@
             this.文件FToolStripMenuItem.Name = "文件FToolStripMenuItem";
             this.文件FToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             this.文件FToolStripMenuItem.Text = "文件(&F)";
+            this.文件FToolStripMenuItem.ToolTipText = "新建/打开/保存/关闭文件";
             // 
             // 新建NToolStripMenuItem
             // 
@@ -113,6 +115,7 @@
             this.新建NToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.新建NToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.新建NToolStripMenuItem.Text = "新建(&N)";
+            this.新建NToolStripMenuItem.ToolTipText = "创建新的MIPS文档";
             this.新建NToolStripMenuItem.Click += new System.EventHandler(this.新建NToolStripMenuItem_Click);
             // 
             // 打开OToolStripMenuItem
@@ -121,6 +124,7 @@
             this.打开OToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.打开OToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.打开OToolStripMenuItem.Text = "打开(&O)...";
+            this.打开OToolStripMenuItem.ToolTipText = "打开一个或多个MIPS文档";
             this.打开OToolStripMenuItem.Click += new System.EventHandler(this.打开OToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
@@ -134,6 +138,7 @@
             this.保存SToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.保存SToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.保存SToolStripMenuItem.Text = "保存(S)";
+            this.保存SToolStripMenuItem.ToolTipText = "保存当前MIPS文档";
             this.保存SToolStripMenuItem.Click += new System.EventHandler(this.保存SToolStripMenuItem_Click);
             // 
             // 全部保存LToolStripMenuItem
@@ -143,6 +148,7 @@
             | System.Windows.Forms.Keys.S)));
             this.全部保存LToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.全部保存LToolStripMenuItem.Text = "全部保存(&L)";
+            this.全部保存LToolStripMenuItem.ToolTipText = "保存所有已经打开的文档";
             this.全部保存LToolStripMenuItem.Click += new System.EventHandler(this.全部保存LToolStripMenuItem_Click);
             // 
             // 另存为AToolStripMenuItem
@@ -150,6 +156,7 @@
             this.另存为AToolStripMenuItem.Name = "另存为AToolStripMenuItem";
             this.另存为AToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.另存为AToolStripMenuItem.Text = "另存为(A)...";
+            this.另存为AToolStripMenuItem.ToolTipText = "将当前文档保存至其他位置";
             this.另存为AToolStripMenuItem.Click += new System.EventHandler(this.另存为AToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
@@ -163,6 +170,7 @@
             this.关闭CToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
             this.关闭CToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.关闭CToolStripMenuItem.Text = "关闭(&C)";
+            this.关闭CToolStripMenuItem.ToolTipText = "关闭当前文档";
             this.关闭CToolStripMenuItem.Click += new System.EventHandler(this.关闭CToolStripMenuItem_Click);
             // 
             // 全部关闭WToolStripMenuItem
@@ -170,6 +178,7 @@
             this.全部关闭WToolStripMenuItem.Name = "全部关闭WToolStripMenuItem";
             this.全部关闭WToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.全部关闭WToolStripMenuItem.Text = "全部关闭(&W)";
+            this.全部关闭WToolStripMenuItem.ToolTipText = "关闭所有打开的文档";
             this.全部关闭WToolStripMenuItem.Click += new System.EventHandler(this.全部关闭WToolStripMenuItem_Click);
             // 
             // toolStripMenuItem7
@@ -183,6 +192,7 @@
             this.退出QToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
             this.退出QToolStripMenuItem.Size = new System.Drawing.Size(261, 26);
             this.退出QToolStripMenuItem.Text = "退出(&Q)";
+            this.退出QToolStripMenuItem.ToolTipText = "关闭所有打开的文档，并退出程序";
             this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
             // 
             // 编辑EToolStripMenuItem
@@ -195,6 +205,7 @@
             this.编辑EToolStripMenuItem.Name = "编辑EToolStripMenuItem";
             this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             this.编辑EToolStripMenuItem.Text = "编辑(&E)";
+            this.编辑EToolStripMenuItem.ToolTipText = "格式化代码/扩展指令选项";
             // 
             // 格式化代码FToolStripMenuItem
             // 
@@ -203,6 +214,7 @@
             | System.Windows.Forms.Keys.F)));
             this.格式化代码FToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.格式化代码FToolStripMenuItem.Text = "格式化代码(&F)";
+            this.格式化代码FToolStripMenuItem.ToolTipText = "调整代码的格式，使其更易读、更规范";
             this.格式化代码FToolStripMenuItem.Click += new System.EventHandler(this.格式化代码FToolStripMenuItem_Click);
             // 
             // toolStripMenuItem8
@@ -216,6 +228,7 @@
             this.启用长跳转LToolStripMenuItem.Name = "启用长跳转LToolStripMenuItem";
             this.启用长跳转LToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.启用长跳转LToolStripMenuItem.Text = "启用长跳转(&L)";
+            this.启用长跳转LToolStripMenuItem.ToolTipText = "使用12位而不是8位代码地址空间；如不确定硬件是否支持，请不要勾选";
             this.启用长跳转LToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用长跳转LToolStripMenuItem_CheckedChanged);
             // 
             // 启用扩展指令EToolStripMenuItem
@@ -224,6 +237,7 @@
             this.启用扩展指令EToolStripMenuItem.Name = "启用扩展指令EToolStripMenuItem";
             this.启用扩展指令EToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.启用扩展指令EToolStripMenuItem.Text = "启用扩展指令(&E)";
+            this.启用扩展指令EToolStripMenuItem.ToolTipText = "启用LPCL、LPCH、SPC三条硬件指令，和INIT、PUSH、POP、CALL、RET、HALT、ADDPC七条软件指令；如不确定硬件是否支持，请不要勾选";
             this.启用扩展指令EToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_CheckedChanged);
             // 
             // 生成BToolStripMenuItem
@@ -241,13 +255,15 @@
             this.生成BToolStripMenuItem.Name = "生成BToolStripMenuItem";
             this.生成BToolStripMenuItem.Size = new System.Drawing.Size(70, 24);
             this.生成BToolStripMenuItem.Text = "生成(&B)";
+            this.生成BToolStripMenuItem.ToolTipText = "生成机器码";
             // 
             // 文件末尾自动停机HToolStripMenuItem
             // 
             this.文件末尾自动停机HToolStripMenuItem.CheckOnClick = true;
             this.文件末尾自动停机HToolStripMenuItem.Name = "文件末尾自动停机HToolStripMenuItem";
             this.文件末尾自动停机HToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
-            this.文件末尾自动停机HToolStripMenuItem.Text = "文件末尾自动停机(&H)";
+            this.文件末尾自动停机HToolStripMenuItem.Text = "文件末尾自动停机(&S)";
+            this.文件末尾自动停机HToolStripMenuItem.ToolTipText = "在文件末尾插入一行“BEQ R1,R1,0xff”，使得运行到文件末尾时在此停住";
             this.文件末尾自动停机HToolStripMenuItem.Click += new System.EventHandler(this.文件末尾自动停机HToolStripMenuItem_Click);
             // 
             // toolStripMenuItem9
@@ -261,6 +277,7 @@
             this.intelHex文件ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
             this.intelHex文件ToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.intelHex文件ToolStripMenuItem.Text = "&Intel Hex文件...";
+            this.intelHex文件ToolStripMenuItem.ToolTipText = "从当前文件创建兼容Quartus的Intel Hex文件";
             this.intelHex文件ToolStripMenuItem.Click += new System.EventHandler(this.intelHex文件ToolStripMenuItem_Click);
             // 
             // 二进制机器码BToolStripMenuItem
@@ -268,6 +285,7 @@
             this.二进制机器码BToolStripMenuItem.Name = "二进制机器码BToolStripMenuItem";
             this.二进制机器码BToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.二进制机器码BToolStripMenuItem.Text = "二进制机器码(&B)...";
+            this.二进制机器码BToolStripMenuItem.ToolTipText = "从当前文件创建只包含纯二进制机器码的文本文件";
             this.二进制机器码BToolStripMenuItem.Click += new System.EventHandler(this.二进制机器码BToolStripMenuItem_Click);
             // 
             // 十六进制机器码HToolStripMenuItem
@@ -275,6 +293,7 @@
             this.十六进制机器码HToolStripMenuItem.Name = "十六进制机器码HToolStripMenuItem";
             this.十六进制机器码HToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.十六进制机器码HToolStripMenuItem.Text = "十六进制机器码(&H)...";
+            this.十六进制机器码HToolStripMenuItem.ToolTipText = "从当前文件创建只包含纯十六进制机器码的文本文件";
             this.十六进制机器码HToolStripMenuItem.Click += new System.EventHandler(this.十六进制机器码HToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
@@ -287,6 +306,7 @@
             this.原始汇编AToolStripMenuItem.Name = "原始汇编AToolStripMenuItem";
             this.原始汇编AToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.原始汇编AToolStripMenuItem.Text = "原始汇编(&A)...";
+            this.原始汇编AToolStripMenuItem.ToolTipText = "从当前文件创建将所有软件扩展指令展开、所有注释删除、所有行号删除、所有跳转目标用立即数表示的汇编程序";
             this.原始汇编AToolStripMenuItem.Click += new System.EventHandler(this.原始汇编AToolStripMenuItem_Click);
             // 
             // toolStripMenuItem6
@@ -300,6 +320,7 @@
             this.下载DToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
             this.下载DToolStripMenuItem.Size = new System.Drawing.Size(245, 26);
             this.下载DToolStripMenuItem.Text = "下载(&D)";
+            this.下载DToolStripMenuItem.ToolTipText = "连接FPGA下载器后，将当前程序下载至FPGA";
             this.下载DToolStripMenuItem.Click += new System.EventHandler(this.下载DToolStripMenuItem_Click);
             // 
             // 调试DToolStripMenuItem
@@ -318,6 +339,7 @@
             this.调试DToolStripMenuItem.Name = "调试DToolStripMenuItem";
             this.调试DToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.调试DToolStripMenuItem.Text = "调试(&D)";
+            this.调试DToolStripMenuItem.ToolTipText = "调试程序功能";
             // 
             // 开始执行SToolStripMenuItem
             // 
@@ -325,6 +347,7 @@
             this.开始执行SToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.开始执行SToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.开始执行SToolStripMenuItem.Text = "开始执行(&R)";
+            this.开始执行SToolStripMenuItem.ToolTipText = "顺序执行当前程序";
             this.开始执行SToolStripMenuItem.Click += new System.EventHandler(this.开始执行SToolStripMenuItem_Click);
             // 
             // 暂停PToolStripMenuItem
@@ -333,6 +356,7 @@
             this.暂停PToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
             this.暂停PToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.暂停PToolStripMenuItem.Text = "暂停(&P)";
+            this.暂停PToolStripMenuItem.ToolTipText = "暂停程序的执行，以便查看/修改寄存器/存储器";
             this.暂停PToolStripMenuItem.Click += new System.EventHandler(this.暂停PToolStripMenuItem_Click);
             // 
             // 停止执行XToolStripMenuItem
@@ -341,6 +365,7 @@
             this.停止执行XToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));
             this.停止执行XToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.停止执行XToolStripMenuItem.Text = "停止执行(&X)";
+            this.停止执行XToolStripMenuItem.ToolTipText = "停止程序执行，退出调试器";
             this.停止执行XToolStripMenuItem.Click += new System.EventHandler(this.停止执行XToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
@@ -354,6 +379,7 @@
             this.逐指令IToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F11)));
             this.逐指令IToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.逐指令IToolStripMenuItem.Text = "逐指令(&I)";
+            this.逐指令IToolStripMenuItem.ToolTipText = "若处于暂停状态，则执行1条硬件指令，然后返回暂停状态；否则仅仅打开调试器";
             this.逐指令IToolStripMenuItem.Click += new System.EventHandler(this.逐指令IToolStripMenuItem_Click);
             // 
             // 逐语句SToolStripMenuItem
@@ -362,6 +388,7 @@
             this.逐语句SToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
             this.逐语句SToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.逐语句SToolStripMenuItem.Text = "逐语句(&S)";
+            this.逐语句SToolStripMenuItem.ToolTipText = "若处于暂停状态，则执行1条软件指令，然后返回暂停状态；否则仅仅打开调试器";
             this.逐语句SToolStripMenuItem.Click += new System.EventHandler(this.逐语句SToolStripMenuItem_Click);
             // 
             // 逐过程OToolStripMenuItem
@@ -370,6 +397,7 @@
             this.逐过程OToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
             this.逐过程OToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.逐过程OToolStripMenuItem.Text = "逐过程(&O)";
+            this.逐过程OToolStripMenuItem.ToolTipText = "若处于暂停状态，则顺序执行直至当前过程调用返回后，返回暂停状态；否则仅仅打开调试器";
             this.逐过程OToolStripMenuItem.Click += new System.EventHandler(this.逐过程OToolStripMenuItem_Click);
             // 
             // 跳出JToolStripMenuItem
@@ -378,6 +406,7 @@
             this.跳出JToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F11)));
             this.跳出JToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.跳出JToolStripMenuItem.Text = "跳出(&J)";
+            this.跳出JToolStripMenuItem.ToolTipText = "顺序执行当前程序，直至返回其调用者";
             this.跳出JToolStripMenuItem.Click += new System.EventHandler(this.跳出JToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
@@ -391,15 +420,18 @@
             this.切换断点BToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
             this.切换断点BToolStripMenuItem.Size = new System.Drawing.Size(234, 26);
             this.切换断点BToolStripMenuItem.Text = "切换断点(&B)";
+            this.切换断点BToolStripMenuItem.ToolTipText = "在当前位置添加/删除断点，使得程序执行到此位置时立即进入暂停状态";
             this.切换断点BToolStripMenuItem.Click += new System.EventHandler(this.切换断点BToolStripMenuItem_Click);
             // 
             // 帮助HToolStripMenuItem
             // 
             this.帮助HToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.查看帮助VToolStripMenuItem});
+            this.查看帮助VToolStripMenuItem,
+            this.关于AToolStripMenuItem});
             this.帮助HToolStripMenuItem.Name = "帮助HToolStripMenuItem";
             this.帮助HToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
             this.帮助HToolStripMenuItem.Text = "帮助(&H)";
+            this.帮助HToolStripMenuItem.ToolTipText = "获得帮助";
             // 
             // 查看帮助VToolStripMenuItem
             // 
@@ -407,7 +439,15 @@
             this.查看帮助VToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
             this.查看帮助VToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
             this.查看帮助VToolStripMenuItem.Text = "查看帮助(&V)...";
+            this.查看帮助VToolStripMenuItem.ToolTipText = "打开此程序的帮助";
             this.查看帮助VToolStripMenuItem.Click += new System.EventHandler(this.查看帮助VToolStripMenuItem_Click);
+            // 
+            // 关于AToolStripMenuItem
+            // 
+            this.关于AToolStripMenuItem.Name = "关于AToolStripMenuItem";
+            this.关于AToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
+            this.关于AToolStripMenuItem.Text = "关于(&A)...";
+            this.关于AToolStripMenuItem.Click += new System.EventHandler(this.关于AToolStripMenuItem_Click);
             // 
             // tabControl1
             // 
@@ -488,6 +528,7 @@
         private System.Windows.Forms.ToolStripMenuItem 启用扩展指令EToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 文件末尾自动停机HToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
+        private System.Windows.Forms.ToolStripMenuItem 关于AToolStripMenuItem;
     }
 }
 
