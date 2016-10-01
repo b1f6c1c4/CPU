@@ -5,7 +5,7 @@ using Antlr4.Runtime;
 
 namespace Assembler
 {
-    partial class AsmParser
+    partial class AsmEParser
     {
         public sealed partial class MacroContext : IFlattenable<IExecutableInstruction>
         {
@@ -121,11 +121,11 @@ SPC  R2, R0         ; +8
                         return Parse(Halt, debug);
                     case "PUSH":
                         if (Rx.Text.ToUpper() != "BP" &&
-                            RegisterNumber(Rx) == 1)
+                            SemanticHelper.RegisterNumber(Rx) == 1)
                             throw new ApplicationException("Cannot PUSH R1!");
                         return Parse(Rx.Text.ToUpper() == "BP" ? PushBp : string.Format(Push, Rx.Text), debug);
                     case "POP":
-                        if (RegisterNumber(Rx) == 1)
+                        if (SemanticHelper.RegisterNumber(Rx) == 1)
                             throw new ApplicationException("Cannot POP R1!");
                         return Parse(string.Format(Pop, Rx.Text), debug);
                     default:
@@ -149,10 +149,10 @@ SPC  R2, R0         ; +8
                         break;
                     case "PUSH":
                         str =
-                            $"{Op.Text.ToUpper().PadRight(4)} {(Rx.Text.ToUpper() == "BP" ? "BP" : $"R{RegisterNumber(Rx)}")}";
+                            $"{Op.Text.ToUpper().PadRight(4)} {(Rx.Text.ToUpper() == "BP" ? "BP" : $"R{SemanticHelper.RegisterNumber(Rx)}")}";
                         break;
                     case "POP":
-                        str = $"{Op.Text.ToUpper().PadRight(4)} R{RegisterNumber(Rx)}";
+                        str = $"{Op.Text.ToUpper().PadRight(4)} R{SemanticHelper.RegisterNumber(Rx)}";
                         break;
                     default:
                         throw new InvalidOperationException();
@@ -162,8 +162,8 @@ SPC  R2, R0         ; +8
 
             private static IReadOnlyList<IExecutableInstruction> Parse(string str, bool debug)
             {
-                var lexer = new AsmLexer(new AntlrInputStream(str));
-                var parser = new AsmParser(new CommonTokenStream(lexer));
+                var lexer = new AsmELexer(new AntlrInputStream(str));
+                var parser = new AsmEParser(new CommonTokenStream(lexer));
                 var prog = parser.prog();
                 return
                     prog.line()

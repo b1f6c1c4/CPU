@@ -16,7 +16,7 @@ namespace Assembler
 
         public void SetWriter(TextWriter writer) => m_Writer = writer;
 
-        protected override void Parse(AsmParser.LineContext context, string filename, int diff = 0)
+        protected override void Parse(AsmEParser.LineContext context, string filename, int diff = 0)
         {
             if (context.label() != null)
                 m_Writer.WriteLine($"{context.label().Name().Symbol.Text}:");

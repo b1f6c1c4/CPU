@@ -2,13 +2,13 @@
 
 namespace Assembler
 {
-    partial class AsmParser
+    partial class AsmEParser
     {
         public sealed partial class InstructionContext : IExecutableInstruction
         {
             public PCTarget Execute(Context context) => GetInst().Execute(context);
 
-            private IExecutableInstruction GetInst()
+            public IExecutableInstruction GetInst()
             {
                 if (typeI() != null)
                     return typeI();
@@ -24,143 +24,17 @@ namespace Assembler
 
         public sealed partial class TypeRContext : IExecutableInstruction
         {
-            public PCTarget Execute(Context context)
-            {
-                switch (Op.Text.ToUpper())
-                {
-                    case "AND":
-                        context.Registers[RegisterNumber(Rd)] =
-                            (byte)(context.Registers[RegisterNumber(Rs)] &
-                                   context.Registers[RegisterNumber(Rt)]);
-                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                        return null;
-                    case "OR":
-                        context.Registers[RegisterNumber(Rd)] =
-                            (byte)(context.Registers[RegisterNumber(Rs)] |
-                                   context.Registers[RegisterNumber(Rt)]);
-                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                        return null;
-                    case "ADD":
-                        {
-                            var s = context.Registers[RegisterNumber(Rs)] +
-                                    context.Registers[RegisterNumber(Rt)];
-                            context.CFlag = (s & ~0xff) != 0;
-                            context.Registers[RegisterNumber(Rd)] = (byte)s;
-                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                            return null;
-                        }
-                    case "SUB":
-                        {
-                            var s = context.Registers[RegisterNumber(Rs)] -
-                                    context.Registers[RegisterNumber(Rt)];
-                            context.CFlag = (s & ~0xff) == 0;
-                            context.Registers[RegisterNumber(Rd)] = (byte)s;
-                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                            return null;
-                        }
-                    case "ADDC":
-                        {
-                            var s = context.Registers[RegisterNumber(Rs)] +
-                                    context.Registers[RegisterNumber(Rt)] +
-                                    (context.CFlag ? 1 : 0);
-                            context.CFlag = (s & ~0xff) != 0;
-                            context.Registers[RegisterNumber(Rd)] = (byte)s;
-                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                            return null;
-                        }
-                    case "SUBC":
-                        {
-                            var s = context.Registers[RegisterNumber(Rs)] -
-                                    context.Registers[RegisterNumber(Rt)] -
-                                    (context.CFlag ? 0 : 1);
-                            context.CFlag = (s & ~0xff) == 0;
-                            context.Registers[RegisterNumber(Rd)] = (byte)s;
-                            context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                            return null;
-                        }
-                    case "SLT":
-                        context.Registers[RegisterNumber(Rd)] =
-                            (context.Registers[RegisterNumber(Rs)] <
-                             context.Registers[RegisterNumber(Rt)])
-                                ? (byte)1
-                                : (byte)0;
-                        context.ZeroFlag = context.Registers[RegisterNumber(Rd)] == 0;
-                        return null;
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
+            public PCTarget Execute(Context context) => TypeRHelper.Execute(this, context);
         }
 
         public sealed partial class TypeIContext : IExecutableInstruction
         {
-            public PCTarget Execute(Context context)
-            {
-                switch (Op.Text.ToUpper())
-                {
-                    case "ANDI":
-                        context.Registers[RegisterNumber(Rt)] =
-                            (byte)(context.Registers[RegisterNumber(Rs)] &
-                                   number());
-                        context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
-                        return null;
-                    case "ORI":
-                        context.Registers[RegisterNumber(Rt)] =
-                            (byte)(context.Registers[RegisterNumber(Rs)] |
-                                   number());
-                        context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
-                        return null;
-                    case "ADDI":
-                        {
-                            var s = context.Registers[RegisterNumber(Rs)] +
-                                    number();
-                            context.CFlag = (s & ~0xff) != 0;
-                            context.Registers[RegisterNumber(Rt)] = (byte)s;
-                            context.ZeroFlag = context.Registers[RegisterNumber(Rt)] == 0;
-                            return null;
-                        }
-                    case "LW":
-                        {
-                            var addr = (context.Registers[RegisterNumber(Rs)] + number()) & 0xff;
-                            context.Registers[RegisterNumber(Rt)] = context.Ram[addr];
-                            return null;
-                        }
-                    case "SW":
-                        {
-                            var addr = (context.Registers[RegisterNumber(Rs)] + number()) & 0xff;
-                            context.Ram[addr] = context.Registers[RegisterNumber(Rt)];
-                            return null;
-                        }
-                    case "BEQ":
-                        if (context.Registers[RegisterNumber(Rs)] == context.Registers[RegisterNumber(Rt)])
-                            return obj().Name() == null
-                                       ? (PCTarget)(sbyte)(int)obj().number()
-                                       : obj().Name().Symbol.Text;
-                        return null;
-                    case "BNE":
-                        if (context.Registers[RegisterNumber(Rs)] != context.Registers[RegisterNumber(Rt)])
-                            return obj().Name() == null
-                                       ? (PCTarget)(sbyte)(int)obj().number()
-                                       : obj().Name().Symbol.Text;
-                        return null;
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
+            public PCTarget Execute(Context context) => TypeIHelper.Execute(this, context);
         }
 
         public sealed partial class TypeJContext : IExecutableInstruction
         {
-            public PCTarget Execute(Context context)
-            {
-                switch (Op.Text.ToUpper())
-                {
-                    case "JMP":
-                        return obj().Name() == null ? new PCTarget(obj().number(), true) : obj().Name().Symbol.Text;
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
+            public PCTarget Execute(Context context) => TypeJHelper.Execute(this, context);
         }
 
         public sealed partial class TypePContext : IExecutableInstruction
@@ -170,15 +44,15 @@ namespace Assembler
                 switch (Op.Text)
                 {
                     case "LPCH":
-                        context.Registers[RegisterNumber(Rt)] = (byte)((context.PC + 1) >> 8);
+                        context.Registers[SemanticHelper.RegisterNumber(Rt)] = (byte)((context.PC + 1) >> 8);
                         return null;
                     case "LPCL":
-                        context.Registers[RegisterNumber(Rt)] = (byte)(context.PC + 1);
+                        context.Registers[SemanticHelper.RegisterNumber(Rt)] = (byte)(context.PC + 1);
                         return null;
                     case "SPC":
                         return new PCTarget(
-                            ((context.Registers[RegisterNumber(Rd)] << 8) |
-                             context.Registers[RegisterNumber(Rt)]),
+                            ((context.Registers[SemanticHelper.RegisterNumber(Rd)] << 8) |
+                             context.Registers[SemanticHelper.RegisterNumber(Rt)]),
                             true
                             );
                     default:

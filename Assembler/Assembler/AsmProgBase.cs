@@ -40,6 +40,8 @@ namespace Assembler
 
         protected readonly Dictionary<string, int> Symbols;
 
+        public bool EnableExtension { get; set; }
+
         public bool EnableLongJump { get; set; }
 
         private int MaxLength => EnableLongJump ? 4096 : 256;
@@ -48,6 +50,7 @@ namespace Assembler
 
         protected AsmProgBase()
         {
+            EnableExtension = true;
             EnableLongJump = true;
             Instructions = new List<IExecutableInstruction>();
             m_Filenames = new List<string>();
@@ -60,10 +63,10 @@ namespace Assembler
             var last = 0;
             using (var sin = new StreamReader(filename))
             {
-                var lexer = new AsmLexer(new AntlrInputStream(sin));
-                var parser = new AsmParser(new CommonTokenStream(lexer));
+                var lexer = new AsmELexer(new AntlrInputStream(sin));
+                var parser = new AsmEParser(new CommonTokenStream(lexer));
                 parser.AddErrorListener(new AssemblyHandler(filename));
-                AsmParser.ProgContext prog;
+                AsmEParser.ProgContext prog;
                 try
                 {
                     prog = parser.prog();
@@ -98,8 +101,8 @@ namespace Assembler
 
             if (halt)
             {
-                var lexer = new AsmLexer(new AntlrInputStream("HALT" + Environment.NewLine));
-                var parser = new AsmParser(new CommonTokenStream(lexer));
+                var lexer = new AsmELexer(new AntlrInputStream("HALT" + Environment.NewLine));
+                var parser = new AsmEParser(new CommonTokenStream(lexer));
                 Parse(parser.line(), filename, last);
             }
         }
@@ -110,7 +113,7 @@ namespace Assembler
                 throw new ApplicationException($"程序过长（{Instructions.Count} / {MaxLength}）");
         }
 
-        protected virtual void Parse(AsmParser.LineContext context, string filename, int diff = 0)
+        protected virtual void Parse(AsmEParser.LineContext context, string filename, int diff = 0)
         {
             if (context.label() != null)
             {
