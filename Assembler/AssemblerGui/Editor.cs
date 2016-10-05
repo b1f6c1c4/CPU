@@ -218,20 +218,28 @@ namespace AssemblerGui
             if (filePath == null)
                 return;
 
-            if (filePath != FilePath)
+            try
             {
-                if (PromptForSave() == PromptForSaveResult.Cancel)
-                    return;
+                if (filePath != FilePath)
+                {
+                    if (PromptForSave() == PromptForSaveResult.Cancel)
+                        return;
 
-                SetFile(filePath);
-                ReloadDoc();
+                    SetFile(filePath);
+                    ReloadDoc();
+                }
+                else if (force)
+                {
+                    var t = m_Scintilla.CurrentLine;
+                    ReloadDoc();
+                    if (m_Scintilla.Lines.Count > t)
+                        m_Scintilla.GotoPosition(m_Scintilla.Lines[t].Position);
+                }
             }
-            else if (force)
+            catch (Exception)
             {
-                var t = m_Scintilla.CurrentLine;
-                ReloadDoc();
-                if (m_Scintilla.Lines.Count > t)
-                    m_Scintilla.GotoPosition(m_Scintilla.Lines[t].Position);
+                Close();
+                throw;
             }
 
             if (!line.HasValue)

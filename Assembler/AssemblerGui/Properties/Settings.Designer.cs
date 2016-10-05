@@ -82,5 +82,16 @@ namespace AssemblerGui.Properties {
                 this["Advance"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Files {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Files"]));
+            }
+            set {
+                this["Files"] = value;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -48,7 +49,30 @@ namespace AssemblerGui
 
             SetupDebugger();
 
-            NewFile();
+            if (Settings.Default.Files == null ||
+                Settings.Default.Files.Count == 0)
+                NewFile();
+            else
+            {
+                foreach (var file in Settings.Default.Files)
+                {
+                    try
+                    {
+                        OpenFile(file);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(
+                                        $"打开文件{file}时发生错误：" +
+                                        e.Message,
+                                        "错误",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                    }
+                }
+                if (!Editors.Any())
+                    NewFile();
+            }
 
             ActiveControl = TheEditor?.ActiveControl;
         }
@@ -267,9 +291,21 @@ namespace AssemblerGui
         {
             if (!SaveAll())
                 e.Cancel = true;
+            else
+            {
+                if (Settings.Default.Files == null)
+                    Settings.Default.Files = new StringCollection();
+                Settings.Default.Files.Clear();
+                foreach (var ed in Editors)
+                {
+                    if (ed.FilePath != null)
+                        Settings.Default.Files.Add(ed.FilePath);
+                }
+                Settings.Default.Save();
+            }
         }
 
-        private bool PromptAdvance()
+        private static bool PromptAdvance()
         {
             if (Settings.Default.Advance)
                 return true;
