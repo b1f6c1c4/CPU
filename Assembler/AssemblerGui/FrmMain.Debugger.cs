@@ -52,7 +52,7 @@ namespace AssemblerGui
                     if (m_Debugger == null)
                         return;
                     m_IsRunning = false;
-                    OpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line, null, true);
+                    TryOpenFile(m_RawDebugger.Source.FilePath, m_RawDebugger.Source.Line, null, true);
                     panel1.Pause(m_RawDebugger);
                 };
             OnExited += StopDebugger;
@@ -89,7 +89,7 @@ namespace AssemblerGui
             catch (AssemblyException e)
             {
                 MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                OpenFile(e.FilePath, e.Line, e.CharPos);
+                TryOpenFile(e.FilePath, e.Line, e.CharPos);
                 return;
             }
 
@@ -107,7 +107,7 @@ namespace AssemblerGui
                                        var ee = e as AssemblyException;
                                        if (ee == null)
                                            return;
-                                       OpenFile(ee.FilePath, ee.Line, ee.CharPos);
+                                       TryOpenFile(ee.FilePath, ee.Line, ee.CharPos);
                                    });
 
             panel1.Show();

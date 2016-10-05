@@ -54,22 +54,7 @@ namespace AssemblerGui
                 NewFile();
             else
             {
-                foreach (var file in Settings.Default.Files)
-                {
-                    try
-                    {
-                        OpenFile(file);
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(
-                                        $"打开文件{file}时发生错误：" +
-                                        e.Message,
-                                        "错误",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                    }
-                }
+                TryOpenFiles(Settings.Default.Files.Cast<string>());
                 if (!Editors.Any())
                     NewFile();
             }
@@ -131,7 +116,10 @@ namespace AssemblerGui
             asm.EnableLongJump = Settings.Default.EnableLongJump;
             try
             {
-                var pre = SaveDependency(TheEditor.FilePath);
+                var pre = SaveDependency();
+                if (pre == null)
+                    return false;
+
                 string fn;
                 using (var mem = new MemoryStream())
                 using (var sw = new StreamWriter(mem))
@@ -150,7 +138,7 @@ namespace AssemblerGui
                     catch (AssemblyException e)
                     {
                         MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        OpenFile(e.FilePath, e.Line, e.CharPos);
+                        TryOpenFile(e.FilePath, e.Line, e.CharPos);
                         return false;
                     }
                     sw.Flush();
@@ -183,6 +171,15 @@ namespace AssemblerGui
                 MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+
+        private Preprocessor SaveDependency()
+        {
+            if (TheEditor.FilePath == null)
+                if (!TheEditor.PerformSave())
+                    return null;
+
+            return SaveDependency(TheEditor.FilePath);
         }
 
         private Preprocessor SaveDependency(string initial)
@@ -236,7 +233,7 @@ namespace AssemblerGui
                                         "错误",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
-                        OpenFile(TheEditor.FilePath, e.Line, e.CharPos);
+                        TryOpenFile(TheEditor.FilePath, e.Line, e.CharPos);
                         return;
                     }
                     sw.Flush();
@@ -297,10 +294,8 @@ namespace AssemblerGui
                     Settings.Default.Files = new StringCollection();
                 Settings.Default.Files.Clear();
                 foreach (var ed in Editors)
-                {
                     if (ed.FilePath != null)
                         Settings.Default.Files.Add(ed.FilePath);
-                }
                 Settings.Default.Save();
             }
         }
@@ -388,8 +383,7 @@ namespace AssemblerGui
             var files = e.Data.GetData(DataFormats.FileDrop) as string[];
             if (files == null)
                 return;
-            foreach (var file in files)
-                OpenFile(file);
+            TryOpenFiles(files);
         }
 
         private void FrmMain_DragEnter(object sender, DragEventArgs e)

@@ -52,6 +52,30 @@ namespace AssemblerGui
             OnStateChanged?.Invoke();
         }
 
+        private void TryOpenFiles(IEnumerable<string> files)
+        {
+            foreach (var file in files)
+                TryOpenFile(file);
+        }
+
+        private void TryOpenFile(string str, int? line = null, int? charPos = null, bool debugging = false,
+                                 bool force = false)
+        {
+            try
+            {
+                OpenFile(str, line, charPos, debugging, force);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                                $"打开文件{str}时发生错误：" +
+                                e.Message,
+                                "错误",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+        }
+
         private void OpenFile(string str, int? line = null, int? charPos = null, bool debugging = false,
                               bool force = false)
         {
@@ -129,8 +153,7 @@ namespace AssemblerGui
             if (strs == null)
                 return;
 
-            foreach (var str in strs)
-                OpenFile(str);
+            TryOpenFiles(strs);
         }
 
         private void 退出QToolStripMenuItem_Click(object sender, EventArgs e)

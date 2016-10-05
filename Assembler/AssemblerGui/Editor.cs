@@ -290,7 +290,20 @@ namespace AssemblerGui
                     return false;
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            File.WriteAllText(FilePath, m_Scintilla.Text);
+            try
+            {
+                File.WriteAllText(FilePath, m_Scintilla.Text);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                                $"保存文件{FilePath}时发生错误：" +
+                                e.Message,
+                                "错误",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return false;
+            }
             Edited = false;
             OnStateChanged?.Invoke();
 
