@@ -70,5 +70,17 @@ namespace AssemblerGui.Properties {
                 this["AppendHalt"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Advance {
+            get {
+                return ((bool)(this["Advance"]));
+            }
+            set {
+                this["Advance"] = value;
+            }
+        }
     }
 }

@@ -61,6 +61,11 @@ namespace AssemblerGui
 
             sb.Append($" v{Application.ProductVersion}");
 
+            if (Settings.Default.EnableLongJump)
+                sb.Append(" [长跳转]");
+            if (Settings.Default.EnableExtension)
+                sb.Append(" [扩展指令]");
+
             if (TheEditor != null)
             {
                 sb.Append($" [{TheEditor.FileName}]");
@@ -264,6 +269,28 @@ namespace AssemblerGui
                 e.Cancel = true;
         }
 
+        private bool PromptAdvance()
+        {
+            if (Settings.Default.Advance)
+                return true;
+
+            var res =
+                MessageBox.Show(
+                                @"警告：启用长跳转 和/或 启用扩展指令 可能会造成意想不到的后果，" +
+                                @"请确保已经参阅软件源代码、了解长跳转机制和扩展指令所有细节！" +
+                                @"是否确认启用？",
+                                "高级功能",
+                                MessageBoxButtons.OKCancel,
+                                MessageBoxIcon.Exclamation,
+                                MessageBoxDefaultButton.Button2);
+            if (res == DialogResult.Cancel)
+                return false;
+
+            Settings.Default.Advance = true;
+            Settings.Default.Save();
+            return true;
+        }
+
         private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e) =>
             ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出", TheEditor.FileName));
 
@@ -335,16 +362,27 @@ namespace AssemblerGui
                 e.Effect = DragDropEffects.Copy;
         }
 
-        private void 启用长跳转LToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void 启用长跳转LToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Settings.Default.EnableLongJump = 启用长跳转LToolStripMenuItem.Checked;
+            if (!Settings.Default.EnableLongJump)
+                if (!PromptAdvance())
+                    return;
+
+            Settings.Default.EnableLongJump ^= true;
             Settings.Default.Save();
+            启用长跳转LToolStripMenuItem.Checked = Settings.Default.EnableLongJump;
+            OnStateChanged?.Invoke();
         }
 
-        private void 启用扩展指令EToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void 启用扩展指令EToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Settings.Default.EnableExtension = 启用扩展指令EToolStripMenuItem.Checked;
+            if (!Settings.Default.EnableLongJump)
+                if (!PromptAdvance())
+                    return;
+
+            Settings.Default.EnableExtension ^= true;
             Settings.Default.Save();
+            启用扩展指令EToolStripMenuItem.Checked = Settings.Default.EnableExtension;
             OnStateChanged?.Invoke();
         }
 
@@ -355,6 +393,7 @@ namespace AssemblerGui
         }
 
         private void 联系作者AToolStripMenuItem_Click(object sender, EventArgs e) =>
-            Process.Start($"mailto:b1f6c1c4@gmail.com?subject=MIPS%20Assembler&body=Version%20{WebUtility.UrlEncode(Application.ProductVersion)}");
+            Process.Start(
+                          $"mailto:b1f6c1c4@gmail.com?subject=MIPS%20Assembler&body=Version%20{WebUtility.UrlEncode(Application.ProductVersion)}");
     }
 }

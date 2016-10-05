@@ -224,21 +224,19 @@
             // 
             // 启用长跳转LToolStripMenuItem
             // 
-            this.启用长跳转LToolStripMenuItem.CheckOnClick = true;
             this.启用长跳转LToolStripMenuItem.Name = "启用长跳转LToolStripMenuItem";
             this.启用长跳转LToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.启用长跳转LToolStripMenuItem.Text = "启用长跳转(&L)";
             this.启用长跳转LToolStripMenuItem.ToolTipText = "使用12位而不是8位代码地址空间；如不确定硬件是否支持，请不要勾选";
-            this.启用长跳转LToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用长跳转LToolStripMenuItem_CheckedChanged);
+            this.启用长跳转LToolStripMenuItem.Click += new System.EventHandler(this.启用长跳转LToolStripMenuItem_Click);
             // 
             // 启用扩展指令EToolStripMenuItem
             // 
-            this.启用扩展指令EToolStripMenuItem.CheckOnClick = true;
             this.启用扩展指令EToolStripMenuItem.Name = "启用扩展指令EToolStripMenuItem";
             this.启用扩展指令EToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.启用扩展指令EToolStripMenuItem.Text = "启用扩展指令(&E)";
             this.启用扩展指令EToolStripMenuItem.ToolTipText = "启用LPCL、LPCH、SPC三条硬件指令，和INIT、PUSH、POP、CALL、RET、HALT、ADDPC七条软件指令；如不确定硬件是否支持，请不要勾选";
-            this.启用扩展指令EToolStripMenuItem.CheckedChanged += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_CheckedChanged);
+            this.启用扩展指令EToolStripMenuItem.Click += new System.EventHandler(this.启用扩展指令EToolStripMenuItem_Click);
             // 
             // 生成BToolStripMenuItem
             // 
