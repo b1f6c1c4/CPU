@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using HeyRed.MarkdownSharp;
@@ -25,18 +26,29 @@ namespace AssemblerGui
         {
             InitializeComponent();
 
-            var assembly = Assembly.GetExecutingAssembly();
-            const string resourceName = "AssemblerGui.Resources.AssemblerGui.md";
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                const string resourceName = "AssemblerGui.Resources.AssemblerGui.md";
 
-            string result;
+                string result;
 
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-                // ReSharper disable once AssignNullToNotNullAttribute
-            using (var reader = new StreamReader(stream))
-                result = reader.ReadToEnd();
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                using (var reader = new StreamReader(stream))
+                    result = reader.ReadToEnd();
 
-            var md = new Markdown();
-            webBrowser1.DocumentText = md.Transform(result);
+                var md = new Markdown();
+                webBrowser1.DocumentText = md.Transform(result);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                                e.Message,
+                                "错误",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
         }
     }
 }
