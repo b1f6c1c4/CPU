@@ -69,7 +69,7 @@
             this.切换断点BToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.帮助HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.查看帮助VToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.关于AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.联系作者AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -427,7 +427,7 @@
             // 
             this.帮助HToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.查看帮助VToolStripMenuItem,
-            this.关于AToolStripMenuItem});
+            this.联系作者AToolStripMenuItem});
             this.帮助HToolStripMenuItem.Name = "帮助HToolStripMenuItem";
             this.帮助HToolStripMenuItem.Size = new System.Drawing.Size(73, 24);
             this.帮助HToolStripMenuItem.Text = "帮助(&H)";
@@ -442,12 +442,12 @@
             this.查看帮助VToolStripMenuItem.ToolTipText = "打开此程序的帮助";
             this.查看帮助VToolStripMenuItem.Click += new System.EventHandler(this.查看帮助VToolStripMenuItem_Click);
             // 
-            // 关于AToolStripMenuItem
+            // 联系作者AToolStripMenuItem
             // 
-            this.关于AToolStripMenuItem.Name = "关于AToolStripMenuItem";
-            this.关于AToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
-            this.关于AToolStripMenuItem.Text = "关于(&A)...";
-            this.关于AToolStripMenuItem.Click += new System.EventHandler(this.关于AToolStripMenuItem_Click);
+            this.联系作者AToolStripMenuItem.Name = "联系作者AToolStripMenuItem";
+            this.联系作者AToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
+            this.联系作者AToolStripMenuItem.Text = "联系作者(&A)...";
+            this.联系作者AToolStripMenuItem.Click += new System.EventHandler(this.联系作者AToolStripMenuItem_Click);
             // 
             // tabControl1
             // 
@@ -528,7 +528,7 @@
         private System.Windows.Forms.ToolStripMenuItem 启用扩展指令EToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 文件末尾自动停机HToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
-        private System.Windows.Forms.ToolStripMenuItem 关于AToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 联系作者AToolStripMenuItem;
     }
 }
 

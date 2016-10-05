@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -58,9 +59,11 @@ namespace AssemblerGui
 
             sb.Append(m_Debugger != null ? "MIPS调试器" : "MIPS编辑器");
 
+            sb.Append($" v{Application.ProductVersion}");
+
             if (TheEditor != null)
             {
-                sb.Append($"- [{TheEditor.FileName}]");
+                sb.Append($" [{TheEditor.FileName}]");
                 if (TheEditor.Edited)
                     sb.Append("*");
             }
@@ -351,7 +354,7 @@ namespace AssemblerGui
             Settings.Default.Save();
         }
 
-        private void 关于AToolStripMenuItem_Click(object sender, EventArgs e) =>
-            Process.Start("https://github.com/b1f6c1c4/CPU");
+        private void 联系作者AToolStripMenuItem_Click(object sender, EventArgs e) =>
+            Process.Start($"mailto:b1f6c1c4@gmail.com?subject=MIPS%20Assembler&body=Version%20{WebUtility.UrlEncode(Application.ProductVersion)}");
     }
 }
