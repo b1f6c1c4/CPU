@@ -23,7 +23,7 @@ namespace AssemblerGui
 
         private bool m_Downloading;
 
-        public FrmMain()
+        private void Setup()
         {
             SetProcessDPIAware();
             InitializeComponent();
@@ -48,7 +48,10 @@ namespace AssemblerGui
                               };
 
             SetupDebugger();
+        }
 
+        private void LoadLastFiles()
+        {
             if (Settings.Default.Files == null ||
                 Settings.Default.Files.Count == 0)
                 NewFile();
@@ -58,6 +61,25 @@ namespace AssemblerGui
                 if (!Editors.Any())
                     NewFile();
             }
+        }
+
+        public FrmMain()
+        {
+            Setup();
+
+            LoadLastFiles();
+
+            ActiveControl = TheEditor?.ActiveControl;
+        }
+
+        public FrmMain(ICollection<string> args)
+        {
+            Setup();
+
+            if (args == null || !args.Any())
+                LoadLastFiles();
+            else
+                TryOpenFiles(args);
 
             ActiveControl = TheEditor?.ActiveControl;
         }

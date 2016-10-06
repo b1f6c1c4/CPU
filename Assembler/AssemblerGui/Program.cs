@@ -12,13 +12,13 @@ namespace AssemblerGui
         ///     应用程序的主入口点。
         /// </summary>
         [STAThread]
-        private static void Main()
+        private static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             try
             {
-                Application.Run(new FrmMain());
+                Application.Run(new FrmMain(args));
             }
             catch (Exception e)
             {
