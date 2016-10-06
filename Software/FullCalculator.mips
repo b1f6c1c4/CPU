@@ -503,7 +503,7 @@ FATAL:
     PUSH R0
     CALL WriteExternal
     POP  R0
-    ADDI R0, R1, 0x0a   ; 'n'
+    ADDI R0, R1, 0x0a   ; '\n'
     PUSH R0
     CALL WriteExternal
     POP  R0

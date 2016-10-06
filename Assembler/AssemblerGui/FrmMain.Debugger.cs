@@ -79,6 +79,7 @@ namespace AssemblerGui
         private void StartDebugger()
         {
             m_RawDebugger = new AsmDebugger(m_BreakPoints);
+            SetFrontend(m_RawDebugger);
 
             var pre = SaveDependency(TheEditor.FilePath);
             try

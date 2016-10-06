@@ -125,10 +125,7 @@ namespace AssemblerGui
                 using (var sw = new StreamWriter(mem))
                 {
                     asm.SetWriter(sw);
-                    if (Settings.Default.EnableExtension)
-                        asm.Frontend = new AntlrExtendedFrontend();
-                    else
-                        asm.Frontend = new AntlrStandardFrontend();
+                    SetFrontend(asm);
                     try
                     {
                         foreach (var p in pre)
@@ -171,6 +168,14 @@ namespace AssemblerGui
                 MessageBox.Show(e.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+        }
+
+        private static void SetFrontend(AsmProgBase asm)
+        {
+            if (Settings.Default.EnableExtension)
+                asm.Frontend = new AntlrExtendedFrontend();
+            else
+                asm.Frontend = new AntlrStandardFrontend();
         }
 
         private Preprocessor SaveDependency()
@@ -217,10 +222,7 @@ namespace AssemblerGui
                 using (var sw = new StreamWriter(mem))
                 {
                     asm.SetWriter(sw);
-                    if (Settings.Default.EnableExtension)
-                        asm.Frontend = new AntlrExtendedFrontend();
-                    else
-                        asm.Frontend = new AntlrStandardFrontend();
+                    SetFrontend(asm);
                     try
                     {
                         asm.Feed(tmp, false);

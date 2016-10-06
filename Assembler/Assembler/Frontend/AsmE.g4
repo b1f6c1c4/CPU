@@ -38,7 +38,7 @@ typeJ
 
 typeP
 	: Op=(LPCL | LPCH) Rt=Register
-	| Op=SPC Rd=Register ',' Rt=Register
+	| Op=SPC Rd=Register ','? Rt=Register
 	;
 
 macro

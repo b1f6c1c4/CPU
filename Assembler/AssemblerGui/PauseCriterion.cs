@@ -50,7 +50,7 @@ namespace AssemblerGui
             }
 
             var l = pos.Line + 1;
-            while (lines[pos.Line - 1].TrimStart().StartsWith(";", true, CultureInfo.InvariantCulture))
+            while (lines[l - 1].TrimStart().StartsWith(";", true, CultureInfo.InvariantCulture))
                 l++;
 
             m_Pos = new SourcePosition(pos.FilePath, l);
