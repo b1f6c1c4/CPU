@@ -35,6 +35,9 @@
   <PropertyGroup>
     <ApplicationIcon>Logo.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Markdown, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1b320cc08ad5aa89, processorArchitecture=MSIL">
       <HintPath>..\packages\Markdown.2.2.0\lib\net451\Markdown.dll</HintPath>
@@ -133,7 +136,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll $(TargetDir)Markdown.dll $(TargetDir)WeifenLuo.WinFormsUI.Docking.dll</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1" /out:$(SolutionDir)..\AssemblerGui.exe $(TargetPath) $(TargetDir)Antlr4.Runtime.dll $(TargetDir)Assembler.dll $(TargetDir)ScintillaNET.dll $(TargetDir)Markdown.dll $(TargetDir)WeifenLuo.WinFormsUI.Docking.dll &amp;&amp; "C:\Program Files (x86)\Windows Kits\8.1\bin\x86\signtool.exe" sign /a $(SolutionDir)..\AssemblerGui.exe</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
