@@ -312,7 +312,7 @@ namespace AssemblerGui
 
         public bool PromptSaveAs()
         {
-            var res = FrmMain.PromptSaveDialog("mips", "MIPS文件", "另存为", FileName);
+            var res = FrmMain.PromptSaveDialog("mips", "MIPS文件", "另存为", FileName, false);
             if (res == null)
                 return false;
 

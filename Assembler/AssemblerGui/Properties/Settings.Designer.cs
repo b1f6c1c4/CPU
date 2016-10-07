@@ -93,5 +93,29 @@ namespace AssemblerGui.Properties {
                 this["Files"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SourcePath {
+            get {
+                return ((string)(this["SourcePath"]));
+            }
+            set {
+                this["SourcePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExportPath {
+            get {
+                return ((string)(this["ExportPath"]));
+            }
+            set {
+                this["ExportPath"] = value;
+            }
+        }
     }
 }

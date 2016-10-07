@@ -115,8 +115,9 @@ namespace AssemblerGui
             Text = sb.ToString();
         }
 
-        public static string PromptSaveDialog(string ext, string desc, string title, string fileName)
+        public static string PromptSaveDialog(string ext, string desc, string title, string fileName, bool isExport)
         {
+            var defPath = isExport ? Settings.Default.ExportPath : Settings.Default.SourcePath;
             var dialog =
                 new SaveFileDialog
                     {
@@ -128,10 +129,23 @@ namespace AssemblerGui
                         DefaultExt = ext,
                         Filter = $"{desc} (*.{ext})|*.{ext}|所有文件 (*)|*",
                         FileName = fileName,
-                        Title = title
+                        Title = title,
+                        InitialDirectory = !string.IsNullOrEmpty(defPath)
+                                               ? defPath
+                                               : AppDomain.CurrentDomain.BaseDirectory
                     };
+
             var res = dialog.ShowDialog();
-            return res == DialogResult.Cancel ? null : dialog.FileName;
+            if (res == DialogResult.Cancel)
+                return null;
+
+            if (isExport)
+                Settings.Default.ExportPath = Path.GetDirectoryName(dialog.FileName);
+            else
+                Settings.Default.SourcePath = Path.GetDirectoryName(dialog.FileName);
+            Settings.Default.Save();
+
+            return dialog.FileName;
         }
 
         private bool ExportFile<T>(T asm, Func<string> prompt, bool open = true)
@@ -349,16 +363,24 @@ namespace AssemblerGui
         }
 
         private void intelHex文件ToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new IntelAssembler(), () => PromptSaveDialog("hex", "Intel Hex文件", "导出", TheEditor.FileName));
+            ExportFile(
+                       new IntelAssembler(),
+                       () => PromptSaveDialog("hex", "Intel Hex文件", "导出", TheEditor.FileName, true));
 
         private void 二进制机器码BToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new BinAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
+            ExportFile(
+                       new BinAssembler(),
+                       () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName, true));
 
         private void 十六进制机器码HToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new HexAssembler(), () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName));
+            ExportFile(
+                       new HexAssembler(),
+                       () => PromptSaveDialog("txt", "纯文本文件", "导出", TheEditor.FileName, true));
 
         private void 原始汇编AToolStripMenuItem_Click(object sender, EventArgs e) =>
-            ExportFile(new AsmFinalPrettifier(), () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName));
+            ExportFile(
+                       new AsmFinalPrettifier(),
+                       () => PromptSaveDialog("mips", "MIPS文件", "导出", TheEditor.FileName, true));
 
         private void 格式化代码FToolStripMenuItem_Click(object sender, EventArgs e) => Cycle(new AsmPrettifier());
 

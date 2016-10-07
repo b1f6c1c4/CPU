@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using AssemblerGui.Properties;
@@ -27,12 +28,18 @@ namespace AssemblerGui
                         Multiselect = true,
                         DefaultExt = "mips",
                         Filter = "MIPS文件 (*.mips)|*.mips|所有文件 (*)|*",
-                        Title = "打开"
+                        Title = "打开",
+                        InitialDirectory = !string.IsNullOrEmpty(Settings.Default.SourcePath)
+                                               ? Settings.Default.SourcePath
+                                               : AppDomain.CurrentDomain.BaseDirectory
                     };
+
             var res = dialog.ShowDialog();
             if (res == DialogResult.Cancel)
                 return null;
 
+            Settings.Default.SourcePath = Path.GetDirectoryName(dialog.FileName);
+            Settings.Default.Save();
             return dialog.FileNames;
         }
 
