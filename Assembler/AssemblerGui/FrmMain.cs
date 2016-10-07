@@ -27,6 +27,7 @@ namespace AssemblerGui
         {
             SetProcessDPIAware();
             InitializeComponent();
+            Icon = Resources.Logo;
 
             启用长跳转LToolStripMenuItem.Checked = Settings.Default.EnableLongJump;
             启用扩展指令EToolStripMenuItem.Checked = Settings.Default.EnableExtension;
@@ -76,7 +77,8 @@ namespace AssemblerGui
         {
             Setup();
 
-            if (args == null || !args.Any())
+            if (args == null ||
+                !args.Any())
                 LoadLastFiles();
             else
                 TryOpenFiles(args);

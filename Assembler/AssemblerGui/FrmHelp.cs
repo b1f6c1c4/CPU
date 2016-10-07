@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using AssemblerGui.Properties;
 using HeyRed.MarkdownSharp;
 
 namespace AssemblerGui
@@ -25,6 +26,7 @@ namespace AssemblerGui
         private FrmHelp()
         {
             InitializeComponent();
+            Icon = Resources.Logo;
 
             try
             {
