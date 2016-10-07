@@ -78,10 +78,12 @@ namespace AssemblerGui
 
         private void StartDebugger()
         {
+            var pre = SaveDependency();
+            if (pre == null)
+                return;
+
             m_RawDebugger = new AsmDebugger(m_BreakPoints);
             SetFrontend(m_RawDebugger);
-
-            var pre = SaveDependency(TheEditor.FilePath);
             try
             {
                 foreach (var p in pre)
@@ -190,8 +192,6 @@ namespace AssemblerGui
         {
             if (m_Debugger == null)
             {
-                SaveDependency(TheEditor.FilePath);
-
                 StartDebugger();
 
                 if (m_Debugger == null)
