@@ -1,4 +1,4 @@
-; REQUIRE: FATAL
+    ; REQUIRE: FATAL
     ;include Stack.mips
     ; Digit_EXPEVA: Push one digit or create number
     ; arg[0]: digit

@@ -52,7 +52,7 @@ flush_Operator_EXPEVA:
     BNE  R0, R2, compare_Operator_EXPEVA
     LW   R0, R3, 0x00
     ADDI R2, R1, 0x0c   ; Right Parenthesis
-    BEQ  R0, R2, fail_Operator_EXPEVA
+    BEQ  R0, R2, fatal_operator
     ADDI R2, R1, 0x0f   ; OK
     BNE  R0, R2, push_op_Operator_EXPEVA
     ANDI R1, R1, 0x00
@@ -61,6 +61,7 @@ flush_Operator_EXPEVA:
     ADDI R3, R1, 0x50
     SLT  R0, R3, R0
     BEQ  R0, R1, ok_OK_Operator_EXPEVA
+fatal_operator:
     JMP  FATAL
 push_op_Operator_EXPEVA:
     CALL Push_operator_EXPEVA
@@ -99,8 +100,5 @@ evaluate_Operator_EXPEVA:
     POP  R0
     CALL Pop_operator_EXPEVA
     JMP  flush_Operator_EXPEVA
-fail_Operator_EXPEVA:
-    ANDI R0, R0, 0x00
-    ADDI R0, R0, 0x01
 done_Operator_EXPEVA:
     RET
